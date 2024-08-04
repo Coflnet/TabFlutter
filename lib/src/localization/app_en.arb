@@ -1,0 +1,6 @@
+{
+  "appTitle": "table_entry",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
