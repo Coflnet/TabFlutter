@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 class Background extends StatelessWidget {
   const Background({Key? key}) : super(key: key);
@@ -6,14 +7,11 @@ class Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             gradient: LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [
-        Color.fromRGBO(21, 31, 51, 1),
-        Color.fromRGBO(21, 31, 51, 1),
-      ],
+      colors: [HexColor("12131d"), HexColor("12131d")],
     )));
   }
 }

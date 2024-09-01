@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
@@ -19,20 +20,20 @@ class _StartStopDetectionState extends State<StartStopDetection> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.bottomCenter,
+      alignment: Alignment.bottomRight,
       child: Container(
-        margin: EdgeInsets.only(bottom: 70),
+        margin: const EdgeInsets.fromLTRB(0, 0, 13, 85),
         child: TextButton(
             onPressed: () {},
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: Colors.blueGrey,
-                  borderRadius: BorderRadius.circular(80)),
+                  color: HexColor("#8332AC"),
+                  borderRadius: BorderRadius.circular(16)),
               child: const Icon(
                 Icons.mic,
-                color: Colors.grey,
-                size: 50,
+                color: Colors.white70,
+                size: 40,
               ),
             )),
       ),
