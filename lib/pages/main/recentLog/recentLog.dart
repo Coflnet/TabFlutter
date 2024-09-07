@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogColumn.dart';
 
 class RecentLog extends StatefulWidget {
@@ -13,7 +15,9 @@ class _RecentLogState extends State<RecentLog> {
   Widget build(BuildContext context) {
     return const Column(
       children: <Widget>[
+        SizedBox(height: 8),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
               "Recent Log",
@@ -21,9 +25,10 @@ class _RecentLogState extends State<RecentLog> {
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                   fontSize: 23),
-            )
+            ),
           ],
         ),
+        SizedBox(height: 7),
         Expanded(child: RecentLogColumn())
       ],
     );

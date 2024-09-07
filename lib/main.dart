@@ -16,6 +16,8 @@ import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarBrightness: Brightness.light,

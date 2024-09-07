@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-class MainPageHeader extends StatelessWidget {
-  const MainPageHeader({Key? key}) : super(key: key);
+class ColumnSettingsHeader extends StatelessWidget {
+  const ColumnSettingsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
+      children: <Widget>[
         const Text(
-          "Home",
+          "Columns",
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w600, fontSize: 30),
+              color: Colors.white, fontWeight: FontWeight.w500, fontSize: 23),
         ),
         TextButton(
             style: TextButton.styleFrom(
@@ -26,9 +26,9 @@ class MainPageHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(60),
               ),
               child: HugeIcon(
-                icon: Icons.more_vert,
+                icon: Icons.add,
                 color: Colors.grey.shade200,
-                size: 40,
+                size: 35,
               ),
             ))
       ],

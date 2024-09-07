@@ -23,7 +23,6 @@ class CurrentStatusVisulization extends StatefulWidget {
 class _CurrentStatusVisulizationState extends State<CurrentStatusVisulization> {
   Stream<List<int>>? micStream;
   double soundLevel = 0;
-  late final RecorderController controller;
   List inputNumbers = [];
 
   Timer? timer;
@@ -31,7 +30,8 @@ class _CurrentStatusVisulizationState extends State<CurrentStatusVisulization> {
   @override
   void initState() {
     super.initState();
-    controller = RecorderController();
+    return;
+    //controller = RecorderController();
     listenToAudio();
     timer = Timer.periodic(const Duration(milliseconds: 130), addNewInputNum);
   }
@@ -39,7 +39,7 @@ class _CurrentStatusVisulizationState extends State<CurrentStatusVisulization> {
   @override
   void dispose() {
     super.dispose();
-    controller.dispose();
+    //controller.dispose();
   }
 
   void listenToAudio() {

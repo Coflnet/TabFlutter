@@ -11,10 +11,12 @@ environment:
 
 dependencies:
   audio_waveforms: ^1.0.5
+  dropdown_button2: ^2.3.9
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  haptic_feedback: ^0.5.1+1
   hexcolor: ^3.0.1
   hugeicons: ^0.0.7
   mic_stream: ^0.7.1+2

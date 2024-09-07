@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/pages/settings/settingsMain.dart';
 
 class FooterButtons extends StatelessWidget {
   final IconData pickedIcon;
   final String text;
   final int selectedPageNum;
   final int wantedPageNum;
+  final Widget scene;
   const FooterButtons(
       {super.key,
       required this.pickedIcon,
       required this.text,
       required this.selectedPageNum,
-      required this.wantedPageNum});
+      required this.wantedPageNum,
+      required this.scene});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,7 @@ class FooterButtons extends StatelessWidget {
       children: [
         IconButton(
             style: IconButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () {},
+            onPressed: () => {changeScene(scene, context)},
             icon: Icon(
               pickedIcon,
               size: 35,
@@ -42,5 +46,18 @@ class FooterButtons extends StatelessWidget {
         )
       ],
     );
+  }
+
+  void changeScene(Widget changeToPage, context) {
+    Haptics.vibrate(HapticsType.medium);
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => changeToPage,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child;
+          },
+          transitionDuration: const Duration(milliseconds: 0),
+        ));
   }
 }
