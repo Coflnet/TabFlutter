@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recognizedData.dart';
@@ -35,6 +36,16 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    SaveColumn().loadColumns();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

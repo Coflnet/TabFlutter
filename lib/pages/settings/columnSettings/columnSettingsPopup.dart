@@ -1,11 +1,19 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/columnNameOption.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/paramOptionsMaim.dart';
 
 class ColumnSettingsPopup extends StatefulWidget {
-  const ColumnSettingsPopup({Key? key}) : super(key: key);
+  final bool isShowing;
+  final VoidCallback closePopup;
+
+  const ColumnSettingsPopup(
+      {super.key, required this.isShowing, required this.closePopup});
 
   @override
   _ColumnSettingsPopupState createState() => _ColumnSettingsPopupState();
@@ -13,6 +21,16 @@ class ColumnSettingsPopup extends StatefulWidget {
 
 class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
   Map filledIn = {"ColName": false, "paramsFilledIn": false};
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void sendUpdate() async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    popupNotifyer().sendUpdate();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,20 +42,26 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
         height: 400,
         child: Column(
           children: [
-            const Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 16),
-                    ColumnNameOption(),
-                    ParamOptionsMaim()
-                  ],
+            ChangeNotifierProvider(
+              create: (context) => popupNotifyer(),
+              child: const Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 16),
+                      ColumnNameOption(),
+                      ParamOptionsMaim()
+                    ],
+                  ),
                 ),
               ),
             ),
             TextButton(
-                onPressed: () {},
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () {
+                  print(EditingColumns().getEditingCol.toString());
+                },
                 child: Container(
                   alignment: Alignment.center,
                   height: 30,

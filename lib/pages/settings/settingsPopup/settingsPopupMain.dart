@@ -5,7 +5,10 @@ import 'package:table_entry/pages/settings/columnSettings/columnSettingsMain.dar
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsPopup.dart';
 
 class SettingsPopupMain extends StatefulWidget {
-  const SettingsPopupMain({Key? key}) : super(key: key);
+  final bool isShowing;
+  final VoidCallback closePopup;
+  const SettingsPopupMain(
+      {super.key, required this.isShowing, required this.closePopup});
 
   @override
   _SettingsPopupMainState createState() => _SettingsPopupMainState();
@@ -21,8 +24,11 @@ class _SettingsPopupMainState extends State<SettingsPopupMain> {
           width: double.infinity,
           height: double.infinity,
           color: Colors.black38,
-          child: const Center(
-            child: ColumnSettingsPopup(),
+          child: Center(
+            child: ColumnSettingsPopup(
+              isShowing: widget.isShowing,
+              closePopup: widget.closePopup,
+            ),
           ),
         ),
       ),

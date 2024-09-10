@@ -3,20 +3,21 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class RecentLogItemParam extends StatelessWidget {
-  const RecentLogItemParam({Key? key}) : super(key: key);
+  final List values;
+  const RecentLogItemParam({super.key, required this.values});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          "Honey",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          (values.isEmpty) ? "" : values[0],
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         Text(
-          "10kg",
-          style: TextStyle(color: Colors.white70, fontSize: 16),
+          (values.isEmpty) ? "" : "Yes",
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
         )
       ],
     );

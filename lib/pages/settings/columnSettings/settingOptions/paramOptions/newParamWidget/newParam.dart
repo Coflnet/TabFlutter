@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/globals/columns/editingColumns.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamNameType.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newlistParam/newListParamMain.dart';
 
 class NewParam extends StatefulWidget {
-  const NewParam({Key? key}) : super(key: key);
+  final int index;
+  final bool update;
+  const NewParam({
+    super.key,
+    required this.index,
+    required this.update,
+  });
 
   @override
   _NewParamState createState() => _NewParamState();
@@ -31,22 +38,34 @@ class _NewParamState extends State<NewParam>
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+    updateParamParams();
+  }
+
+  void updateParamParams() {
+    setState(() {
+      type = EditingColumns().getEditingCol.params[widget.index].type;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
         decoration: BoxDecoration(
             color: HexColor("23263E"), borderRadius: BorderRadius.circular(16)),
         child: Column(
           children: <Widget>[
-            NewParamNameType(updateType: changeType),
+            NewParamNameType(
+                updateType: changeType,
+                selectedValue: type,
+                index: widget.index),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: displayListType
                   ? SlideTransition(
-                      position: _offsetAnimation, child: NewListParamMain())
+                      position: _offsetAnimation,
+                      child: const NewListParamMain())
                   : const SizedBox.shrink(),
             ),
           ],
@@ -54,6 +73,7 @@ class _NewParamState extends State<NewParam>
   }
 
   void changeType(String newType) {
+    print(type);
     if (newType == "List") {
       setState(() {
         displayListType = true;
@@ -67,5 +87,6 @@ class _NewParamState extends State<NewParam>
       });
       _controller.reverse();
     }
+    print(type);
   }
 }

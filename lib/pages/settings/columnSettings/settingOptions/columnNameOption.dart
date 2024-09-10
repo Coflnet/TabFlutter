@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
+import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
+import 'package:table_entry/pages/settings/columnSettings/emojiPopup/columnEmojiPopup.dart';
 
 class ColumnNameOption extends StatefulWidget {
   const ColumnNameOption({Key? key}) : super(key: key);
@@ -10,53 +15,70 @@ class ColumnNameOption extends StatefulWidget {
 
 class _ColumnNameOptionState extends State<ColumnNameOption> {
   bool isCompleted = false;
+  late TextEditingController controller;
+  String displayedName = "";
+
+  void reactToNotifer() {
+    controller.text = EditingColumns().getEditingCol.name;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController(text: "");
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                "Name",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.fromLTRB(6, 3, 3, 6),
-                decoration: BoxDecoration(
-                    color: HexColor("23263E"),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const TextField(
-                  decoration: InputDecoration.collapsed(
-                    hintStyle: const TextStyle(color: Colors.white30),
-                    hintText: "Column Name",
-                    border: InputBorder.none,
+    return Consumer<popupNotifyer>(
+      builder: (context, value, child) {
+        reactToNotifer();
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const Text(
+                    "Name",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700),
                   ),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700),
-                ),
-              )
-            ],
-          ),
-        ),
-        Icon(
-          isCompleted
-              ? Icons.check_box_rounded
-              : Icons.check_box_outline_blank_rounded,
-          size: 36,
-          color: isCompleted ? Colors.green.shade300 : Colors.grey,
-        ),
-        const SizedBox(width: 3.5)
-      ],
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(6, 3, 3, 6),
+                    decoration: BoxDecoration(
+                        color: HexColor("23263E"),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: TextField(
+                      controller: controller,
+                      onChanged: updateText,
+                      decoration: const InputDecoration.collapsed(
+                        hintStyle: TextStyle(color: Colors.white30),
+                        hintText: "Column Name",
+                        border: InputBorder.none,
+                      ),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            ColumnEmojiPopup(),
+            const SizedBox(width: 3.5)
+          ],
+        );
+      },
     );
+  }
+
+  void updateText(String newText) {
+    EditingColumns().updateName(newText);
   }
 }

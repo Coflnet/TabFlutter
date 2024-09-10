@@ -3,7 +3,8 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class ColumnSettingsHeader extends StatelessWidget {
-  const ColumnSettingsHeader({super.key});
+  final VoidCallback addNewColl;
+  const ColumnSettingsHeader({super.key, required this.addNewColl});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class ColumnSettingsHeader extends StatelessWidget {
         TextButton(
             style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 4)),
-            onPressed: () {},
+            onPressed: addNewColl,
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(

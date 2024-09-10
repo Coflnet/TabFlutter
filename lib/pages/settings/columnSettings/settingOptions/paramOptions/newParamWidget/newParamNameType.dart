@@ -6,14 +6,21 @@ import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOp
 
 class NewParamNameType extends StatefulWidget {
   final Function(String) updateType;
-  const NewParamNameType({super.key, required this.updateType});
+  final int index;
+  final String selectedValue;
+
+  const NewParamNameType({
+    super.key,
+    required this.updateType,
+    required this.selectedValue,
+    required this.index,
+  });
 
   @override
   _NewParamNameTypeState createState() => _NewParamNameTypeState();
 }
 
 class _NewParamNameTypeState extends State<NewParamNameType> {
-  String selectedValue = "String";
   final List<String> items = ["String", "0/10", "List"];
 
   @override
@@ -21,7 +28,7 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        NewParamNameOption(),
+        NewParamNameOption(index: widget.index),
         Expanded(
           child: Column(
             children: <Widget>[
@@ -66,13 +73,9 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
                               ),
                             ))
                         .toList(),
-                    value: selectedValue,
-                    onChanged: (value) => {
-                      setState(() {
-                        selectedValue = value ?? "";
-                      }),
-                      widget.updateType(selectedValue)
-                    },
+                    value: widget.selectedValue,
+                    onChanged: (value) =>
+                        {widget.updateType(value ?? widget.selectedValue)},
                   )))
             ],
           ),

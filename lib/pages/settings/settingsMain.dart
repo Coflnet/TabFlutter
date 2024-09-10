@@ -5,8 +5,15 @@ import 'package:table_entry/pages/settings/columnSettings/columnSettingsMain.dar
 import 'package:table_entry/pages/settings/settingsHeader.dart';
 import 'package:table_entry/pages/settings/settingsPopup/settingsPopupMain.dart';
 
-class SettingsMain extends StatelessWidget {
-  const SettingsMain({super.key});
+class SettingsMain extends StatefulWidget {
+  const SettingsMain({Key? key}) : super(key: key);
+
+  @override
+  _SettingsMainState createState() => _SettingsMainState();
+}
+
+class _SettingsMainState extends State<SettingsMain> {
+  bool popupVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +25,28 @@ class SettingsMain extends StatelessWidget {
             const Background(),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
-              child: const Column(
+              child: Column(
                 children: <Widget>[
-                  SettingsHeader(),
-                  SizedBox(height: 20),
-                  ColumnSettingsMain(),
+                  const SettingsHeader(),
+                  const SizedBox(height: 20),
+                  ColumnSettingsMain(popup: popup),
                 ],
               ),
             ),
             const Footer(),
-            SettingsPopupMain()
+            Visibility(
+                visible: popupVisible,
+                child: SettingsPopupMain(
+                    isShowing: popupVisible, closePopup: popup))
           ],
         ),
       ),
     );
+  }
+
+  void popup() {
+    setState(() {
+      popupVisible = !popupVisible;
+    });
   }
 }

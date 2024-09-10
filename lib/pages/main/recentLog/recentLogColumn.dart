@@ -14,7 +14,7 @@ class _RecentLogColumnState extends State<RecentLogColumn> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        children: <Widget>[RecentLogItem(), RecentLogItem(), RecentLogItem()],
+        children: <Widget>[],
       ),
     );
   }

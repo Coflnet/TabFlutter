@@ -11,6 +11,7 @@ environment:
 
 dependencies:
   audio_waveforms: ^1.0.5
+  custom_pop_up_menu: ^1.2.4
   dropdown_button2: ^2.3.9
   flutter:
     sdk: flutter
