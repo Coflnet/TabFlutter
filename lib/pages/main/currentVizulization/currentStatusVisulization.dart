@@ -73,7 +73,6 @@ class _CurrentStatusVisulizationState extends State<CurrentStatusVisulization> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const SizedBox(height: 55),
             const MainPageHeader(),
             const SizedBox(height: 20),
             const CurrentStateHeader(),

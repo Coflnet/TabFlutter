@@ -19,32 +19,34 @@ class FooterButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-            style: IconButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () => {changeScene(scene, context)},
-            icon: Icon(
-              pickedIcon,
-              size: 35,
-              color: selectedPageNum == wantedPageNum
-                  ? HexColor("#8332AC")
-                  : Colors.white30,
-            )),
-        Transform.translate(
-          offset: const Offset(0, -6),
-          child: Text(
-            text,
-            style: TextStyle(
-                fontSize: 14,
-                color: selectedPageNum == wantedPageNum
-                    ? HexColor("#8332AC")
-                    : Colors.white30,
-                fontWeight: FontWeight.w700),
+    return TextButton(
+      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+      onPressed: () => {changeScene(scene, context)},
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 8),
+          Icon(
+            pickedIcon,
+            size: 35,
+            color: selectedPageNum == wantedPageNum
+                ? HexColor("#8332AC")
+                : Colors.white30,
           ),
-        )
-      ],
+          Transform.translate(
+            offset: const Offset(0, -3),
+            child: Text(
+              text,
+              style: TextStyle(
+                  fontSize: 14,
+                  color: selectedPageNum == wantedPageNum
+                      ? HexColor("#8332AC")
+                      : Colors.white30,
+                  fontWeight: FontWeight.w700),
+            ),
+          )
+        ],
+      ),
     );
   }
 

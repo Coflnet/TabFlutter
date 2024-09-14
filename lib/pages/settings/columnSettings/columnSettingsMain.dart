@@ -35,9 +35,15 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
             shrinkWrap: true,
             itemCount: createdColumns.length,
             itemBuilder: (context, index) {
-              return RecentLogItem(
-                name: createdColumns[index].name,
-                values: createdColumns[index].params,
+              return Container(
+                margin: EdgeInsets.only(bottom: 17),
+                child: RecentLogItem(
+                  name: createdColumns[index].name,
+                  values: createdColumns[index].params,
+                  settings: true,
+                  index: index,
+                  buttonClicked: editCollumnPressed,
+                ),
               );
             })
       ],
@@ -50,6 +56,10 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
           .add(EditingColumns().createNewCol("", createdColumns.length));
     });
     widget.popup();
-    print(createdColumns[0].params);
+  }
+
+  void editCollumnPressed(col collumnData) {
+    EditingColumns().setEditingCol = collumnData;
+    widget.popup();
   }
 }

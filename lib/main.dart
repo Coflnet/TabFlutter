@@ -9,9 +9,13 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/pages/main/currentVizulization/currentStateHeader.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
+import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recognizedData.dart';
+import 'package:table_entry/pages/main/selectedColumn/selectCollumnMain.dart';
+import 'package:table_entry/pages/main/selectedColumn/selectColumnSelector.dart';
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
@@ -53,7 +57,8 @@ class _MainState extends State<Main> {
       home: Scaffold(
         body: MultiProvider(
           providers: [
-            ChangeNotifierProvider(create: (_) => newVoiceDataNotifer())
+            ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
+            ChangeNotifierProvider(create: (_) => UpdateRecentLog())
           ],
           child: Stack(
             children: [
@@ -61,7 +66,9 @@ class _MainState extends State<Main> {
               const StartStopDetection(),
               Column(
                 children: <Widget>[
-                  const CurrentStatusVisulization(),
+                  const MainPageHeader(),
+                  const CurrentStateHeader(),
+                  const SelectCollumnMain(),
                   Expanded(
                     child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 24),

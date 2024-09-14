@@ -1,4 +1,5 @@
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 
 col editingCol =
     col(name: "", id: 1, emoji: "", params: [param(name: "", type: "")]);
@@ -33,10 +34,15 @@ class EditingColumns {
   }
 
   void updateListOption(int index, int listIndex, String value) {
-    editingCol.params[index].listOption[listIndex] = value;
+    editingCol.params[index].listOption?[listIndex] = value;
   }
 
-  void saveParam() {}
+  void saveCol() {
+    SaveColumn().saveColumn(editingCol.id, editingCol);
+  }
 
   col get getEditingCol => editingCol;
+  set setEditingCol(col value) {
+    editingCol = value;
+  }
 }

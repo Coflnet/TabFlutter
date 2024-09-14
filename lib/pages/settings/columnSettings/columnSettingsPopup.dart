@@ -60,7 +60,8 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
             TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
-                  print(EditingColumns().getEditingCol.toString());
+                  EditingColumns().saveCol();
+                  widget.closePopup();
                 },
                 child: Container(
                   alignment: Alignment.center,

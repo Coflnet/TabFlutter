@@ -6,7 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
+import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 
 class StartStopDetection extends StatefulWidget {
   const StartStopDetection({Key? key}) : super(key: key);
@@ -19,6 +22,7 @@ class _StartStopDetectionState extends State<StartStopDetection> {
   SpeechToText speech = SpeechToText();
   double level = 0.0;
   bool isRunning = false;
+  String recordedData = "";
 
   @override
   void initState() {
@@ -60,6 +64,8 @@ class _StartStopDetectionState extends State<StartStopDetection> {
     });
     if (!isRunning) {
       speech.stop();
+      RecentLogRequest()
+          .request(recordedData, RecentLogHandler().getCurrentSelected);
       return;
     }
     startListening();
@@ -70,13 +76,13 @@ class _StartStopDetectionState extends State<StartStopDetection> {
         onDevice: SpeachSettingsRetrevial().get_onDevice,
         listenMode: ListenMode.dictation,
         cancelOnError: true,
-        partialResults: false,
+        partialResults: true,
         autoPunctuation: true,
         enableHapticFeedback: true);
     speech.listen(
       onResult: onResult,
       listenFor: const Duration(seconds: 3000),
-      pauseFor: const Duration(seconds: 10),
+      pauseFor: const Duration(seconds: 40),
       localeId: SpeachSettingsRetrevial().getCurrentLocaleId,
       onSoundLevelChange: soundLevelListener,
       listenOptions: options,
@@ -85,10 +91,11 @@ class _StartStopDetectionState extends State<StartStopDetection> {
   }
 
   void onResult(SpeechRecognitionResult result) {
-    if (result.recognizedWords.length < 20) {
-      return;
+    if (result.finalResult) {
+      setState(() {
+        recordedData = "$recordedData ${result.recognizedWords}";
+      });
     }
-    print(result.recognizedWords.length);
   }
 
   void soundLevelListener(double level) {

@@ -19,11 +19,13 @@ dependencies:
     sdk: flutter
   haptic_feedback: ^0.5.1+1
   hexcolor: ^3.0.1
+  http: ^1.2.2
   hugeicons: ^0.0.7
   mic_stream: ^0.7.1+2
   noise_meter: ^5.0.2
   path_provider: ^2.1.4
   provider: ^6.1.2
+  scroll_snap_list: ^0.9.1
   speech_to_text: ^6.6.2
   waveform_flutter: ^1.0.1
 

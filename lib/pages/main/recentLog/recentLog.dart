@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:provider/provider.dart';
+import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogColumn.dart';
+
+class UpdateRecentLog extends ChangeNotifier {
+  late _RecentLogState lbState;
+
+  void setPageState(_RecentLogState state) {
+    lbState = state;
+  }
+
+  void recentLogUpdate() {
+    lbState.recentLogUpdate();
+  }
+}
 
 class RecentLog extends StatefulWidget {
   const RecentLog({Key? key}) : super(key: key);
@@ -11,12 +25,16 @@ class RecentLog extends StatefulWidget {
 }
 
 class _RecentLogState extends State<RecentLog> {
+  List<col> recentLogItems = [];
+  void recentLogUpdate() {}
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    Provider.of<UpdateRecentLog>(context, listen: false).setPageState(this);
+
+    return Column(
       children: <Widget>[
-        SizedBox(height: 8),
-        Row(
+        const SizedBox(height: 8),
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
@@ -28,8 +46,8 @@ class _RecentLogState extends State<RecentLog> {
             ),
           ],
         ),
-        SizedBox(height: 7),
-        Expanded(child: RecentLogColumn())
+        const SizedBox(height: 7),
+        Expanded(child: RecentLogColumn(recentLog: recentLogItems))
       ],
     );
   }

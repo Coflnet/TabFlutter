@@ -8,8 +8,11 @@ List<col> collumns = [];
 
 class SaveColumn {
   void loadColumns() async {
+    if (collumns.isNotEmpty) {
+      return;
+    }
     Directory appDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDir.path}/savedColumns.json";
+    String filePath = "${appDir.path}/savedColumn.json";
     File file = File(filePath);
     if (!file.existsSync()) {
       await createFile(file);
@@ -17,7 +20,10 @@ class SaveColumn {
 
     var fileDataJson = file.readAsStringSync();
     var fileData = jsonDecode(fileDataJson);
-    print(fileData);
+    for (var element in fileData["columns"]) {
+      collumns.add(col.fromJson(element));
+    }
+    print(collumns);
   }
 
   Future<void> createFile(file) async {
@@ -41,14 +47,18 @@ class SaveColumn {
   }
 
   void saveFile() async {
+    List savingColumns = [];
     Directory appDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDir.path}/itemDetails.json";
+    for (var i in collumns) {
+      savingColumns.add(i.toJson());
+    }
+    String filePath = "${appDir.path}/savedColumn.json";
     File file = File(filePath);
-    var fileData = {"columns": collumns};
+    var fileData = {"columns": savingColumns};
 
     var fileDataJson = jsonEncode(fileData);
     file.writeAsString(fileDataJson);
   }
 
-  get getColumns => collumns;
+  List<col> get getColumns => collumns;
 }

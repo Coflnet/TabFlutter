@@ -7,30 +7,25 @@ class MainPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
       children: [
-        const Text(
-          "Home",
-          style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w600, fontSize: 30),
+        const SizedBox(height: 55),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 24),
+              child: const Text(
+                "Home",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 30),
+              ),
+            ),
+          ],
         ),
-        TextButton(
-            style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 4)),
-            onPressed: () {},
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: HexColor("1E202E"),
-                borderRadius: BorderRadius.circular(60),
-              ),
-              child: HugeIcon(
-                icon: Icons.more_vert,
-                color: Colors.grey.shade200,
-                size: 40,
-              ),
-            ))
+        const SizedBox(height: 30)
       ],
     );
   }

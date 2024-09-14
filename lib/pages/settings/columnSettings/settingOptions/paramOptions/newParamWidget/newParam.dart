@@ -73,7 +73,7 @@ class _NewParamState extends State<NewParam>
   }
 
   void changeType(String newType) {
-    print(type);
+    EditingColumns().updateParam(widget.index, "type", newType);
     if (newType == "List") {
       setState(() {
         displayListType = true;
@@ -87,6 +87,5 @@ class _NewParamState extends State<NewParam>
       });
       _controller.reverse();
     }
-    print(type);
   }
 }
