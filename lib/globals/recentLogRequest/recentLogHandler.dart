@@ -22,8 +22,8 @@ class RecentLogHandler {
     print(fileData);
   }
 
-  void addRecentLog(col recentLogCol) {
-    recentLog.add(recentLogCol);
+  void addRecentLog(List<col> recentLogCol) {
+    recentLog.addAll(recentLogCol);
     saveFile();
   }
 
@@ -50,4 +50,5 @@ class RecentLogHandler {
 
   col get getCurrentSelected => currentSelected;
   set setCurrentSelected(col value) => currentSelected = value;
+  List<col> get getRecentLog => recentLog;
 }

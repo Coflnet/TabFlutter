@@ -23,6 +23,7 @@ class _NewParamState extends State<NewParam>
   bool displayListType = false;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  late TextEditingController controller;
 
   @override
   void initState() {

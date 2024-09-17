@@ -51,6 +51,7 @@ class param {
         listOption = listOption ?? [];
 
   void operator []=(String key, dynamic value) {
+    svalue = "$value";
     switch (key) {
       case "name":
         name = value;
@@ -70,14 +71,15 @@ class param {
       'name': name,
       'type': type,
       'listOption': listOption,
+      'svalue': svalue
     };
   }
 
   factory param.fromJson(Map<String, dynamic> json) {
     return param(
-      name: json['name'],
-      type: json['type'],
-      listOption: json['listOption'] ?? [],
-    );
+        name: json['name'],
+        type: json['type'],
+        listOption: json['listOption'] ?? [],
+        svalue: json["svalue"] ?? "");
   }
 }

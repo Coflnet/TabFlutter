@@ -36,7 +36,7 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
             itemCount: createdColumns.length,
             itemBuilder: (context, index) {
               return Container(
-                margin: EdgeInsets.only(bottom: 17),
+                margin: const EdgeInsets.only(bottom: 17),
                 child: RecentLogItem(
                   name: createdColumns[index].name,
                   values: createdColumns[index].params,

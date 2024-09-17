@@ -3,6 +3,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogColumn.dart';
 
 class UpdateRecentLog extends ChangeNotifier {
@@ -26,7 +27,12 @@ class RecentLog extends StatefulWidget {
 
 class _RecentLogState extends State<RecentLog> {
   List<col> recentLogItems = [];
-  void recentLogUpdate() {}
+  void recentLogUpdate() {
+    setState(() {
+      recentLogItems = RecentLogHandler().getRecentLog;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<UpdateRecentLog>(context, listen: false).setPageState(this);
@@ -47,7 +53,8 @@ class _RecentLogState extends State<RecentLog> {
           ],
         ),
         const SizedBox(height: 7),
-        Expanded(child: RecentLogColumn(recentLog: recentLogItems))
+        Expanded(child: RecentLogColumn(recentLog: recentLogItems)),
+        const SizedBox(height: 77)
       ],
     );
   }

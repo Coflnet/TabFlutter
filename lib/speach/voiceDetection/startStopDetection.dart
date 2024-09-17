@@ -4,8 +4,10 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
@@ -58,14 +60,19 @@ class _StartStopDetectionState extends State<StartStopDetection> {
     );
   }
 
-  void startStopListening() {
+  void startStopListening() async {
+    print("i");
     setState(() {
       isRunning = !isRunning;
     });
     if (!isRunning) {
       speech.stop();
-      RecentLogRequest()
+      List<col> newRecentCol = await RecentLogRequest()
           .request(recordedData, RecentLogHandler().getCurrentSelected);
+      if (context.mounted) {
+        Provider.of<UpdateRecentLog>(context, listen: false).recentLogUpdate();
+      }
+
       return;
     }
     startListening();
@@ -76,7 +83,7 @@ class _StartStopDetectionState extends State<StartStopDetection> {
         onDevice: SpeachSettingsRetrevial().get_onDevice,
         listenMode: ListenMode.dictation,
         cancelOnError: true,
-        partialResults: true,
+        partialResults: false,
         autoPunctuation: true,
         enableHapticFeedback: true);
     speech.listen(

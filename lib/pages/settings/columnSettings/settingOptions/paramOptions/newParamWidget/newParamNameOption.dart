@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
@@ -52,8 +53,14 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
                   color: HexColor("2A2D54"),
                   borderRadius: BorderRadius.circular(8)),
               child: TextField(
+                maxLengthEnforcement:
+                    MaxLengthEnforcement.truncateAfterCompositionEnds,
+                maxLength: 8,
                 controller: controller,
-                decoration: const InputDecoration.collapsed(
+                decoration: const InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                  counterText: "",
                   hintStyle: TextStyle(color: Colors.white30),
                   hintText: "Set name",
                 ),

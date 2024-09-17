@@ -54,12 +54,15 @@ class _ColumnNameOptionState extends State<ColumnNameOption> {
                         color: HexColor("23263E"),
                         borderRadius: BorderRadius.circular(8)),
                     child: TextField(
+                      maxLength: 8,
                       controller: controller,
                       onChanged: updateText,
-                      decoration: const InputDecoration.collapsed(
-                        hintStyle: TextStyle(color: Colors.white30),
-                        hintText: "Column Name",
+                      decoration: const InputDecoration(
+                        isCollapsed: true,
                         border: InputBorder.none,
+                        counterText: "",
+                        hintStyle: TextStyle(color: Colors.white30),
+                        hintText: "Table Name",
                       ),
                       style: const TextStyle(
                           color: Colors.white,

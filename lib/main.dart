@@ -9,6 +9,7 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStateHeader.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
@@ -48,6 +49,7 @@ class _MainState extends State<Main> {
 
   void loadData() async {
     SaveColumn().loadColumns();
+    RecentLogHandler().loadRecentLog();
   }
 
   @override
@@ -63,7 +65,6 @@ class _MainState extends State<Main> {
           child: Stack(
             children: [
               const Background(),
-              const StartStopDetection(),
               Column(
                 children: <Widget>[
                   const MainPageHeader(),
@@ -76,7 +77,8 @@ class _MainState extends State<Main> {
                   )
                 ],
               ),
-              const Footer()
+              const Footer(),
+              const StartStopDetection(),
             ],
           ),
         ),
