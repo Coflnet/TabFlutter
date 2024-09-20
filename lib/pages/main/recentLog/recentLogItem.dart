@@ -29,7 +29,6 @@ class _RecentLogItemState extends State<RecentLogItem> {
   @override
   void initState() {
     super.initState();
-    print(widget.values[0]);
   }
 
   @override
@@ -56,7 +55,7 @@ class _RecentLogItemState extends State<RecentLogItem> {
                     values: (widget.values.length == 2)
                         ? [widget.values[1].name, widget.values[1]]
                         : []),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
               ],
             ),
           ),

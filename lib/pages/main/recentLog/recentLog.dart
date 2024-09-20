@@ -34,22 +34,54 @@ class _RecentLogState extends State<RecentLog> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    setState(() {
+      recentLogItems = RecentLogHandler().getRecentLog;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     Provider.of<UpdateRecentLog>(context, listen: false).setPageState(this);
 
     return Column(
       children: <Widget>[
         const SizedBox(height: 8),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(
+            const Text(
               "Recent Log",
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                   fontSize: 23),
             ),
+            TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () => {
+                      RecentLogHandler().clear(),
+                      Provider.of<UpdateRecentLog>(context, listen: false)
+                          .recentLogUpdate()
+                    },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: HexColor("1E202E"),
+                    borderRadius: BorderRadius.circular(120),
+                  ),
+                  child: Icon(
+                    size: 27,
+                    HugeIcons.strokeRoundedDelete04,
+                    color: Colors.grey.shade200,
+                  ),
+                ))
           ],
         ),
         const SizedBox(height: 7),

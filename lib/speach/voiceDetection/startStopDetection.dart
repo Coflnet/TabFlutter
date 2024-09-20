@@ -33,8 +33,9 @@ class _StartStopDetectionState extends State<StartStopDetection> {
   }
 
   void initSpeach() {
-    speech.initialize(onStatus: statusListener);
-    setState(() {});
+    setState(() {
+      speech.initialize(onStatus: statusListener);
+    });
   }
 
   @override
@@ -61,7 +62,6 @@ class _StartStopDetectionState extends State<StartStopDetection> {
   }
 
   void startStopListening() async {
-    print("i");
     setState(() {
       isRunning = !isRunning;
     });
@@ -75,13 +75,20 @@ class _StartStopDetectionState extends State<StartStopDetection> {
 
       return;
     }
+
+    setState(() {
+      recordedData = "";
+    });
+
     startListening();
   }
 
   void startListening() {
+    speech.statusListener = statusListener;
+
     var options = SpeechListenOptions(
         onDevice: SpeachSettingsRetrevial().get_onDevice,
-        listenMode: ListenMode.dictation,
+        listenMode: ListenMode.deviceDefault,
         cancelOnError: true,
         partialResults: false,
         autoPunctuation: true,

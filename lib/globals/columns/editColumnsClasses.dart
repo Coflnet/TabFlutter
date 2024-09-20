@@ -12,7 +12,7 @@ class col {
 
   @override
   String toString() {
-    return "name: ${name}params: $params id :$id";
+    return "\n name: $name params: ${params.map((p) => p.toString())} id :$id";
   }
 
   Map<String, dynamic> toJson() {
@@ -34,29 +34,38 @@ class col {
       emoji: json['emoji'],
     );
   }
+
+  col copy() {
+    return col(
+      name: name,
+      emoji: emoji,
+      id: id,
+      params: params.map((aram) => aram.copy()).toList(),
+    );
+  }
 }
 
 class param {
   String name;
   String type;
   String? svalue;
-  List? listOption;
+  List<String>? listOption;
 
   param(
       {required this.name,
       required this.type,
-      List? listOption,
+      List<String>? listOption,
       String? svalue})
       : svalue = svalue ?? '',
-        listOption = listOption ?? [];
+        listOption = listOption ?? <String>[];
 
   void operator []=(String key, dynamic value) {
-    svalue = "$value";
     switch (key) {
       case "name":
         name = value;
       case "type":
         type = value;
+        svalue = "$value";
       case "listOption":
         type = value;
       case "value":
@@ -64,6 +73,11 @@ class param {
       default:
         throw ArgumentError("Unknown param $key");
     }
+  }
+
+  @override
+  String toString() {
+    return "\n Param name $name type $type svalue $svalue";
   }
 
   Map<String, dynamic> toJson() {
@@ -79,7 +93,18 @@ class param {
     return param(
         name: json['name'],
         type: json['type'],
-        listOption: json['listOption'] ?? [],
+        listOption: (json['listOption'] as List<dynamic>?)
+                ?.map((item) => item.toString())
+                .toList() ??
+            <String>[],
         svalue: json["svalue"] ?? "");
+  }
+
+  param copy() {
+    return param(
+        name: name,
+        type: type,
+        listOption: List<String>.from(listOption ?? <String>[]),
+        svalue: svalue);
   }
 }

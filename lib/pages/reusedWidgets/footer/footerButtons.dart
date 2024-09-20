@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/pages/reusedWidgets/footer/footerGlobal.dart';
 import 'package:table_entry/pages/settings/settingsMain.dart';
 
 class FooterButtons extends StatelessWidget {
@@ -51,6 +52,7 @@ class FooterButtons extends StatelessWidget {
   }
 
   void changeScene(Widget changeToPage, context) {
+    FooterGlobal().setSelectedPage = wantedPageNum;
     Haptics.vibrate(HapticsType.medium);
     Navigator.push(
         context,

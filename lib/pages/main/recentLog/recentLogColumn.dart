@@ -14,16 +14,33 @@ class RecentLogColumn extends StatefulWidget {
 
 class _RecentLogColumnState extends State<RecentLogColumn> {
   @override
+  void initState() {
+    super.initState();
+    print(widget.recentLog.length);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
         child: ListView.builder(
             itemCount: recentLog.length,
-            itemBuilder: (context, index) => RecentLogItem(
-                name: widget.recentLog[index].name,
-                values: widget.recentLog[index].params,
-                index: index,
-                settings: false,
-                buttonClicked: buttonClicked)));
+            itemBuilder: (context, index) => Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: (recentLog.length == 0)
+                      ? Container()
+                      : RecentLogItem(
+                          name: widget
+                              .recentLog[(widget.recentLog.length - 1) - index]
+                              .name,
+                          values: widget
+                              .recentLog[(widget.recentLog.length - 1) - index]
+                              .params,
+                          index: index,
+                          settings: false,
+                          buttonClicked: buttonClicked),
+                )));
   }
 
   void buttonClicked(col whichCollumn) {}

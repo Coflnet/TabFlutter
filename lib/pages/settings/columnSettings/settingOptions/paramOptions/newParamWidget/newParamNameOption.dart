@@ -28,9 +28,11 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
 
   void reactToNotifer() async {
     print("react");
+
     setState(() {
       name = EditingColumns().getEditingCol.params[widget.index].name;
     });
+    controller.text = name;
   }
 
   @override

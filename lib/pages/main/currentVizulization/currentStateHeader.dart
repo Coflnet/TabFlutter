@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:table_entry/pages/settings/settingsMain.dart';
 
 class CurrentStateHeader extends StatelessWidget {
   const CurrentStateHeader({Key? key}) : super(key: key);
@@ -8,15 +10,15 @@ class CurrentStateHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 24),
+      margin: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Selected Column",
+                "Selected Table",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -24,7 +26,21 @@ class CurrentStateHeader extends StatelessWidget {
               ),
               TextButton(
                   style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  onPressed: () {},
+                  onPressed: () {
+                    Haptics.vibrate(HapticsType.medium);
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const SettingsMain(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return child;
+                          },
+                          transitionDuration: const Duration(milliseconds: 0),
+                        ));
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(

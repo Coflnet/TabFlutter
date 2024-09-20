@@ -31,21 +31,25 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
       children: <Widget>[
         ColumnSettingsHeader(addNewColl: addNewCollumn),
         const SizedBox(height: 9),
-        ListView.builder(
-            shrinkWrap: true,
-            itemCount: createdColumns.length,
-            itemBuilder: (context, index) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 17),
-                child: RecentLogItem(
-                  name: createdColumns[index].name,
-                  values: createdColumns[index].params,
-                  settings: true,
-                  index: index,
-                  buttonClicked: editCollumnPressed,
-                ),
-              );
-            })
+        MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: createdColumns.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 17),
+                  child: RecentLogItem(
+                    name: createdColumns[index].name,
+                    values: createdColumns[index].params,
+                    settings: true,
+                    index: index,
+                    buttonClicked: editCollumnPressed,
+                  ),
+                );
+              }),
+        )
       ],
     );
   }

@@ -10,6 +10,9 @@ List<col> recentLog = [];
 
 class RecentLogHandler {
   void loadRecentLog() async {
+    if (recentLog.isNotEmpty) {
+      return;
+    }
     Directory appDir = await getApplicationDocumentsDirectory();
     String filePath = "${appDir.path}/recentLog.json";
     File file = File(filePath);
@@ -19,7 +22,9 @@ class RecentLogHandler {
 
     var fileDataJson = file.readAsStringSync();
     var fileData = jsonDecode(fileDataJson);
-    print(fileData);
+    for (var element in fileData["columns"]) {
+      recentLog.add(col.fromJson(element));
+    }
   }
 
   void addRecentLog(List<col> recentLogCol) {
@@ -46,6 +51,11 @@ class RecentLogHandler {
     var fileData = {"recentLog": []};
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
+  }
+
+  void clear() {
+    recentLog = [];
+    saveFile();
   }
 
   col get getCurrentSelected => currentSelected;

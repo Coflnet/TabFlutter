@@ -12,7 +12,7 @@ class ColumnSettingsHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         const Text(
-          "Columns",
+          "Tables",
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.w500, fontSize: 23),
         ),

@@ -10,7 +10,7 @@ class ParamOptionsHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        const Text("Params",
+        const Text("Columns",
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
