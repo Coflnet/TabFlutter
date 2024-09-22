@@ -12,7 +12,7 @@ class RecentLogItem extends StatefulWidget {
   final List<param> values;
   final int index;
   final bool settings;
-  final Function(col) buttonClicked;
+  final Function(int) buttonClicked;
   const RecentLogItem(
       {super.key,
       required this.name,
@@ -66,6 +66,6 @@ class _RecentLogItemState extends State<RecentLogItem> {
   }
 
   void clickedSettings() {
-    widget.buttonClicked(SaveColumn().getColumns[widget.index]);
+    widget.buttonClicked(widget.index);
   }
 }

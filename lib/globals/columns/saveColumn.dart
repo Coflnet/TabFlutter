@@ -23,7 +23,6 @@ class SaveColumn {
     for (var element in fileData["columns"]) {
       collumns.add(col.fromJson(element));
     }
-    print(collumns);
   }
 
   Future<void> createFile(file) async {

@@ -1,3 +1,9 @@
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
+
 class col {
   String name;
   List<param> params;
@@ -97,7 +103,7 @@ class param {
                 ?.map((item) => item.toString())
                 .toList() ??
             <String>[],
-        svalue: json["svalue"] ?? "");
+        svalue: json["svalue"] ?? "hi");
   }
 
   param copy() {

@@ -62,8 +62,8 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
     widget.popup();
   }
 
-  void editCollumnPressed(col collumnData) {
-    EditingColumns().setEditingCol = collumnData;
+  void editCollumnPressed(int index) {
+    EditingColumns().setEditingCol = SaveColumn().getColumns[index];
     widget.popup();
   }
 }

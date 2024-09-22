@@ -19,7 +19,8 @@ class UpdateRecentLog extends ChangeNotifier {
 }
 
 class RecentLog extends StatefulWidget {
-  const RecentLog({Key? key}) : super(key: key);
+  final VoidCallback changeVis;
+  const RecentLog({super.key, required this.changeVis});
 
   @override
   _RecentLogState createState() => _RecentLogState();
@@ -40,7 +41,7 @@ class _RecentLogState extends State<RecentLog> {
   }
 
   void loadData() async {
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
       recentLogItems = RecentLogHandler().getRecentLog;
     });
@@ -85,7 +86,9 @@ class _RecentLogState extends State<RecentLog> {
           ],
         ),
         const SizedBox(height: 7),
-        Expanded(child: RecentLogColumn(recentLog: recentLogItems)),
+        Expanded(
+            child: RecentLogColumn(
+                recentLog: recentLogItems, changeVis: widget.changeVis)),
         const SizedBox(height: 77)
       ],
     );

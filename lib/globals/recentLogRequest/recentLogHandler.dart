@@ -7,6 +7,7 @@ import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 late col currentSelected;
 
 List<col> recentLog = [];
+List<col> displayedLog = [];
 
 class RecentLogHandler {
   void loadRecentLog() async {
@@ -29,18 +30,27 @@ class RecentLogHandler {
 
   void addRecentLog(List<col> recentLogCol) {
     recentLog.addAll(recentLogCol);
+    displayedLog.addAll(recentLogCol);
     saveFile();
   }
 
   void saveFile() async {
-    List savingColumns = [];
+    List savingColumnsAll = [];
+    List savingColumnsDisplayed = [];
     Directory appDir = await getApplicationDocumentsDirectory();
     for (var i in recentLog) {
-      savingColumns.add(i.toJson());
+      savingColumnsAll.add(i.toJson());
     }
+    for (var i in displayedLog) {
+      savingColumnsDisplayed.add(i.toJson());
+    }
+
     String filePath = "${appDir.path}/recentLog.json";
     File file = File(filePath);
-    var fileData = {"columns": savingColumns};
+    var fileData = {
+      "columns": savingColumnsAll,
+      "displayed": savingColumnsDisplayed
+    };
 
     var fileDataJson = jsonEncode(fileData);
     file.writeAsString(fileDataJson);
@@ -48,7 +58,7 @@ class RecentLogHandler {
 
   Future<void> createFile(file) async {
     file.createSync();
-    var fileData = {"recentLog": []};
+    var fileData = {"recentLog": [], "displayed": []};
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }

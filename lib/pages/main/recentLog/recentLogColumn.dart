@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/columns/editingColumns.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogItem.dart';
 
 class RecentLogColumn extends StatefulWidget {
   final List<col> recentLog;
-  const RecentLogColumn({super.key, required this.recentLog});
+  final VoidCallback changeVis;
+  const RecentLogColumn(
+      {super.key, required this.recentLog, required this.changeVis});
 
   @override
   _RecentLogColumnState createState() => _RecentLogColumnState();
@@ -16,7 +19,6 @@ class _RecentLogColumnState extends State<RecentLogColumn> {
   @override
   void initState() {
     super.initState();
-    print(widget.recentLog.length);
   }
 
   @override
@@ -25,23 +27,37 @@ class _RecentLogColumnState extends State<RecentLogColumn> {
         context: context,
         removeTop: true,
         child: ListView.builder(
-            itemCount: recentLog.length,
-            itemBuilder: (context, index) => Container(
+            itemCount: widget.recentLog.isEmpty ? 0 : widget.recentLog.length,
+            itemBuilder: (context, index) {
+              if (recentLog.isEmpty) {
+                return Container();
+              } else {
+                return Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  child: (recentLog.length == 0)
-                      ? Container()
-                      : RecentLogItem(
-                          name: widget
-                              .recentLog[(widget.recentLog.length - 1) - index]
-                              .name,
-                          values: widget
-                              .recentLog[(widget.recentLog.length - 1) - index]
-                              .params,
-                          index: index,
-                          settings: false,
-                          buttonClicked: buttonClicked),
-                )));
+                  child: RecentLogItem(
+                      name: (widget.recentLog.isEmpty)
+                          ? ""
+                          : widget.recentLog[length(index)].name,
+                      values: (widget.recentLog.isEmpty)
+                          ? []
+                          : widget.recentLog[length(index)].params,
+                      index: index,
+                      settings: true,
+                      buttonClicked: buttonClicked),
+                );
+              }
+            }));
   }
 
-  void buttonClicked(col whichCollumn) {}
+  void buttonClicked(int index) {
+    EditingColumns().setEditingCol =
+        RecentLogHandler().getRecentLog[(widget.recentLog.length - 1) - index];
+    widget.changeVis();
+  }
+
+  int length(int index) {
+    return (widget.recentLog.isEmpty)
+        ? index
+        : (widget.recentLog.length - 1) - index;
+  }
 }

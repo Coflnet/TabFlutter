@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/pages/main/recentLog/popup/recentLogColumns.dart';
+import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupColumns.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupHeader.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
 
 class RecentLogPopup extends StatefulWidget {
-  const RecentLogPopup({Key? key}) : super(key: key);
+  final VoidCallback closePopup;
+  const RecentLogPopup({super.key, required this.closePopup});
 
   @override
   _RecentLogPopupState createState() => _RecentLogPopupState();
@@ -24,9 +27,18 @@ class _RecentLogPopupState extends State<RecentLogPopup> {
       child: ChangeNotifierProvider(
         create: (context) => recnetLogPopupNotifer(),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            const RecentLogPopupHeader(),
-            const SizedBox(height: 8),
+            SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  const RecentLogPopupHeader(),
+                  const SizedBox(height: 8),
+                  RecentLogPopupColumns(
+                      params: EditingColumns().getEditingCol.params),
+                ],
+              ),
+            ),
             TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {

@@ -10,9 +10,12 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
+import 'package:table_entry/launchPage.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStateHeader.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
+import 'package:table_entry/pages/main/recentLog/popup/recentLogPopup.dart';
+import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupContainer.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recognizedData.dart';
 import 'package:table_entry/pages/main/selectedColumn/selectCollumnMain.dart';
@@ -30,7 +33,7 @@ void main() {
     statusBarIconBrightness: Brightness.light,
     systemNavigationBarColor: HexColor("1D1E2B"),
   ));
-  runApp(const Main());
+  runApp(const LaunchPage());
 }
 
 class Main extends StatefulWidget {
@@ -41,6 +44,7 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
+  bool isVisible = false;
   @override
   void initState() {
     super.initState();
@@ -73,16 +77,27 @@ class _MainState extends State<Main> {
                   Expanded(
                     child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 24),
-                        child: const RecentLog()),
+                        child: RecentLog(
+                          changeVis: closePopup,
+                        )),
                   )
                 ],
               ),
               const Footer(),
               const StartStopDetection(),
+              Visibility(
+                  visible: isVisible,
+                  child: RecentLogPopupContainer(closePopup: closePopup))
             ],
           ),
         ),
       ),
     );
+  }
+
+  void closePopup() {
+    setState(() {
+      isVisible = !isVisible;
+    });
   }
 }
