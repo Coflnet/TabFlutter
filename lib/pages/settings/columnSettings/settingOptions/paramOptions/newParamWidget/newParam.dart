@@ -46,6 +46,14 @@ class _NewParamState extends State<NewParam>
     setState(() {
       type = EditingColumns().getEditingCol.params[widget.index].type;
     });
+    print(type);
+    if (type == "List") {
+      setState(() {
+        displayListType = true;
+      });
+      print(EditingColumns().getEditingCol.params[widget.index].listOption);
+      _controller.forward();
+    }
   }
 
   @override
@@ -66,7 +74,14 @@ class _NewParamState extends State<NewParam>
               child: displayListType
                   ? SlideTransition(
                       position: _offsetAnimation,
-                      child: const NewListParamMain())
+                      child: NewListParamMain(
+                        index: widget.index,
+                        storedList: EditingColumns()
+                                .getEditingCol
+                                .params[widget.index]
+                                .listOption ??
+                            [],
+                      ))
                   : const SizedBox.shrink(),
             ),
           ],

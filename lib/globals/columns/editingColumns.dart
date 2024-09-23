@@ -10,19 +10,18 @@ class EditingColumns {
         emoji: "",
         name: name,
         id: id,
-        params: [param(name: "NewParam", type: "String", svalue: "String")]);
+        params: [param(name: "", type: "String", svalue: "String")]);
     return editingCol;
   }
 
   void addNewParam() {
-    editingCol.params
-        .add(param(name: "NewParam", type: "String", svalue: "String"));
+    editingCol.params.add(param(name: "", type: "String", svalue: "String"));
   }
 
   void updateParam(int index, String param, dynamic value) {
     editingCol.params[index][param] = value;
     if (param == "type" || value == "listOption") {
-      editingCol.params[index].listOption = ["NewOption"];
+      editingCol.params[index].listOption = [];
     }
   }
 
@@ -38,7 +37,12 @@ class EditingColumns {
     editingCol.params[index].listOption?[listIndex] = value;
   }
 
+  void addListOption(int index) {
+    editingCol.params[index].listOption?.add("");
+  }
+
   void saveCol() {
+    print(editingCol.params.toString());
     SaveColumn().saveColumn(editingCol.id, editingCol);
   }
 

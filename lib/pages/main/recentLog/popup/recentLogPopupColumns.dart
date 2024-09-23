@@ -57,6 +57,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
                           ),
                           (widget.params[index].type == "List")
                               ? RecentLogPopupListOption(
+                                  types: widget.params[index].listOption ?? [],
                                   selectedValue:
                                       widget.params[index].svalue ?? "",
                                   index: index)

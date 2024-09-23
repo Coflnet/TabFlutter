@@ -83,7 +83,7 @@ class param {
 
   @override
   String toString() {
-    return "\n Param name $name type $type svalue $svalue";
+    return "\n Param name $name type $type svalue $svalue  listOption $listOption";
   }
 
   Map<String, dynamic> toJson() {

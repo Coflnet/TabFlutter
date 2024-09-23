@@ -26,6 +26,9 @@ class RecentLogHandler {
     for (var element in fileData["columns"]) {
       recentLog.add(col.fromJson(element));
     }
+    for (var element in fileData["displayed"]) {
+      displayedLog.add(col.fromJson(element));
+    }
   }
 
   void addRecentLog(List<col> recentLogCol) {
@@ -64,11 +67,12 @@ class RecentLogHandler {
   }
 
   void clear() {
-    recentLog = [];
+    displayedLog = [];
     saveFile();
   }
 
   col get getCurrentSelected => currentSelected;
   set setCurrentSelected(col value) => currentSelected = value;
   List<col> get getRecentLog => recentLog;
+  List<col> get getDisplayedLog => displayedLog;
 }

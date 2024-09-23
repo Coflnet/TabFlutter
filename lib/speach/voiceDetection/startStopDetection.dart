@@ -51,9 +51,9 @@ class _StartStopDetectionState extends State<StartStopDetection> {
               decoration: BoxDecoration(
                   color: HexColor("#8332AC"),
                   borderRadius: BorderRadius.circular(16)),
-              child: const Icon(
+              child: Icon(
                 Icons.mic,
-                color: Colors.white70,
+                color: isRunning ? Colors.white : Colors.white70,
                 size: 40,
               ),
             )),

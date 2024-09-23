@@ -5,9 +5,13 @@ import 'package:table_entry/globals/columns/editingColumns.dart';
 
 class RecentLogPopupListOption extends StatefulWidget {
   String selectedValue;
+  final List types;
   final int index;
   RecentLogPopupListOption(
-      {super.key, required this.selectedValue, required this.index});
+      {super.key,
+      required this.selectedValue,
+      required this.index,
+      required this.types});
 
   @override
   _RecentLogPopupListOptionState createState() =>
@@ -15,7 +19,17 @@ class RecentLogPopupListOption extends StatefulWidget {
 }
 
 class _RecentLogPopupListOptionState extends State<RecentLogPopupListOption> {
-  final List<String> items = ["String", "0/10", "List"];
+  late List<String> items;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      items = widget.types as List<String>;
+    });
+    print("$items types");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(

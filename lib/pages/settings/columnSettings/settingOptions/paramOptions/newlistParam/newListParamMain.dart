@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/globals/columns/editingColumns.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newlistParam/newListParam.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newlistParam/newListParamHeader.dart';
 
 class NewListParamMain extends StatefulWidget {
-  const NewListParamMain({Key? key}) : super(key: key);
+  final List storedList;
+  final int index;
+  const NewListParamMain(
+      {super.key, required this.storedList, required this.index});
 
   @override
   _NewListParamMainState createState() => _NewListParamMainState();
 }
 
 class _NewListParamMainState extends State<NewListParamMain> {
-  List paramNames = [""];
+  List paramNames = [];
   int itemCount = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    paramNames.addAll(widget.storedList);
+    itemCount = paramNames.length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +44,9 @@ class _NewListParamMainState extends State<NewListParamMain> {
               itemCount: itemCount,
               itemBuilder: (context, index) {
                 return NewListParam(
-                    itemCount: index, updateParamName: updateParamNames);
+                    name: paramNames[index],
+                    itemCount: index,
+                    updateParamName: updateParamNames);
               })
         ],
       ),
@@ -44,6 +57,7 @@ class _NewListParamMainState extends State<NewListParamMain> {
     setState(() {
       itemCount += 1;
       paramNames.add("");
+      EditingColumns().addListOption(widget.index);
     });
   }
 
@@ -51,6 +65,7 @@ class _NewListParamMainState extends State<NewListParamMain> {
     setState(() {
       paramNames[item] = newString;
     });
+    EditingColumns().updateListOption(widget.index, item, newString);
   }
 
   void checkFilledIn() {

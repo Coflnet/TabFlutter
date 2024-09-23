@@ -30,7 +30,7 @@ class _RecentLogState extends State<RecentLog> {
   List<col> recentLogItems = [];
   void recentLogUpdate() {
     setState(() {
-      recentLogItems = RecentLogHandler().getRecentLog;
+      recentLogItems = RecentLogHandler().getDisplayedLog;
     });
   }
 
@@ -43,7 +43,7 @@ class _RecentLogState extends State<RecentLog> {
   void loadData() async {
     await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
-      recentLogItems = RecentLogHandler().getRecentLog;
+      recentLogItems = RecentLogHandler().getDisplayedLog;
     });
   }
 

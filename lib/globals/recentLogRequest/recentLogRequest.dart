@@ -46,12 +46,10 @@ class RecentLogRequest {
 FunctionObjectTypes matchType(String type) {
   switch (type) {
     case "String":
-      print("string");
       return FunctionObjectTypes.string;
     case "List":
-      return FunctionObjectTypes.array;
+      return FunctionObjectTypes.string;
     case "0/10":
-      print("0/10");
       return FunctionObjectTypes.integer;
     default:
       print("default");
