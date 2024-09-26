@@ -71,7 +71,7 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
                       color: HexColor("8332AC"),
                       borderRadius: BorderRadius.circular(6)),
                   child: const Text(
-                    "Confirm",
+                    "Save",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

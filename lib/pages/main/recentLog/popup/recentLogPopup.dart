@@ -53,7 +53,7 @@ class _RecentLogPopupState extends State<RecentLogPopup> {
                       color: HexColor("8332AC"),
                       borderRadius: BorderRadius.circular(6)),
                   child: const Text(
-                    "Confirm",
+                    "Save",
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
