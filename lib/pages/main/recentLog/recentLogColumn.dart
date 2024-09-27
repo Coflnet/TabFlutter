@@ -50,8 +50,9 @@ class _RecentLogColumnState extends State<RecentLogColumn> {
   }
 
   void buttonClicked(int index) {
-    EditingColumns().setEditingCol =
-        RecentLogHandler().getRecentLog[(widget.recentLog.length - 1) - index];
+    EditingColumns().setEditingCol = RecentLogHandler()
+        .getDisplayedLog[(widget.recentLog.length - 1) - index];
+    print("${EditingColumns().getEditingCol.toString()}  editing column");
     widget.changeVis();
   }
 

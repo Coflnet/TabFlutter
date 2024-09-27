@@ -45,7 +45,7 @@ class _FooterState extends State<Footer> {
                 pickedIcon: HugeIcons.strokeRoundedSettings01,
                 text: "Settings",
                 selectedPageNum: selectedPage,
-                wantedPageNum: 1),
+                wantedPageNum: 2),
           ],
         ),
       ),
