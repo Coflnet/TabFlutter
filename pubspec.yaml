@@ -29,6 +29,7 @@ dependencies:
   scroll_snap_list: ^0.9.1
   share_plus: ^10.0.2
   speech_to_text: ^6.6.2
+  url_launcher: ^6.3.0
   waveform_flutter: ^1.0.1
 
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:table_entry/main.dart';
+import 'package:table_entry/pages/about/aboutMain.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footerButtons.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footerGlobal.dart';
 import 'package:table_entry/pages/settings/settingsMain.dart';
@@ -34,7 +35,7 @@ class _FooterState extends State<Footer> {
                 selectedPageNum: selectedPage,
                 wantedPageNum: 0),
             FooterButtons(
-                scene: const Main(),
+                scene: const AboutMain(),
                 pickedIcon: HugeIcons.strokeRoundedFile01,
                 text: "About",
                 selectedPageNum: selectedPage,
