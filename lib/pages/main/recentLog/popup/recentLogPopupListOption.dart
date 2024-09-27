@@ -50,7 +50,7 @@ class _RecentLogPopupListOptionState extends State<RecentLogPopupListOption> {
             widget.selectedValue = newVal ?? widget.selectedValue;
           });
           EditingColumns()
-              .updateParam(widget.index, "svalue", widget.selectedValue);
+              .updateParam(widget.index, "value", widget.selectedValue);
         },
         items: items
             .map((String item) => DropdownMenuItem<String>(
