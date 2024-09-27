@@ -71,6 +71,25 @@ class RecentLogHandler {
     saveFile();
   }
 
+  void updateCollumn(col updatingCollumn) {
+    for (var i in recentLog) {
+      if (i.id == updatingCollumn.id) {
+        recentLog.remove(i);
+        recentLog.add(updatingCollumn);
+        saveFile();
+        break;
+      }
+    }
+    for (var i in displayedLog) {
+      if (i.id == updatingCollumn.id) {
+        displayedLog.remove(i);
+        displayedLog.add(updatingCollumn);
+        saveFile();
+        break;
+      }
+    }
+  }
+
   col get getCurrentSelected => currentSelected;
   set setCurrentSelected(col value) => currentSelected = value;
   List<col> get getRecentLog => recentLog;

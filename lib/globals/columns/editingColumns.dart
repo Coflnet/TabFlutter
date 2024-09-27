@@ -1,8 +1,10 @@
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 
 col editingCol =
     col(name: "", id: 1, emoji: "", params: [param(name: "", type: "")]);
+int editingIndex = 0;
 
 class EditingColumns {
   col createNewCol(String name, int id) {
@@ -42,11 +44,12 @@ class EditingColumns {
   }
 
   void saveCol() {
-    print(editingCol.params.toString());
-    SaveColumn().saveColumn(editingCol.id, editingCol);
+    RecentLogHandler().updateCollumn(editingCol);
   }
 
   col get getEditingCol => editingCol;
+  int get getEditingIndex => editingIndex;
+  set setEditingIndex(v) => editingIndex = v;
   set setEditingCol(col value) {
     editingCol = value;
   }

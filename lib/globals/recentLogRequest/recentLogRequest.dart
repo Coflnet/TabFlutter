@@ -34,6 +34,8 @@ class RecentLogRequest {
           }
         });
       });
+      newCollumn.id =
+          RecentLogHandler().getRecentLog.length + 1 + newCollumns.length;
       newCollumns.add(newCollumn);
     }
     print("new collumn values ${newCollumns[0].toString()}");

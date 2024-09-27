@@ -33,6 +33,7 @@ class SaveColumn {
   }
 
   void saveColumn(int id, col col) {
+    print(id);
     for (var i in collumns) {
       if (i.id == id) {
         collumns.remove(i);
