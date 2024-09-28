@@ -45,6 +45,7 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   bool isVisible = false;
+  bool isRecording = false;
   @override
   void initState() {
     super.initState();
@@ -60,13 +61,13 @@ class _MainState extends State<Main> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(fontFamily: "WorkSans"),
-      home: Scaffold(
-        body: MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
-            ChangeNotifierProvider(create: (_) => UpdateRecentLog())
-          ],
-          child: Stack(
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
+          ChangeNotifierProvider(create: (_) => UpdateRecentLog())
+        ],
+        child: Scaffold(
+          body: Stack(
             children: [
               const Background(),
               Column(
@@ -84,12 +85,20 @@ class _MainState extends State<Main> {
                 ],
               ),
               const Footer(),
-              const StartStopDetection(),
               Visibility(
                   visible: isVisible,
                   child: RecentLogPopupContainer(closePopup: closePopup))
             ],
           ),
+          floatingActionButton: StartStopDetection(
+            startStop: () => setState(() {
+              isRecording = !isRecording;
+            }),
+            changeRecordingData: (s) {},
+          ),
+          floatingActionButtonLocation: isRecording
+              ? FloatingActionButtonLocation.centerDocked
+              : FloatingActionButtonLocation.endDocked,
         ),
       ),
     );

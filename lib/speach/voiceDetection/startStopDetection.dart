@@ -14,21 +14,29 @@ import 'package:table_entry/globals/speachSettingsGlobal.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 
 class StartStopDetection extends StatefulWidget {
-  const StartStopDetection({Key? key}) : super(key: key);
+  final VoidCallback startStop;
+  final Function(String) changeRecordingData;
+  const StartStopDetection(
+      {super.key, required this.startStop, required this.changeRecordingData});
 
   @override
   _StartStopDetectionState createState() => _StartStopDetectionState();
 }
 
-class _StartStopDetectionState extends State<StartStopDetection> {
+class _StartStopDetectionState extends State<StartStopDetection>
+    with SingleTickerProviderStateMixin {
   SpeechToText speech = SpeechToText();
   double level = 0.0;
+  late AnimationController controller;
   bool isRunning = false;
   String recordedData = "";
 
   @override
   void initState() {
     super.initState();
+    controller = AnimationController(
+      vsync: this,
+    );
     initSpeach();
   }
 
@@ -40,23 +48,49 @@ class _StartStopDetectionState extends State<StartStopDetection> {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomRight,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(0, 0, 13, 85),
-        child: TextButton(
-            onPressed: startStopListening,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  color: HexColor("#8332AC"),
-                  borderRadius: BorderRadius.circular(16)),
-              child: Icon(
-                Icons.mic,
-                color: isRunning ? Colors.white : Colors.white70,
-                size: 40,
-              ),
-            )),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 0, 0, 85),
+      child: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          double scale = 1 + (level / 50);
+          return isRunning
+              ? Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue.withOpacity(0.5)),
+                  child: Center(
+                    child: TextButton(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                        onPressed: startStopListening,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: HexColor("#8332AC"),
+                              borderRadius: BorderRadius.circular(80)),
+                          child: Icon(
+                            Icons.mic,
+                            color: isRunning ? Colors.white : Colors.white70,
+                            size: 60,
+                          ),
+                        )),
+                  ))
+              : TextButton(
+                  onPressed: startStopListening,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: HexColor("#8332AC"),
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Icon(
+                      Icons.mic,
+                      color: isRunning ? Colors.white : Colors.white70,
+                      size: 40,
+                    ),
+                  ));
+        },
       ),
     );
   }
@@ -78,8 +112,9 @@ class _StartStopDetectionState extends State<StartStopDetection> {
 
     setState(() {
       recordedData = "";
+      widget.changeRecordingData(recordedData);
     });
-
+    widget.startStop();
     startListening();
   }
 
@@ -109,6 +144,7 @@ class _StartStopDetectionState extends State<StartStopDetection> {
       setState(() {
         recordedData = "$recordedData ${result.recognizedWords}";
       });
+      widget.changeRecordingData(recordedData);
     }
   }
 
