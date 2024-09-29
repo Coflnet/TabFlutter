@@ -49,33 +49,28 @@ class _StartStopDetectionState extends State<StartStopDetection>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 0, 85),
+      margin:
+          isRunning ? EdgeInsets.only(bottom: 10) : EdgeInsets.only(bottom: 86),
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
           double scale = 1 + (level / 50);
           return isRunning
-              ? Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue.withOpacity(0.5)),
-                  child: Center(
-                    child: TextButton(
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: startStopListening,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              color: HexColor("#8332AC"),
-                              borderRadius: BorderRadius.circular(80)),
-                          child: Icon(
-                            Icons.mic,
-                            color: isRunning ? Colors.white : Colors.white70,
-                            size: 60,
-                          ),
-                        )),
+              ? TextButton(
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: startStopListening,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        color: HexColor("#8332AC"),
+                        borderRadius: BorderRadius.circular(90)),
+                    child: Icon(
+                      Icons.stop,
+                      color: isRunning ? Colors.white : Colors.white70,
+                      size: 45,
+                    ),
                   ))
               : TextButton(
                   onPressed: startStopListening,
@@ -99,6 +94,8 @@ class _StartStopDetectionState extends State<StartStopDetection>
     setState(() {
       isRunning = !isRunning;
     });
+    widget.startStop();
+
     if (!isRunning) {
       speech.stop();
       List<col> newRecentCol = await RecentLogRequest()
@@ -114,7 +111,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
       recordedData = "";
       widget.changeRecordingData(recordedData);
     });
-    widget.startStop();
     startListening();
   }
 
