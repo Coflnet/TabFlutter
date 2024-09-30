@@ -30,6 +30,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
   late AnimationController controller;
   bool isRunning = false;
   String recordedData = "";
+  String displayedRecordedData = "";
 
   @override
   void initState() {
@@ -49,8 +50,9 @@ class _StartStopDetectionState extends State<StartStopDetection>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin:
-          isRunning ? EdgeInsets.only(bottom: 10) : EdgeInsets.only(bottom: 86),
+      margin: isRunning
+          ? const EdgeInsets.only(bottom: 10)
+          : const EdgeInsets.only(bottom: 86),
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, child) {
@@ -109,7 +111,8 @@ class _StartStopDetectionState extends State<StartStopDetection>
 
     setState(() {
       recordedData = "";
-      widget.changeRecordingData(recordedData);
+      displayedRecordedData = "";
+      widget.changeRecordingData(displayedRecordedData);
     });
     startListening();
   }
@@ -139,8 +142,10 @@ class _StartStopDetectionState extends State<StartStopDetection>
     if (result.finalResult) {
       setState(() {
         recordedData = "$recordedData ${result.recognizedWords}";
+        displayedRecordedData =
+            "$displayedRecordedData \n ${result.recognizedWords}.";
       });
-      widget.changeRecordingData(recordedData);
+      widget.changeRecordingData(displayedRecordedData);
     }
   }
 

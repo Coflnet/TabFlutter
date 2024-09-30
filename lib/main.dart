@@ -14,6 +14,7 @@ import 'package:table_entry/launchPage.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStateHeader.dart';
 import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
+import 'package:table_entry/pages/main/listeningMode/listeningModeMain.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopup.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupContainer.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
@@ -48,6 +49,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   bool isVisible = false;
   bool isRecording = false;
   bool switchVis = false;
+  String recognizedWords = "";
   late Animation<Offset> animation;
   late Animation<Offset> animation2;
   late AnimationController controller;
@@ -62,7 +64,8 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
     controller2 = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     animation2 = Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
-        .animate(CurvedAnimation(parent: controller, curve: Curves.easeInQuad));
+        .animate(
+            CurvedAnimation(parent: controller, curve: Curves.easeInOutQuad));
     loadData();
   }
 
@@ -112,13 +115,9 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                       opacity: isRecording ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 500),
                       child: SlideTransition(
-                        position: animation2,
-                        child: Container(
-                          color: Colors.white,
-                          width: 300,
-                          height: 400,
-                        ),
-                      ),
+                          position: animation2,
+                          child: ListeningModeMain(
+                              recognizedWords: recognizedWords)),
                     )),
                   ],
                 ),
@@ -135,7 +134,8 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
               isRecording ? controller.forward() : controller.reverse();
               isRecording ? controller2.forward() : controller2.reverse();
             }),
-            changeRecordingData: (s) {},
+            changeRecordingData: (String newString) =>
+                setState(() => recognizedWords = newString),
           ),
           floatingActionButtonLocation: isRecording
               ? FloatingActionButtonLocation.centerDocked
