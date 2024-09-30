@@ -36,17 +36,19 @@ class ListeningModeMain extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 36),
           color: HexColor("1D1E2B"),
+          width: double.infinity,
           height: 190,
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Text(
+                textWidthBasis: TextWidthBasis.longestLine,
                 textAlign: TextAlign.center,
-                "Say 'new entry' before each entry and each column say the name 'value' than the value",
+                "Say 'new entry' before each entry and each \ncolumn say the name 'value' than the value",
                 style: TextStyle(
-                    color: Colors.grey.shade200.withOpacity(0.6),
+                    color: Colors.grey.shade200.withOpacity(0.4),
                     fontWeight: FontWeight.w500,
-                    fontSize: 12),
+                    fontSize: 13),
               )
             ],
           ),

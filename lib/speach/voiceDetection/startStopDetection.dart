@@ -32,6 +32,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
   bool isRunning = false;
   String recordedData = "";
   String displayedRecordedData = "";
+  bool levelIsZero = false;
 
   @override
   void initState() {
@@ -59,7 +60,8 @@ class _StartStopDetectionState extends State<StartStopDetection>
         builder: (context, child) {
           double scale = 1 + (level / 50);
           return isRunning
-              ? StartStopDetectionRunning(startStop: startStopListening)
+              ? StartStopDetectionRunning(
+                  startStop: startStopListening, run: levelIsZero)
               : TextButton(
                   onPressed: startStopListening,
                   child: Container(
@@ -144,6 +146,11 @@ class _StartStopDetectionState extends State<StartStopDetection>
     setState(() {
       this.level = level;
     });
+    if (level == 0) {
+      setState(() {
+        levelIsZero = true;
+      });
+    }
   }
 
   void statusListener(String status) {

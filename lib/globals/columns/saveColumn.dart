@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 
 List<col> collumns = [];
+bool usedBefore = false;
 
 class SaveColumn {
   void loadColumns() async {
@@ -23,17 +24,18 @@ class SaveColumn {
     for (var element in fileData["columns"]) {
       collumns.add(col.fromJson(element));
     }
+
+    usedBefore = fileData["usedBefore"];
   }
 
   Future<void> createFile(file) async {
     file.createSync();
-    var fileData = {"columns": []};
+    var fileData = {"columns": [], "usedBefore": false};
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }
 
   void saveColumn(int id, col col) {
-    print(id);
     for (var i in collumns) {
       if (i.id == id) {
         collumns.remove(i);
@@ -54,11 +56,13 @@ class SaveColumn {
     }
     String filePath = "${appDir.path}/savedColumn.json";
     File file = File(filePath);
-    var fileData = {"columns": savingColumns};
+    var fileData = {"columns": savingColumns, "usedBefore": usedBefore};
 
     var fileDataJson = jsonEncode(fileData);
     file.writeAsString(fileDataJson);
   }
 
+  bool get getUsedBefore => usedBefore;
+  set setUsedBefore(v) => usedBefore = v;
   List<col> get getColumns => collumns;
 }
