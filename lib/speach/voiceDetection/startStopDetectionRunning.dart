@@ -24,6 +24,12 @@ class _StartStopDetectionRunningState extends State<StartStopDetectionRunning> {
   void initState() {
     super.initState();
     controller = CustomPopupMenuController();
+
+    waitCall();
+  }
+
+  void waitCall() async {
+    await Future.delayed(Duration(milliseconds: 300));
     if (widget.run) {
       setState(() {
         selectedType = 1;
