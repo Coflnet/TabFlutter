@@ -12,6 +12,7 @@ import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
+import 'package:table_entry/speach/voiceDetection/startStopDetectionRunning.dart';
 
 class StartStopDetection extends StatefulWidget {
   final VoidCallback startStop;
@@ -58,22 +59,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
         builder: (context, child) {
           double scale = 1 + (level / 50);
           return isRunning
-              ? TextButton(
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  onPressed: startStopListening,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: HexColor("#8332AC"),
-                        borderRadius: BorderRadius.circular(90)),
-                    child: Icon(
-                      Icons.stop,
-                      color: isRunning ? Colors.white : Colors.white70,
-                      size: 45,
-                    ),
-                  ))
+              ? StartStopDetectionRunning(startStop: startStopListening)
               : TextButton(
                   onPressed: startStopListening,
                   child: Container(
