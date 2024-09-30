@@ -58,9 +58,10 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700));
+        vsync: this, duration: const Duration(milliseconds: 500));
     animation = Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1))
-        .animate(CurvedAnimation(parent: controller, curve: Curves.easeInQuad));
+        .animate(
+            CurvedAnimation(parent: controller, curve: Curves.easeInOutQuad));
     controller2 = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     animation2 = Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
@@ -93,7 +94,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                   Expanded(
                     child: AnimatedOpacity(
                       opacity: isRecording ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 700),
+                      duration: const Duration(milliseconds: 500),
                       child: SlideTransition(
                         position: animation,
                         child: Column(
@@ -129,11 +130,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
             ],
           ),
           floatingActionButton: StartStopDetection(
-            startStop: () => setState(() {
-              isRecording = !isRecording;
-              isRecording ? controller.forward() : controller.reverse();
-              isRecording ? controller2.forward() : controller2.reverse();
-            }),
+            startStop: () => handleAnimations(),
             changeRecordingData: (String newString) =>
                 setState(() => recognizedWords = newString),
           ),
@@ -145,7 +142,35 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
     );
   }
 
-  void handleAnimations() {}
+  void handleAnimations() async {
+    if (!isRecording) {
+      setState(() {
+        isRecording = true;
+      });
+      playAnimations(false);
+      return;
+    }
+    playAnimations(true);
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    setState(() {
+      isRecording = !isRecording;
+    });
+  }
+
+  void playAnimations(bool flip) async {
+    if (flip) {
+      controller.reverse();
+      controller2.reverse();
+
+      return;
+    }
+
+    controller.forward();
+    await Future.delayed(const Duration(microseconds: 200));
+    controller2.forward();
+  }
 
   void closePopup() {
     setState(() {

@@ -51,7 +51,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
   Widget build(BuildContext context) {
     return Container(
       margin: isRunning
-          ? const EdgeInsets.only(bottom: 10)
+          ? const EdgeInsets.only(bottom: 15)
           : const EdgeInsets.only(bottom: 86),
       child: AnimatedBuilder(
         animation: controller,
@@ -100,6 +100,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
 
     if (!isRunning) {
       speech.stop();
+      return;
       List<col> newRecentCol = await RecentLogRequest()
           .request(recordedData, RecentLogHandler().getCurrentSelected);
       if (context.mounted) {
@@ -143,7 +144,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
       setState(() {
         recordedData = "$recordedData ${result.recognizedWords}";
         displayedRecordedData =
-            "$displayedRecordedData \n ${result.recognizedWords}.";
+            "$displayedRecordedData\n${result.recognizedWords}.";
       });
       widget.changeRecordingData(displayedRecordedData);
     }

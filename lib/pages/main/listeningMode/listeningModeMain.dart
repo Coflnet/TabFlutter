@@ -22,26 +22,32 @@ class ListeningModeMain extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: SingleChildScrollView(
-              child: Flexible(
-                child: Text(
-                  recognizedWords,
-                  style: TextStyle(
-                      color: Colors.grey.shade200,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500),
-                ),
+              child: Text(
+                recognizedWords,
+                style: TextStyle(
+                    color: Colors.grey.shade300,
+                    fontSize: 21,
+                    fontWeight: FontWeight.w300),
               ),
             ),
           ),
         ),
         const SizedBox(height: 16),
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: 36),
           color: HexColor("1D1E2B"),
-          height: 170,
+          height: 190,
           child: Column(
             children: <Widget>[
+              const SizedBox(height: 14),
               Text(
-                  "Say 'new entry' before each entry and each column say the name 'value' than the value ")
+                textAlign: TextAlign.center,
+                "Say 'new entry' before each entry and each column say the name 'value' than the value",
+                style: TextStyle(
+                    color: Colors.grey.shade200.withOpacity(0.6),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12),
+              )
             ],
           ),
         )
