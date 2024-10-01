@@ -88,7 +88,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
 
     if (!isRunning) {
       speech.stop();
-      return;
       List<col> newRecentCol = await RecentLogRequest()
           .request(recordedData, RecentLogHandler().getCurrentSelected);
       if (context.mounted) {
