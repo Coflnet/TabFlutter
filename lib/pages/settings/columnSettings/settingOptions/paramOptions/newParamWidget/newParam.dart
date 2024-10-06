@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamNameType.dart';
@@ -47,7 +48,7 @@ class _NewParamState extends State<NewParam>
       type = EditingColumns().getEditingCol.params[widget.index].type;
     });
     print(type);
-    if (type == "List") {
+    if (type == translate("optionList")) {
       setState(() {
         displayListType = true;
       });
@@ -90,10 +91,10 @@ class _NewParamState extends State<NewParam>
 
   void changeType(String newType) {
     EditingColumns().updateParam(widget.index, "type", newType);
-    if (newType == "List") {
+    if (newType == translate("optionList")) {
       setState(() {
         displayListType = true;
-        type = "List";
+        type = translate("optionList");
       });
       _controller.forward();
     } else {

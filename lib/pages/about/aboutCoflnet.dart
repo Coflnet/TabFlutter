@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutCoflnet extends StatelessWidget {
@@ -15,7 +16,7 @@ class AboutCoflnet extends StatelessWidget {
     return Column(
       children: <Widget>[
         Text(
-          "Interested in a app like this?",
+          translate("aboutCoflnet"),
           style: TextStyle(color: Colors.grey.shade300, fontSize: 19),
         ),
         const SizedBox(height: 6),

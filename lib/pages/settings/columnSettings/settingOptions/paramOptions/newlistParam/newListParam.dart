@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class NewListParam extends StatefulWidget {
@@ -41,9 +42,9 @@ class _NewListParamState extends State<NewListParam> {
               child: TextField(
                 controller: controller,
                 textAlign: TextAlign.center,
-                decoration: const InputDecoration.collapsed(
-                  hintStyle: TextStyle(color: Colors.white30),
-                  hintText: "List name",
+                decoration: InputDecoration.collapsed(
+                  hintStyle: const TextStyle(color: Colors.white30),
+                  hintText: translate("listHint"),
                 ),
                 onChanged: (String newString) =>
                     widget.updateParamName(widget.itemCount, newString),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
@@ -41,9 +42,9 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
       return Expanded(
         child: Column(
           children: <Widget>[
-            const Text(
-              "Name",
-              style: TextStyle(
+            Text(
+              translate("newHeader"),
+              style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
                   fontWeight: FontWeight.w600),
@@ -59,12 +60,12 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
                     MaxLengthEnforcement.truncateAfterCompositionEnds,
                 maxLength: 8,
                 controller: controller,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   isCollapsed: true,
                   border: InputBorder.none,
                   counterText: "",
-                  hintStyle: TextStyle(color: Colors.white30),
-                  hintText: "Set name",
+                  hintStyle: const TextStyle(color: Colors.white30),
+                  hintText: translate("setNameHint"),
                 ),
                 onChanged: (value) {
                   EditingColumns().updateParam(widget.index, "name", value);

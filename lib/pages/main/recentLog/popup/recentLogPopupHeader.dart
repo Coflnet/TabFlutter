@@ -45,7 +45,7 @@ class _RecentLogPopupHeaderState extends State<RecentLogPopupHeader> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "HEllo world",
+                  "Recent log",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

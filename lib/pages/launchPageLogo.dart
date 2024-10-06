@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/main.dart';
@@ -23,9 +24,8 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
     SaveColumn().loadColumns();
     RecentLogHandler().loadRecentLog();
     await Future.delayed(const Duration(milliseconds: 200));
-    print("push");
-
-    print("changing");
+    print(SaveColumn().getlanguage);
+    changeLocale(context, SaveColumn().getlanguage);
     Navigator.push(
       context,
       PageRouteBuilder(

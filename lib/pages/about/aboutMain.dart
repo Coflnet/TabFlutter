@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/pages/about/aboutCoflnet.dart';
 import 'package:table_entry/pages/about/aboutHelp.dart';
 import 'package:table_entry/pages/about/aboutLegalButtons.dart';
@@ -23,28 +24,28 @@ class _AboutMainState extends State<AboutMain> {
             const Background(),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(height: 55),
+                  const SizedBox(height: 55),
                   Text(
-                    "About",
-                    style: TextStyle(
+                    translate("aboutHeader"),
+                    style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 30),
                   ),
-                  SizedBox(height: 30),
-                  SizedBox(height: 45),
-                  Expanded(
+                  const SizedBox(height: 30),
+                  const SizedBox(height: 45),
+                  const Expanded(
                       child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       AboutCoflnet(),
                     ],
                   )),
-                  SizedBox(height: 16),
-                  AboutLegalButtons()
+                  const SizedBox(height: 16),
+                  const AboutLegalButtons()
                 ],
               ),
             ),

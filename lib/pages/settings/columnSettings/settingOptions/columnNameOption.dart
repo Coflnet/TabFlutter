@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
@@ -40,9 +41,9 @@ class _ColumnNameOptionState extends State<ColumnNameOption> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text(
-                    "Name",
-                    style: TextStyle(
+                  Text(
+                    translate("nameOption"),
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w700),
@@ -57,12 +58,12 @@ class _ColumnNameOptionState extends State<ColumnNameOption> {
                       maxLength: 8,
                       controller: controller,
                       onChanged: updateText,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isCollapsed: true,
                         border: InputBorder.none,
                         counterText: "",
-                        hintStyle: TextStyle(color: Colors.white30),
-                        hintText: "Table Name",
+                        hintStyle: const TextStyle(color: Colors.white30),
+                        hintText: translate("hintTableName"),
                       ),
                       style: const TextStyle(
                           color: Colors.white,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:table_entry/pages/settings/export/exportAsCsv.dart';
@@ -13,14 +14,14 @@ class SettingExportMain extends StatefulWidget {
 class _SettingExportMainState extends State<SettingExportMain> {
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              "Export",
-              style: TextStyle(
+              translate("export"),
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 23,
                   fontWeight: FontWeight.w500),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutLegalButtons extends StatelessWidget {
-  const AboutLegalButtons({Key? key}) : super(key: key);
+  const AboutLegalButtons({super.key});
   void launchUrlL() async {
     final Uri url = Uri.parse("https://coflnet.com/privacy");
 
@@ -22,12 +23,12 @@ class AboutLegalButtons extends StatelessWidget {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Colors.white24, width: 2.3)),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "🏛️Privacy Policy",
-                    style: TextStyle(
+                    translate("privacyButton"),
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w500),
@@ -35,7 +36,7 @@ class AboutLegalButtons extends StatelessWidget {
                 ],
               ),
             )),
-        SizedBox(
+        const SizedBox(
           height: 120,
         )
       ],

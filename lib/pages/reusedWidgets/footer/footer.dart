@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -31,19 +32,19 @@ class _FooterState extends State<Footer> {
             FooterButtons(
                 scene: const Main(),
                 pickedIcon: HugeIcons.strokeRoundedHome03,
-                text: "Home",
+                text: translate("footerHome"),
                 selectedPageNum: selectedPage,
                 wantedPageNum: 0),
             FooterButtons(
                 scene: const AboutMain(),
                 pickedIcon: HugeIcons.strokeRoundedFile01,
-                text: "About",
+                text: translate("footerAbout"),
                 selectedPageNum: selectedPage,
                 wantedPageNum: 1),
             FooterButtons(
                 scene: const SettingsMain(),
                 pickedIcon: HugeIcons.strokeRoundedSettings01,
-                text: "Settings",
+                text: translate("footerSettings"),
                 selectedPageNum: selectedPage,
                 wantedPageNum: 2),
           ],

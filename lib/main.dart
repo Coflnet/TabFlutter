@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
@@ -25,8 +26,9 @@ import 'package:table_entry/pages/main/selectedColumn/selectColumnSelector.dart'
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -35,7 +37,10 @@ void main() {
     statusBarIconBrightness: Brightness.light,
     systemNavigationBarColor: HexColor("1D1E2B"),
   ));
-  runApp(const LaunchPage());
+
+  var delegate = await LocalizationDelegate.create(
+      fallbackLocale: 'en_US', supportedLocales: ['en_US', 'es', 'de']);
+  runApp(LocalizedApp(delegate, const LaunchPage()));
 }
 
 class Main extends StatefulWidget {
@@ -77,8 +82,17 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var localizationDelegate = LocalizedApp.of(context).delegate;
+
     return MaterialApp(
       theme: ThemeData(fontFamily: "WorkSans"),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        localizationDelegate
+      ],
+      supportedLocales: localizationDelegate.supportedLocales,
+      locale: localizationDelegate.currentLocale,
       home: MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -11,9 +12,9 @@ class ColumnSettingsHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        const Text(
-          "Tables",
-          style: TextStyle(
+        Text(
+          translate("columnSettingHeader"),
+          style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.w500, fontSize: 23),
         ),
         TextButton(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class NewListParamHeader extends StatelessWidget {
@@ -12,9 +13,9 @@ class NewListParamHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          const Text(
-            "List Options",
-            style: TextStyle(
+          Text(
+            translate("listOptions"),
+            style: const TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20),
           ),
           IconButton(

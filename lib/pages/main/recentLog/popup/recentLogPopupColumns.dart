@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupEditBox.dart';
@@ -24,9 +25,9 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          const Text(
-            "Columns",
-            style: TextStyle(
+          Text(
+            translate("columns"),
+            style: const TextStyle(
                 color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 12),

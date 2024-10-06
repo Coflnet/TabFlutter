@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 
 List<col> collumns = [];
 bool usedBefore = false;
+String language = "en";
 
 class SaveColumn {
   void loadColumns() async {
@@ -26,11 +28,12 @@ class SaveColumn {
     }
 
     usedBefore = fileData["usedBefore"];
+    language = fileData["language"];
   }
 
   Future<void> createFile(file) async {
     file.createSync();
-    var fileData = {"columns": [], "usedBefore": false};
+    var fileData = {"columns": [], "usedBefore": false, "language": "en"};
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }
@@ -56,13 +59,19 @@ class SaveColumn {
     }
     String filePath = "${appDir.path}/savedColumn.json";
     File file = File(filePath);
-    var fileData = {"columns": savingColumns, "usedBefore": usedBefore};
+    var fileData = {
+      "columns": savingColumns,
+      "usedBefore": usedBefore,
+      "language": language
+    };
 
     var fileDataJson = jsonEncode(fileData);
     file.writeAsString(fileDataJson);
   }
 
   bool get getUsedBefore => usedBefore;
+  String get getlanguage => language;
   set setUsedBefore(v) => usedBefore = v;
+  set setlanguage(v) => language = v;
   List<col> get getColumns => collumns;
 }
