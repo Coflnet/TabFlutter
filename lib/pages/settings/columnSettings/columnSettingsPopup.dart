@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/columnNameOption.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/paramOptionsMaim.dart';
@@ -60,7 +61,8 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
             TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {
-                  EditingColumns().saveCol();
+                  SaveColumn().saveColumn(EditingColumns().getEditingCol.id,
+                      EditingColumns().getEditingCol);
                   widget.closePopup();
                 },
                 child: Container(

@@ -21,5 +21,6 @@
     "listOptions": "List Options",
     "listHint": "List name",
     "newHeader": "Name",
-    "setNameHint": "setName"
+    "setNameHint": "setName",
+    "listType": "Type"
 }

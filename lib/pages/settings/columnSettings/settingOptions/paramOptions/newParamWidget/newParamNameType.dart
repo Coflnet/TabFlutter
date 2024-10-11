@@ -78,7 +78,9 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
                               ),
                             ))
                         .toList(),
-                    value: widget.selectedValue,
+                    value: (widget.selectedValue == "")
+                        ? translate("optionString")
+                        : widget.selectedValue,
                     onChanged: (value) =>
                         {widget.updateType(value ?? widget.selectedValue)},
                   )))

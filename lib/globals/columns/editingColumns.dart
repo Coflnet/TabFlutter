@@ -12,12 +12,12 @@ class EditingColumns {
         emoji: "",
         name: name,
         id: id,
-        params: [param(name: "", type: "String", svalue: "String")]);
+        params: [param(name: "", type: "", svalue: "")]);
     return editingCol;
   }
 
   void addNewParam() {
-    editingCol.params.add(param(name: "", type: "String", svalue: "String"));
+    editingCol.params.add(param(name: "", type: "", svalue: ""));
   }
 
   void updateParam(int index, String param, dynamic value) {

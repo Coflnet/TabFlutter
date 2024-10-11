@@ -28,7 +28,7 @@ class RecentLog extends StatefulWidget {
 }
 
 class _RecentLogState extends State<RecentLog> {
-  List<col> recentLogItems = [];
+  List<col> recentLogItems = RecentLogHandler().getDisplayedLog;
   void recentLogUpdate() {
     setState(() {
       recentLogItems = RecentLogHandler().getDisplayedLog;

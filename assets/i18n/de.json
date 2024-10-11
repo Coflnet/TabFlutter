@@ -20,6 +20,8 @@
     "optionType": "Typ",
     "listOptions": "Auswahloptionen",
     "listHint": "Beschreibung",
-    "newHeader": "Name",
-    "setNameHint": "setName"
+    "newHeader": "Titel",
+    "setNameHint": "Bezeich",
+    "listType": "Typ"
+
 }

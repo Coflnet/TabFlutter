@@ -63,15 +63,15 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 1100));
     animation = Tween<Offset>(begin: Offset.zero, end: const Offset(0, 1))
         .animate(
-            CurvedAnimation(parent: controller, curve: Curves.easeInOutQuad));
+            CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic));
     controller2 = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 900));
     animation2 = Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
         .animate(
-            CurvedAnimation(parent: controller, curve: Curves.easeInOutQuad));
+            CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic));
     loadData();
   }
 
@@ -107,8 +107,9 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                   const MainPageHeader(),
                   Expanded(
                     child: AnimatedOpacity(
+                      curve: Curves.easeInOutQuad,
                       opacity: isRecording ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 700),
                       child: SlideTransition(
                         position: animation,
                         child: Column(
@@ -127,6 +128,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                         child: AnimatedOpacity(
+                      curve: Curves.easeInOutQuad,
                       opacity: isRecording ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 500),
                       child: SlideTransition(

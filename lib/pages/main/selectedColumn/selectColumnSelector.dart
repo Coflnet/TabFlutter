@@ -13,11 +13,14 @@ class SelectColumnSelector extends StatefulWidget {
 }
 
 class _SelectColumnSelectorState extends State<SelectColumnSelector> {
-  List columns = [];
-  @override
+  List columns = SaveColumn().getColumns;
+  late ScrollController controller;
+
   void initState() {
     super.initState();
     loadColumns();
+    controller = ScrollController(
+        initialScrollOffset: SaveColumn().getSelcColumn.toDouble());
   }
 
   void loadColumns() async {
@@ -31,6 +34,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   @override
   Widget build(BuildContext context) {
     return ScrollSnapList(
+        listController: controller,
         scrollDirection: Axis.vertical,
         itemBuilder: (context, index) {
           return (index == columns.length)
@@ -47,6 +51,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
         itemCount: columns.length + 1,
         itemSize: 100,
         onItemFocus: (int num) {
+          SaveColumn().setSelcColumn = num;
           RecentLogHandler().setCurrentSelected = columns[num];
         });
   }

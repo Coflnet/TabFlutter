@@ -23,14 +23,14 @@ class _SettingHeaderLangState extends State<SettingHeaderLang> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-              color: HexColor("2A2D54"),
+              color: HexColor("242536"),
               borderRadius: BorderRadius.circular(8)),
           child: DropdownButtonHideUnderline(
               child: DropdownButton2(
             iconStyleData: const IconStyleData(iconSize: 0),
             dropdownStyleData: DropdownStyleData(
                 decoration: BoxDecoration(
-                    color: HexColor("2A2D54"),
+                    color: HexColor("242536"),
                     borderRadius: BorderRadius.circular(8)),
                 offset: const Offset(0, -10)),
             isDense: true,

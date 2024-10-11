@@ -71,7 +71,6 @@ class param {
         name = value;
       case "type":
         type = value;
-        svalue = "$value";
       case "listOption":
         type = value;
       case "value":

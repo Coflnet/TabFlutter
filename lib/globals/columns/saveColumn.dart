@@ -8,6 +8,7 @@ import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 List<col> collumns = [];
 bool usedBefore = false;
 String language = "en";
+int selectedColumn = 0;
 
 class SaveColumn {
   void loadColumns() async {
@@ -74,4 +75,6 @@ class SaveColumn {
   set setUsedBefore(v) => usedBefore = v;
   set setlanguage(v) => language = v;
   List<col> get getColumns => collumns;
+  int get getSelcColumn => selectedColumn;
+  set setSelcColumn(v) => selectedColumn = v;
 }
