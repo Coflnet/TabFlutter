@@ -24,7 +24,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   }
 
   void loadColumns() async {
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
     setState(() {
       columns = SaveColumn().getColumns;
     });
@@ -52,6 +52,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
         itemSize: 100,
         onItemFocus: (int num) {
           SaveColumn().setSelcColumn = num;
+          SaveColumn().saveFile();
           RecentLogHandler().setCurrentSelected = columns[num];
         });
   }

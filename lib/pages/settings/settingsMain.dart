@@ -18,14 +18,13 @@ class _SettingsMainState extends State<SettingsMain> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(fontFamily: "WorkSans"),
-      home: Scaffold(
-        body: Stack(
-          children: [
-            const Background(),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24),
+    return Scaffold(
+      body: Stack(
+        children: [
+          const Background(),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
                   const SettingsHeader(),
@@ -36,13 +35,13 @@ class _SettingsMainState extends State<SettingsMain> {
                 ],
               ),
             ),
-            const Footer(),
-            Visibility(
-                visible: popupVisible,
-                child: SettingsPopupMain(
-                    isShowing: popupVisible, closePopup: popup))
-          ],
-        ),
+          ),
+          const Footer(),
+          Visibility(
+              visible: popupVisible,
+              child:
+                  SettingsPopupMain(isShowing: popupVisible, closePopup: popup))
+        ],
       ),
     );
   }

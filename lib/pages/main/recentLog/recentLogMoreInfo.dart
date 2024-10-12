@@ -5,9 +5,9 @@ class RecentLogMoreInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () {},
-      icon: Icon(
+    return Container(
+      padding: const EdgeInsets.all(8),
+      child: Icon(
         Icons.info_outline,
         color: Colors.grey.shade500,
         size: 30,

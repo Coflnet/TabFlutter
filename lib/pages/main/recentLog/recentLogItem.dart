@@ -51,16 +51,18 @@ class _RecentLogItemState extends State<RecentLogItem> {
                 RecentLogName(name: widget.name),
                 RecentLogItemParam(
                     values: [widget.values[0].name, widget.values[0]]),
-                RecentLogItemParam(
-                    values: (widget.values.length == 2)
-                        ? [widget.values[1].name, widget.values[1]]
-                        : []),
+                (MediaQuery.sizeOf(context).width <= 390)
+                    ? Container()
+                    : RecentLogItemParam(
+                        values: (widget.values.length == 2)
+                            ? [widget.values[1].name, widget.values[1]]
+                            : []),
                 const SizedBox(width: 6),
               ],
             ),
           ),
         ),
-        const RecentLogMoreInfo()
+        Visibility(visible: widget.settings, child: const RecentLogMoreInfo())
       ],
     );
   }

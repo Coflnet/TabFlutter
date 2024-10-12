@@ -3,34 +3,29 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
-import 'package:speech_to_text/speech_recognition_error.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/launchPage.dart';
-import 'package:table_entry/pages/main/currentVizulization/currentStateHeader.dart';
-import 'package:table_entry/pages/main/currentVizulization/currentStatusVisulization.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
 import 'package:table_entry/pages/main/listeningMode/listeningModeMain.dart';
-import 'package:table_entry/pages/main/recentLog/popup/recentLogPopup.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupContainer.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recentLogSelectHolder.dart';
 import 'package:table_entry/pages/main/recognizedData.dart';
-import 'package:table_entry/pages/main/selectedColumn/selectCollumnMain.dart';
-import 'package:table_entry/pages/main/selectedColumn/selectColumnSelector.dart';
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+    SystemUiOverlay.top,
+    SystemUiOverlay.bottom,
+  ]);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarBrightness: Brightness.light,
@@ -88,6 +83,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
       theme: ThemeData(fontFamily: "WorkSans"),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         localizationDelegate
       ],

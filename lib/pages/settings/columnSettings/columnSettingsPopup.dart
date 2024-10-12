@@ -40,7 +40,7 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
         decoration: BoxDecoration(
             color: HexColor("1D1E2B"), borderRadius: BorderRadius.circular(16)),
         width: MediaQuery.sizeOf(context).width * 0.8,
-        height: 400,
+        height: MediaQuery.sizeOf(context).height * 0.65,
         child: Column(
           children: [
             ChangeNotifierProvider(

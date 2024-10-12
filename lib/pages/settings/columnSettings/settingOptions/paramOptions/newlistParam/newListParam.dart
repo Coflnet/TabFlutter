@@ -27,34 +27,26 @@ class _NewListParamState extends State<NewListParam> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.shrink(
+    return Center(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-        width: 30,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-        child: Column(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      color: const Color.fromARGB(31, 215, 212, 255), width: 2),
-                  borderRadius: BorderRadius.circular(8)),
-              child: TextField(
-                controller: controller,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration.collapsed(
-                  hintStyle: const TextStyle(color: Colors.white30),
-                  hintText: translate("listHint"),
-                ),
-                onChanged: (String newString) =>
-                    widget.updateParamName(widget.itemCount, newString),
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+              border: Border.all(
+                  color: const Color.fromARGB(31, 215, 212, 255), width: 2),
+              borderRadius: BorderRadius.circular(8)),
+          child: TextField(
+            controller: controller,
+            textAlign: TextAlign.center,
+            decoration: InputDecoration.collapsed(
+              hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+              hintText: translate("listHint"),
             ),
-          ],
+            onChanged: (String newString) =>
+                widget.updateParamName(widget.itemCount, newString),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+          ),
         ),
       ),
     );

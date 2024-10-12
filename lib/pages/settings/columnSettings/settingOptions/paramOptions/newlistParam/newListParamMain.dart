@@ -29,12 +29,13 @@ class _NewListParamMainState extends State<NewListParamMain> {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: <Widget>[
           NewListParamHeader(addCount: addItemCount),
           GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: (1 / .25),
+                  childAspectRatio: (1 / .27),
                   crossAxisCount: 2,
                   mainAxisSpacing: 13,
                   crossAxisSpacing: 8),

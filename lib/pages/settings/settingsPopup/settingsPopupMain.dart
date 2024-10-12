@@ -25,9 +25,23 @@ class _SettingsPopupMainState extends State<SettingsPopupMain> {
           height: double.infinity,
           color: Colors.black38,
           child: Center(
-            child: ColumnSettingsPopup(
-              isShowing: widget.isShowing,
-              closePopup: widget.closePopup,
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                ColumnSettingsPopup(
+                  isShowing: widget.isShowing,
+                  closePopup: widget.closePopup,
+                ),
+                IconButton(
+                    onPressed: () {
+                      widget.closePopup();
+                    },
+                    icon: Icon(
+                      Icons.close_rounded,
+                      size: 37,
+                      color: Colors.grey.shade400,
+                    ))
+              ],
             ),
           ),
         ),
