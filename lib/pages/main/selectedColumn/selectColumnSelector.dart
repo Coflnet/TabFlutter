@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
@@ -14,17 +16,16 @@ class SelectColumnSelector extends StatefulWidget {
 
 class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   List columns = SaveColumn().getColumns;
-  late ScrollController controller;
+  final ScrollController _scrollController = ScrollController();
 
+  @override
   void initState() {
     super.initState();
     loadColumns();
-    controller = ScrollController(
-        initialScrollOffset: SaveColumn().getSelcColumn.toDouble());
   }
 
   void loadColumns() async {
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       columns = SaveColumn().getColumns;
     });
@@ -33,27 +34,54 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollSnapList(
-        listController: controller,
-        scrollDirection: Axis.vertical,
-        itemBuilder: (context, index) {
-          return (index == columns.length)
-              ? Container(height: 50)
-              : RecentLogItem(
-                  name: columns[index].name,
-                  values: columns[index].params,
-                  settings: false,
-                  index: index,
-                  buttonClicked: (i) {},
-                );
-        },
-        dynamicItemSize: true,
-        itemCount: columns.length + 1,
-        itemSize: 100,
-        onItemFocus: (int num) {
-          SaveColumn().setSelcColumn = num;
-          SaveColumn().saveFile();
-          RecentLogHandler().setCurrentSelected = columns[num];
-        });
+    return NotificationListener(
+      onNotification: (scrollNotification) {
+        setState(() {}); // Trigger rebuild on scroll
+        return true;
+      },
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: ListView.builder(
+          padding: EdgeInsets.fromLTRB(0, 30, 0, 40),
+          controller: _scrollController,
+          itemBuilder: (context, index) {
+            double itemPosition = _getItemPosition(index);
+
+            double scale = lerpDouble(0.9, 1.0, _smoothStep(1 - itemPosition))!;
+
+            return Transform.scale(
+                scale: scale,
+                child: Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: RecentLogItem(
+                    name: columns[index].name,
+                    values: columns[index].params,
+                    settings: false,
+                    index: index,
+                    buttonClicked: (i) {},
+                  ),
+                ));
+          },
+          physics: BouncingScrollPhysics(parent: PageScrollPhysics()),
+          itemExtent: 100,
+          itemCount: columns.length,
+        ),
+      ),
+    );
+  }
+
+  double _smoothStep(double x) {
+    return x * x * (3 - 2 * x);
+  }
+
+  double _getItemPosition(int index) {
+    if (!_scrollController.hasClients) return 0.0;
+    double itemHeight = 200.0;
+    double scrollOffset = _scrollController.offset;
+    double itemPosition =
+        (index * itemHeight - scrollOffset).abs() / itemHeight;
+
+    return itemPosition;
   }
 }

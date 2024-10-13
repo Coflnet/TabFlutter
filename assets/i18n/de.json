@@ -22,6 +22,8 @@
     "listHint": "Beschreibung",
     "newHeader": "Titel",
     "setNameHint": "Bezeich",
-    "listType": "Typ"
-
+    "listType": "Typ",
+    "String": "Text",
+    "List": "Auswahl",
+    "0/10": "0-10"
 }

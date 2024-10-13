@@ -31,7 +31,7 @@ class SaveColumn {
 
     usedBefore = fileData["usedBefore"];
     language = fileData["language"];
-    selectedColumn = fileData[""];
+    selectedColumn = fileData["selectedColumn"];
   }
 
   Future<void> createFile(file) async {

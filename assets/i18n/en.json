@@ -22,5 +22,8 @@
     "listHint": "List name",
     "newHeader": "Name",
     "setNameHint": "setName",
-    "listType": "Type"
+    "listType": "Type",
+    "String": "String",
+    "List": "List",
+    "0/10": "0/10"
 }

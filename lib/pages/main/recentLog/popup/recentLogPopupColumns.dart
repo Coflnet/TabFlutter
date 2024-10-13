@@ -56,7 +56,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600),
                           ),
-                          (widget.params[index].type == "List")
+                          (widget.params[index].type == translate("List"))
                               ? RecentLogPopupListOption(
                                   types: widget.params[index].listOption ?? [],
                                   selectedValue:
