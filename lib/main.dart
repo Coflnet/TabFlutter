@@ -80,78 +80,73 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
     var localizationDelegate = LocalizedApp.of(context).delegate;
 
     return MaterialApp(
-      theme: ThemeData(fontFamily: "WorkSans"),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        localizationDelegate
-      ],
-      supportedLocales: localizationDelegate.supportedLocales,
-      locale: localizationDelegate.currentLocale,
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
-          ChangeNotifierProvider(create: (_) => UpdateRecentLog())
+        theme: ThemeData(fontFamily: "WorkSans"),
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          localizationDelegate
         ],
-        child: Scaffold(
-          body: Stack(
-            children: [
-              const Background(),
-              Column(
+        supportedLocales: localizationDelegate.supportedLocales,
+        locale: localizationDelegate.currentLocale,
+        home: MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
+              ChangeNotifierProvider(create: (_) => UpdateRecentLog())
+            ],
+            child: Scaffold(
+              body: Stack(
                 children: [
-                  const MainPageHeader(),
-                  Expanded(
-                    child: AnimatedOpacity(
-                      curve: Curves.easeInOutQuad,
-                      opacity: isRecording ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 700),
-                      child: SlideTransition(
-                        position: animation,
-                        child: Column(
-                          children: <Widget>[
-                            RecentLogSelectHolder(closePopup: closePopup),
-                          ],
+                  const Background(),
+                  Column(
+                    children: [
+                      const MainPageHeader(),
+                      Expanded(
+                        child: AnimatedOpacity(
+                          curve: Curves.easeInOutQuad,
+                          opacity: isRecording ? 0.0 : 1.0,
+                          duration: const Duration(milliseconds: 700),
+                          child: SlideTransition(
+                            position: animation,
+                            child: Column(
+                              children: <Widget>[
+                                RecentLogSelectHolder(closePopup: closePopup),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  Visibility(
+                    visible: isRecording,
+                    child: Column(
+                      children: [
+                        Expanded(
+                            child: AnimatedOpacity(
+                          curve: Curves.easeInOutQuad,
+                          opacity: isRecording ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 500),
+                          child: SlideTransition(
+                              position: animation2,
+                              child: ListeningModeMain(
+                                  recognizedWords: recognizedWords)),
+                        )),
+                      ],
                     ),
+                  ),
+                  SlideTransition(position: animation, child: const Footer()),
+                  Visibility(
+                      visible: isVisible,
+                      child: RecentLogPopupContainer(closePopup: closePopup)),
+                  StartStopDetection(
+                    startStop: () => handleAnimations(),
+                    changeRecordingData: (String newString) =>
+                        setState(() => recognizedWords = newString),
                   ),
                 ],
               ),
-              Visibility(
-                visible: isRecording,
-                child: Column(
-                  children: [
-                    Expanded(
-                        child: AnimatedOpacity(
-                      curve: Curves.easeInOutQuad,
-                      opacity: isRecording ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 500),
-                      child: SlideTransition(
-                          position: animation2,
-                          child: ListeningModeMain(
-                              recognizedWords: recognizedWords)),
-                    )),
-                  ],
-                ),
-              ),
-              SlideTransition(position: animation, child: const Footer()),
-              Visibility(
-                  visible: isVisible,
-                  child: RecentLogPopupContainer(closePopup: closePopup))
-            ],
-          ),
-          floatingActionButton: StartStopDetection(
-            startStop: () => handleAnimations(),
-            changeRecordingData: (String newString) =>
-                setState(() => recognizedWords = newString),
-          ),
-          floatingActionButtonLocation: isRecording
-              ? FloatingActionButtonLocation.centerDocked
-              : FloatingActionButtonLocation.endDocked,
-        ),
-      ),
-    );
+            )));
   }
 
   void handleAnimations() async {

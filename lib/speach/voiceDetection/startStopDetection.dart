@@ -30,6 +30,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
   double level = 0.0;
   late AnimationController controller;
   bool isRunning = false;
+  Alignment alignment = Alignment.bottomRight;
   String recordedData = "";
   String displayedRecordedData = "";
   bool levelIsZero = false;
@@ -51,31 +52,35 @@ class _StartStopDetectionState extends State<StartStopDetection>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: isRunning
-          ? const EdgeInsets.only(bottom: 15)
-          : const EdgeInsets.only(bottom: 86),
-      child: AnimatedBuilder(
-        animation: controller,
-        builder: (context, child) {
-          double scale = 1 + (level / 50);
-          return isRunning
-              ? StartStopDetectionRunning(
-                  startStop: startStopListening, run: levelIsZero)
-              : TextButton(
-                  onPressed: startStopListening,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        color: HexColor("#8332AC"),
-                        borderRadius: BorderRadius.circular(16)),
-                    child: Icon(
-                      Icons.mic,
-                      color: isRunning ? Colors.white : Colors.white70,
-                      size: 40,
-                    ),
-                  ));
-        },
+    return AnimatedAlign(
+      alignment: alignment,
+      duration: const Duration(milliseconds: 400),
+      child: Container(
+        margin: isRunning
+            ? const EdgeInsets.only(bottom: 15)
+            : const EdgeInsets.only(bottom: 86),
+        child: AnimatedBuilder(
+          animation: controller,
+          builder: (context, child) {
+            double scale = 1 + (level / 50);
+            return isRunning
+                ? StartStopDetectionRunning(
+                    startStop: startStopListening, run: levelIsZero)
+                : TextButton(
+                    onPressed: startStopListening,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          color: HexColor("#8332AC"),
+                          borderRadius: BorderRadius.circular(16)),
+                      child: Icon(
+                        Icons.mic,
+                        color: isRunning ? Colors.white : Colors.white70,
+                        size: 40,
+                      ),
+                    ));
+          },
+        ),
       ),
     );
   }
@@ -87,6 +92,9 @@ class _StartStopDetectionState extends State<StartStopDetection>
     widget.startStop();
 
     if (!isRunning) {
+      setState(() {
+        alignment = Alignment.bottomRight;
+      });
       speech.stop();
       List<col> newRecentCol = await RecentLogRequest()
           .request(recordedData, RecentLogHandler().getCurrentSelected);
@@ -106,6 +114,9 @@ class _StartStopDetectionState extends State<StartStopDetection>
   }
 
   void startListening() {
+    setState(() {
+      alignment = Alignment.bottomCenter;
+    });
     speech.statusListener = statusListener;
 
     var options = SpeechListenOptions(
