@@ -24,7 +24,7 @@ class _StartStopDetectionRunningState extends State<StartStopDetectionRunning> {
   void initState() {
     super.initState();
     controller = CustomPopupMenuController();
-
+    print("called");
     waitCall();
   }
 

@@ -54,8 +54,11 @@ class _StartStopDetectionState extends State<StartStopDetection>
   Widget build(BuildContext context) {
     return AnimatedAlign(
       alignment: alignment,
-      duration: const Duration(milliseconds: 400),
-      child: Container(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutQuad,
+      child: AnimatedContainer(
+        curve: Curves.easeInOutQuad,
+        duration: const Duration(milliseconds: 500),
         margin: isRunning
             ? const EdgeInsets.only(bottom: 15)
             : const EdgeInsets.only(bottom: 86),

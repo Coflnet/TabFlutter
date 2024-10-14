@@ -16,34 +16,58 @@ class SelectColumnSelector extends StatefulWidget {
 
 class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   List columns = SaveColumn().getColumns;
-  final ScrollController _scrollController = ScrollController();
+  int _currentIndex = 0;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(SaveColumn().getSelcColumn * 100 + 20);
+    });
+
     loadColumns();
   }
 
   void loadColumns() async {
-    await Future.delayed(Duration(milliseconds: 100));
     setState(() {
       columns = SaveColumn().getColumns;
     });
     RecentLogHandler().setCurrentSelected = columns[0];
   }
 
+  void _onScroll() {
+    double itemHeight = 200.0;
+    int newIndex = (_scrollController.offset / itemHeight).round();
+
+    if (newIndex != _currentIndex) {
+      setState(() {
+        _currentIndex = newIndex;
+      });
+      _onSelectedIndexChanged(newIndex);
+    }
+  }
+
+  void _onSelectedIndexChanged(int index) {
+    SaveColumn().setSelcColumn = index;
+    SaveColumn().saveFile();
+    RecentLogHandler().setCurrentSelected = columns[index];
+  }
+
   @override
   Widget build(BuildContext context) {
     return NotificationListener(
       onNotification: (scrollNotification) {
-        setState(() {}); // Trigger rebuild on scroll
+        setState(() {});
         return true;
       },
       child: MediaQuery.removePadding(
         context: context,
         removeTop: true,
         child: ListView.builder(
-          padding: EdgeInsets.fromLTRB(0, 30, 0, 40),
+          padding: const EdgeInsets.fromLTRB(0, 15, 0, 40),
           controller: _scrollController,
           itemBuilder: (context, index) {
             double itemPosition = _getItemPosition(index);
@@ -77,7 +101,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
 
   double _getItemPosition(int index) {
     if (!_scrollController.hasClients) return 0.0;
-    double itemHeight = 200.0;
+    double itemHeight = 100.0;
     double scrollOffset = _scrollController.offset;
     double itemPosition =
         (index * itemHeight - scrollOffset).abs() / itemHeight;
