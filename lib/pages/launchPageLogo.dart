@@ -23,9 +23,16 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
   void loadApp() async {
     SaveColumn().loadColumns();
     RecentLogHandler().loadRecentLog();
+
     await Future.delayed(const Duration(milliseconds: 200));
-    print(SaveColumn().getlanguage);
-    changeLocale(context, SaveColumn().getlanguage);
+
+    Locale local = Localizations.localeOf(context);
+    SaveColumn().saveFile();
+    if (local.languageCode == "de") {
+      changeLocale(context, "de");
+      SaveColumn().setlanguage = "de";
+      SaveColumn().saveFile();
+    }
     Navigator.push(
       context,
       PageRouteBuilder(

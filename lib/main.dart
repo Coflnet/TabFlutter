@@ -77,18 +77,8 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var localizationDelegate = LocalizedApp.of(context).delegate;
-
     return MaterialApp(
         theme: ThemeData(fontFamily: "WorkSans"),
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          localizationDelegate
-        ],
-        supportedLocales: localizationDelegate.supportedLocales,
-        locale: localizationDelegate.currentLocale,
         home: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),

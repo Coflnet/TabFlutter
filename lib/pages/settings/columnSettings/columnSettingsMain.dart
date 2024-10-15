@@ -35,6 +35,7 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
           context: context,
           removeTop: true,
           child: ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: createdColumns.length,
               itemBuilder: (context, index) {
@@ -49,7 +50,8 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
                   ),
                 );
               }),
-        )
+        ),
+        Container(height: 75)
       ],
     );
   }
