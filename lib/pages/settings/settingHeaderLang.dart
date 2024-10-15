@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 
 class SettingHeaderLang extends StatefulWidget {
@@ -66,5 +67,6 @@ class _SettingHeaderLangState extends State<SettingHeaderLang> {
         SaveColumn().setlanguage = "de";
         SaveColumn().saveFile();
     }
+    Restart.restartApp();
   }
 }

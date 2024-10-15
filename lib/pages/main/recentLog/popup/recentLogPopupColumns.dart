@@ -18,6 +18,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
   @override
   void initState() {
     super.initState();
+    handleTranslate();
   }
 
   void handleTranslate() {
@@ -26,7 +27,9 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
     }
     List enList = ["List", "0/10", "String"];
     for (var element in widget.params) {
-      if (enList.contains(element.type)) {}
+      if (enList.contains(element.type)) {
+        element.type = enList[enList.indexOf(element.type)];
+      }
     }
   }
 

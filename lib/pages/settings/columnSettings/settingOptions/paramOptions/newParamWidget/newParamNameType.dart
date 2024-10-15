@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/main.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamNameOption.dart';
 
@@ -27,6 +28,11 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
     translate("optionList"),
     translate("option0/10")
   ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

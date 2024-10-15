@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamNameType.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newlistParam/newListParamMain.dart';
 
@@ -13,6 +14,8 @@ class NewParam extends StatefulWidget {
     required this.index,
     required this.update,
   });
+
+  Object? get selectedValue => null;
 
   @override
   _NewParamState createState() => _NewParamState();
@@ -47,13 +50,23 @@ class _NewParamState extends State<NewParam>
     setState(() {
       type = EditingColumns().getEditingCol.params[widget.index].type;
     });
-    print(type);
+    checklang();
     if (type == translate("optionList")) {
       setState(() {
         displayListType = true;
       });
       print(EditingColumns().getEditingCol.params[widget.index].listOption);
       _controller.forward();
+    }
+  }
+
+  void checklang() {
+    if (SaveColumn().getlanguage == "en") {
+      return;
+    }
+    List<String> enList = ["List", "0/10", "String"];
+    if (enList.contains(type)) {
+      type = translate(enList[enList.indexOf(type)]);
     }
   }
 
