@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupEditBox.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupListOption.dart';
 
@@ -17,7 +18,16 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
   @override
   void initState() {
     super.initState();
-    print(widget.params.toString());
+  }
+
+  void handleTranslate() {
+    if (SaveColumn().getlanguage == "en") {
+      return;
+    }
+    List enList = ["List", "0/10", "String"];
+    for (var element in widget.params) {
+      if (enList.contains(element.type)) {}
+    }
   }
 
   @override

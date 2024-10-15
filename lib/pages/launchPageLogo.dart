@@ -27,7 +27,7 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
     await Future.delayed(const Duration(milliseconds: 200));
 
     Locale local = Localizations.localeOf(context);
-    SaveColumn().saveFile();
+    changeLocale(context, SaveColumn().getlanguage);
     if (local.languageCode == "de") {
       changeLocale(context, "de");
       SaveColumn().setlanguage = "de";

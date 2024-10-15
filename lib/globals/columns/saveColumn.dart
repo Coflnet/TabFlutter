@@ -47,15 +47,16 @@ class SaveColumn {
   }
 
   void saveColumn(int id, col col) {
+    print("saved");
     for (var i in collumns) {
       if (i.id == id) {
         collumns.remove(i);
-        collumns.add(col);
+        collumns.insert(0, col);
         saveFile();
         return;
       }
     }
-    collumns.add(col);
+    collumns.insert(0, col);
     saveFile();
   }
 
