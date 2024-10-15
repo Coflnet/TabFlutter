@@ -33,13 +33,13 @@ class _RecentLogItemState extends State<RecentLogItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        TextButton(
-          style: TextButton.styleFrom(padding: EdgeInsets.zero),
-          onPressed: (widget.settings) ? clickedSettings : () {},
-          child: Container(
+    return TextButton(
+      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+      onPressed: (widget.settings) ? clickedSettings : () {},
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          Container(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
             margin: const EdgeInsets.only(bottom: 0),
             decoration: BoxDecoration(
@@ -61,9 +61,9 @@ class _RecentLogItemState extends State<RecentLogItem> {
               ],
             ),
           ),
-        ),
-        Visibility(visible: widget.settings, child: const RecentLogMoreInfo())
-      ],
+          Visibility(visible: widget.settings, child: const RecentLogMoreInfo())
+        ],
+      ),
     );
   }
 

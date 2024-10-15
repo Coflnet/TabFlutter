@@ -126,14 +126,14 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                     ),
                   ),
                   SlideTransition(position: animation, child: const Footer()),
-                  Visibility(
-                      visible: isVisible,
-                      child: RecentLogPopupContainer(closePopup: closePopup)),
                   StartStopDetection(
                     startStop: () => handleAnimations(),
                     changeRecordingData: (String newString) =>
                         setState(() => recognizedWords = newString),
                   ),
+                  Visibility(
+                      visible: isVisible,
+                      child: RecentLogPopupContainer(closePopup: closePopup)),
                 ],
               ),
             )));
