@@ -38,7 +38,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   }
 
   void _onScroll() {
-    double itemHeight = 100.0;
+    double itemHeight = 70.0;
     int newIndex = (_scrollController.offset / itemHeight).round();
 
     if (newIndex != _currentIndex) {
@@ -73,7 +73,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
         },
         dynamicItemSize: true,
         itemCount: columns.length + 1,
-        itemSize: 100,
+        itemSize: 90,
         onItemFocus: (int num) {
           SaveColumn().setSelcColumn = num;
           SaveColumn().saveFile();

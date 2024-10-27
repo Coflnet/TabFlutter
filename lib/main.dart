@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +17,6 @@ import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +37,7 @@ void main() async {
 }
 
 class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+  const Main({super.key});
 
   @override
   _MainState createState() => _MainState();
