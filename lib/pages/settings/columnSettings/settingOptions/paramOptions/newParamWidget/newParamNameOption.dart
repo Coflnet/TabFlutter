@@ -58,7 +58,7 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
               child: TextField(
                 maxLengthEnforcement:
                     MaxLengthEnforcement.truncateAfterCompositionEnds,
-                maxLength: 8,
+                maxLength: 24,
                 controller: controller,
                 decoration: InputDecoration(
                   isCollapsed: true,
