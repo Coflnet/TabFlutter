@@ -1,5 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:table_entry/globals/columns/columnsDataProccessing.dart';
+import 'package:table_entry/globals/convertCSV.dart';
+import 'package:table_entry/pages/settings/csvExport/csvExportConfirmExport.dart';
 import 'package:table_entry/pages/settings/csvExport/csvExportDateSelect.dart';
 import 'package:table_entry/pages/settings/csvExport/csvExportFileName.dart';
 import 'package:table_entry/pages/settings/csvExport/csvExportOptionsHeader.dart';
@@ -32,7 +40,8 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
               const CsvExportTableSelect(),
               const SizedBox(height: 12),
               const CsvExportDateSelect(),
-              Expanded(child: SizedBox()),
+              const Expanded(child: SizedBox()),
+              CsvExportConfirmExport(closePopup: exportAndClose)
             ],
           ),
           IconButton(
@@ -47,5 +56,23 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
         ],
       ),
     );
+  }
+
+  void exportAndClose() async {
+    final columnData = ColumnsDataProccessing().getColumnData();
+    String csv = ConvertCsv().convertCsv(columnData);
+    Directory appDir = await getApplicationDocumentsDirectory();
+    String filePath = "${appDir.path}/exportCSVTEMP.json";
+    File file = File(filePath);
+    file.createSync();
+    print(ColumnsDataProccessing().getFileName);
+    final result = await Share.shareXFiles([
+      XFile.fromData(utf8.encode(csv), mimeType: "csv", name: "TabData")
+    ], fileNameOverrides: [
+      ColumnsDataProccessing().getFileName.replaceAll(RegExp(r"\s+"), "")
+    ], text: ColumnsDataProccessing().getFileName);
+    if (result.status == ShareResultStatus.success) {
+      widget.closePopup();
+    }
   }
 }

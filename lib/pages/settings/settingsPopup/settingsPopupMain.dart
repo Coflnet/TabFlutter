@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:table_entry/pages/settings/columnSettings/collumnSettingContainer.dart';
-import 'package:table_entry/pages/settings/columnSettings/columnSettingsMain.dart';
-import 'package:table_entry/pages/settings/columnSettings/columnSettingsPopup.dart';
 import 'package:table_entry/pages/settings/csvExport/csvExportPopupMain.dart';
 
 class SettingsPopupMain extends StatefulWidget {

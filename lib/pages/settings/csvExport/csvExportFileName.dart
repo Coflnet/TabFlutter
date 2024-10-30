@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
+import 'package:table_entry/globals/columns/columnsDataProccessing.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 
 class CsvExportFileName extends StatefulWidget {
@@ -19,7 +20,8 @@ class _CsvExportFileNameState extends State<CsvExportFileName> {
 
     controller = TextEditingController(
         text:
-            "${RecentLogHandler().getCurrentSelected.name}-${DateFormat("Md").format(DateTime.now())}");
+            "${RecentLogHandler().getCurrentSelected.name}-${DateFormat("MMM-d").format(DateTime.now())}");
+    ColumnsDataProccessing().setFileName = controller.text;
   }
 
   @override
@@ -49,6 +51,7 @@ class _CsvExportFileNameState extends State<CsvExportFileName> {
               hintStyle: TextStyle(color: Colors.white30),
             ),
             onChanged: (value) {
+              ColumnsDataProccessing().setFileName = value;
               widget.fileNameChanged();
             },
             style: const TextStyle(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
+import 'package:table_entry/globals/columns/columnsDataProccessing.dart';
 
 class CsvExportDateSelect extends StatefulWidget {
   const CsvExportDateSelect({super.key});
@@ -21,6 +22,7 @@ class _CsvExportDateSelectState extends State<CsvExportDateSelect> {
     );
     if (picked != null && picked != selectedDate) {
       setState(() {
+        ColumnsDataProccessing().setAfterDate = picked;
         selectedDate = picked;
       });
     }

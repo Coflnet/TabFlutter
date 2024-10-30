@@ -60,7 +60,7 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
       createdColumns
           .add(EditingColumns().createNewCol("", createdColumns.length));
     });
-    widget.popup(1);
+    widget.popup(0);
   }
 
   void editCollumnPressed(int index) {

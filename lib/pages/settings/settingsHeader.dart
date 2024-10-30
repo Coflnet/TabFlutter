@@ -3,7 +3,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/pages/settings/settingHeaderLang.dart';
 
 class SettingsHeader extends StatelessWidget {
-  const SettingsHeader({Key? key}) : super(key: key);
+  const SettingsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class SettingsHeader extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   fontSize: 30),
             ),
-            SettingHeaderLang()
+            const SettingHeaderLang()
           ],
         ),
       ),

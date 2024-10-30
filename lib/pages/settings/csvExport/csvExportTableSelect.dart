@@ -14,12 +14,12 @@ class CsvExportTableSelect extends StatefulWidget {
 
 class _CsvExportTableSelectState extends State<CsvExportTableSelect> {
   List<DropdownMenuItem> items = [];
-  String selectedValue =
-      SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
+  String selectedValue = "";
 
   @override
   void initState() {
     super.initState();
+
     for (var i in SaveColumn().getColumns) {
       items.add(
         DropdownMenuItem<String>(
@@ -33,6 +33,13 @@ class _CsvExportTableSelectState extends State<CsvExportTableSelect> {
     }
 
     ColumnsDataProccessing().setSelectedColumn = selectedValue;
+    if (SaveColumn().getColumns.isNotEmpty) {
+      setState(() {
+        selectedValue =
+            SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
+        print(selectedValue);
+      });
+    }
   }
 
   @override

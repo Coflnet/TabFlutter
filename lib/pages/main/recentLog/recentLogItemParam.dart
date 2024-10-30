@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class RecentLogItemParam extends StatelessWidget {
@@ -8,7 +6,7 @@ class RecentLogItemParam extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 100,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -23,6 +21,7 @@ class RecentLogItemParam extends StatelessWidget {
             child: Text(
               (values.isEmpty) ? "" : values[1].svalue,
               style: const TextStyle(color: Colors.white70, fontSize: 16),
+              textAlign: TextAlign.center,
             ),
           )
         ],

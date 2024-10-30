@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 
-late col currentSelected;
+col currentSelected = col(name: "no-tabls", emoji: "", id: 1, params: []);
 
 List<col> recentLog = [];
 List<col> displayedLog = [];
