@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
-import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogItem.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsHeader.dart';
 
 class ColumnSettingsMain extends StatefulWidget {
-  final VoidCallback popup;
+  final Function(int) popup;
   const ColumnSettingsMain({super.key, required this.popup});
 
   @override
@@ -35,7 +34,7 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
           context: context,
           removeTop: true,
           child: ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: createdColumns.length,
               itemBuilder: (context, index) {
@@ -61,11 +60,11 @@ class _ColumnSettingsMainState extends State<ColumnSettingsMain> {
       createdColumns
           .add(EditingColumns().createNewCol("", createdColumns.length));
     });
-    widget.popup();
+    widget.popup(1);
   }
 
   void editCollumnPressed(int index) {
     EditingColumns().setEditingCol = SaveColumn().getColumns[index].copy();
-    widget.popup();
+    widget.popup(0);
   }
 }

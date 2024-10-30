@@ -7,7 +7,7 @@ import 'package:table_entry/pages/settings/settingsHeader.dart';
 import 'package:table_entry/pages/settings/settingsPopup/settingsPopupMain.dart';
 
 class SettingsMain extends StatefulWidget {
-  const SettingsMain({Key? key}) : super(key: key);
+  const SettingsMain({super.key});
 
   @override
   _SettingsMainState createState() => _SettingsMainState();
@@ -15,6 +15,7 @@ class SettingsMain extends StatefulWidget {
 
 class _SettingsMainState extends State<SettingsMain> {
   bool popupVisible = false;
+  int popupSelected = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class _SettingsMainState extends State<SettingsMain> {
                 children: <Widget>[
                   const SettingsHeader(),
                   const SizedBox(height: 35),
-                  SettingExportMain(),
+                  SettingExportMain(exportPopup: popup),
                   const SizedBox(height: 20),
                   ColumnSettingsMain(popup: popup),
                 ],
@@ -39,15 +40,24 @@ class _SettingsMainState extends State<SettingsMain> {
           const Footer(),
           Visibility(
               visible: popupVisible,
-              child:
-                  SettingsPopupMain(isShowing: popupVisible, closePopup: popup))
+              child: SettingsPopupMain(
+                  isShowing: popupVisible,
+                  closePopup: closePopup,
+                  selectedPopup: popupSelected))
         ],
       ),
     );
   }
 
-  void popup() {
+  void closePopup() {
     setState(() {
+      popupVisible = false;
+    });
+  }
+
+  void popup(int select) {
+    setState(() {
+      popupSelected = select;
       popupVisible = !popupVisible;
     });
   }

@@ -6,12 +6,12 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/convertCSV.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 
 class ExportAsCsv extends StatelessWidget {
-  const ExportAsCsv({super.key});
+  final Function(int) openPopup;
+  const ExportAsCsv({super.key, required this.openPopup});
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +51,8 @@ class ExportAsCsv extends StatelessWidget {
   }
 
   void handleCSV() async {
+    openPopup(1);
+    return;
     String csv = ConvertCsv().convertCsv(RecentLogHandler().getRecentLog);
     Directory appDir = await getApplicationDocumentsDirectory();
     String filePath = "${appDir.path}/exportCSVTEMP.json";

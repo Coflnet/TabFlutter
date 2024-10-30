@@ -9,12 +9,15 @@ class col {
   List<param> params;
   String emoji;
   int id;
+  DateTime createdDate;
 
   col(
       {required this.name,
       required this.params,
       required this.id,
-      required this.emoji});
+      DateTime? createdDate,
+      required this.emoji})
+      : createdDate = DateTime.now();
 
   @override
   String toString() {

@@ -1,7 +1,3 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:http/http.dart' as http;
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -10,8 +6,10 @@ class RecentLogRequest {
   Future<List<col>> request(String inputText, col collumn) async {
     Map<String, PropertyInfo> inputData = {};
 
-    collumn.params.forEach((i) => inputData[i.name] =
-        PropertyInfo(type: matchType(i.type), enumValues: i.listOption));
+    for (var i in collumn.params) {
+      inputData[i.name] =
+          PropertyInfo(type: matchType(i.type), enumValues: i.listOption);
+    }
 
     final client = ApiClient(basePath: "https://demo.coflnet.com");
     final result = await TabApi(client).post(
@@ -27,13 +25,14 @@ class RecentLogRequest {
     for (var object in result) {
       col newCollumn = collumn.copy();
       object.forEach((String colKey, k) {
-        newCollumn.params.forEach((key) {
+        for (var key in newCollumn.params) {
           if (key.name == colKey) {
             print("setting value to $k");
             key["value"] = k;
           }
-        });
+        }
       });
+      newCollumn.createdDate = DateTime.now();
       newCollumn.id =
           RecentLogHandler().getRecentLog.length + 1 + newCollumns.length;
       newCollumns.add(newCollumn);

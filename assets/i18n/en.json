@@ -25,5 +25,8 @@
     "listType": "Type",
     "String": "String",
     "List": "List",
-    "0/10": "0/10"
+    "0/10": "0/10",
+    "options": "Options",
+    "exTable": "Table",
+    "exAfter": "After Date"
 }

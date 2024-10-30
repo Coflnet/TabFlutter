@@ -34,7 +34,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
     setState(() {
       columns = SaveColumn().getColumns;
     });
-    RecentLogHandler().setCurrentSelected = columns[0];
+    RecentLogHandler().setCurrentSelected = columns[SaveColumn().getSelcColumn];
   }
 
   void _onScroll() {

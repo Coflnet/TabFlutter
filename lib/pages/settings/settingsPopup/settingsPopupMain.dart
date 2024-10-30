@@ -1,14 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:table_entry/pages/settings/columnSettings/collumnSettingContainer.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsMain.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsPopup.dart';
+import 'package:table_entry/pages/settings/csvExport/csvExportPopupMain.dart';
 
 class SettingsPopupMain extends StatefulWidget {
+  final int selectedPopup;
   final bool isShowing;
   final VoidCallback closePopup;
   const SettingsPopupMain(
-      {super.key, required this.isShowing, required this.closePopup});
+      {super.key,
+      required this.isShowing,
+      required this.closePopup,
+      required this.selectedPopup});
 
   @override
   _SettingsPopupMainState createState() => _SettingsPopupMainState();
@@ -25,25 +31,11 @@ class _SettingsPopupMainState extends State<SettingsPopupMain> {
           height: double.infinity,
           color: Colors.black38,
           child: Center(
-            child: Stack(
-              alignment: Alignment.topRight,
-              children: [
-                ColumnSettingsPopup(
-                  isShowing: widget.isShowing,
-                  closePopup: widget.closePopup,
-                ),
-                IconButton(
-                    onPressed: () {
-                      widget.closePopup();
-                    },
-                    icon: Icon(
-                      Icons.close_rounded,
-                      size: 37,
-                      color: Colors.grey.shade400,
-                    ))
-              ],
-            ),
-          ),
+              child: (widget.selectedPopup == 0)
+                  ? Collumnsettingcontainer(
+                      isShowing: widget.isShowing,
+                      closePopup: widget.closePopup)
+                  : CsvExportPopupMain(closePopup: widget.closePopup)),
         ),
       ),
     );
