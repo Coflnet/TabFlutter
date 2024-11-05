@@ -1,3 +1,4 @@
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -7,6 +8,10 @@ class RecentLogRequest {
     Map<String, PropertyInfo> inputData = {};
 
     for (var i in collumn.params) {
+      if (i.type == translate("date")) {
+        i.svalue = DateTime.now().toIso8601String();
+        continue;
+      }
       inputData[i.name] =
           PropertyInfo(type: matchType(i.type), enumValues: i.listOption);
     }

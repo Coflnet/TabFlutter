@@ -28,8 +28,6 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
   }
 
   void reactToNotifer() async {
-    print("react");
-
     setState(() {
       name = EditingColumns().getEditingCol.params[widget.index].name;
     });
@@ -40,6 +38,7 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
   Widget build(BuildContext context) {
     return Consumer<popupNotifyer>(builder: (context, value, child) {
       return Expanded(
+        flex: 2,
         child: Column(
           children: <Widget>[
             Text(

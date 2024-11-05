@@ -90,6 +90,7 @@ class _RecentLogState extends State<RecentLog> {
         Expanded(
             child: RecentLogColumn(
                 recentLog: recentLogItems, changeVis: widget.changeVis)),
+        const SizedBox(height: 75)
       ],
     );
   }

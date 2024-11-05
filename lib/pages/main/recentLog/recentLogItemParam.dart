@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class RecentLogItemParam extends StatelessWidget {
   final List values;
-  const RecentLogItemParam({super.key, required this.values});
+  final String type;
+  const RecentLogItemParam(
+      {super.key, required this.values, required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +20,13 @@ class RecentLogItemParam extends StatelessWidget {
             style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
           Visibility(
-            visible: !(values.isEmpty || values[1].svalue == ""),
+            visible: !(values.isEmpty ||
+                values[1].svalue == "" ||
+                (values.isEmpty || type == translate('date'))),
             child: Text(
               (values.isEmpty) ? "" : values[1].svalue,
               style: const TextStyle(color: Colors.white70, fontSize: 16),
+              overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
           )

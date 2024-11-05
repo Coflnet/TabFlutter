@@ -2,8 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:table_entry/globals/columns/saveColumn.dart';
-import 'package:table_entry/main.dart';
+import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamDateType.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/newParamWidget/newParamNameOption.dart';
 
 class NewParamNameType extends StatefulWidget {
@@ -26,12 +25,17 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
   final List<String> items = [
     translate("optionString"),
     translate("optionList"),
-    translate("option0/10")
+    translate("option0/10"),
+    translate("date")
   ];
+  bool dateT = true;
 
   @override
   void initState() {
     super.initState();
+    if (widget.selectedValue == translate("date")) {
+      dateT = false;
+    }
   }
 
   @override
@@ -39,8 +43,11 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        NewParamNameOption(index: widget.index),
+        Visibility(
+            visible: dateT, child: NewParamNameOption(index: widget.index)),
+        NewParamDateType(dateT: dateT),
         Expanded(
+          flex: 2,
           child: Column(
             children: <Widget>[
               Text(
@@ -58,6 +65,7 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
                   child: DropdownButtonHideUnderline(
                       child: DropdownButton2(
                     dropdownStyleData: DropdownStyleData(
+                        maxHeight: 160,
                         decoration: BoxDecoration(
                             color: HexColor("2A2D54"),
                             borderRadius: BorderRadius.circular(8)),
@@ -87,13 +95,21 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
                     value: (widget.selectedValue == "")
                         ? translate("optionString")
                         : widget.selectedValue,
-                    onChanged: (value) =>
-                        {widget.updateType(value ?? widget.selectedValue)},
+                    onChanged: (value) => {
+                      checkType(value ?? ""),
+                      widget.updateType(value ?? widget.selectedValue)
+                    },
                   )))
             ],
           ),
         )
       ],
     );
+  }
+
+  void checkType(String newType) {
+    setState(() {
+      dateT = newType != translate("date");
+    });
   }
 }

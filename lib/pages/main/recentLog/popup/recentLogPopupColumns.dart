@@ -3,6 +3,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/pages/main/recentLog/popup/recentLogDateColumn.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupEditBox.dart';
 import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupListOption.dart';
 
@@ -19,13 +20,14 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
   void initState() {
     super.initState();
     handleTranslate();
+    print(widget.params.toString());
   }
 
   void handleTranslate() {
     if (SaveColumn().getlanguage == "en") {
       return;
     }
-    List enList = ["List", "0/10", "String"];
+    List enList = ["List", "0/10", "String", "Date"];
     for (var element in widget.params) {
       if (enList.contains(element.type)) {
         element.type = enList[enList.indexOf(element.type)];
@@ -69,17 +71,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600),
                           ),
-                          (widget.params[index].type == translate("List"))
-                              ? RecentLogPopupListOption(
-                                  types: widget.params[index].listOption ?? [],
-                                  selectedValue:
-                                      widget.params[index].svalue ?? "",
-                                  index: index)
-                              : RecentLogPopupEditBox(
-                                  name: widget.params[index].svalue ?? "",
-                                  isNumber:
-                                      (widget.params[index].type == "0/10"),
-                                  index: index)
+                          getWidget(widget.params[index].type, index),
                         ],
                       ),
                     )),
@@ -87,5 +79,22 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
         ],
       ),
     );
+  }
+
+  Widget getWidget(String value, int index) {
+    if (value == translate("List")) {
+      return RecentLogPopupListOption(
+          types: widget.params[index].listOption ?? [],
+          selectedValue: widget.params[index].svalue ?? "",
+          index: index);
+    } else if (value == translate("Date")) {
+      return RecentLogDateColumn(
+          index: index, dateTimeString: widget.params[index].svalue ?? "");
+    } else {
+      return RecentLogPopupEditBox(
+          name: widget.params[index].svalue ?? "",
+          isNumber: (widget.params[index].type == "0/10"),
+          index: index);
+    }
   }
 }

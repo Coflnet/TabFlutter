@@ -50,10 +50,14 @@ class _RecentLogItemState extends State<RecentLogItem> {
               children: <Widget>[
                 RecentLogName(name: widget.name),
                 RecentLogItemParam(
+                    type: widget.values[0].type,
                     values: [widget.values[0].name, widget.values[0]]),
                 (MediaQuery.sizeOf(context).width <= 390)
                     ? Container()
                     : RecentLogItemParam(
+                        type: (widget.values.length == 2)
+                            ? widget.values[1].type
+                            : "",
                         values: (widget.values.length == 2)
                             ? [widget.values[1].name, widget.values[1]]
                             : []),
