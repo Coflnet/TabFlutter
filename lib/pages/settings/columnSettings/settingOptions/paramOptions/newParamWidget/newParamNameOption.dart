@@ -38,7 +38,7 @@ class _NewParamNameOptionState extends State<NewParamNameOption> {
   Widget build(BuildContext context) {
     return Consumer<popupNotifyer>(builder: (context, value, child) {
       return Expanded(
-        flex: 2,
+        flex: 3,
         child: Column(
           children: <Widget>[
             Text(

@@ -22,9 +22,11 @@ class RecentLogItemParam extends StatelessWidget {
           Visibility(
             visible: !(values.isEmpty ||
                 values[1].svalue == "" ||
-                (values.isEmpty || type == translate('date'))),
+                (values.isEmpty ||
+                    type == translate('date') ||
+                    type == translate('weather'))),
             child: Text(
-              (values.isEmpty) ? "" : values[1].svalue,
+              getContent(),
               style: const TextStyle(color: Colors.white70, fontSize: 16),
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -33,5 +35,11 @@ class RecentLogItemParam extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String getContent() {
+    if (values.isEmpty) return "";
+    if (values[1].svalue is List) return "${values[1].svalue[0]}";
+    return values[1].svalue;
   }
 }

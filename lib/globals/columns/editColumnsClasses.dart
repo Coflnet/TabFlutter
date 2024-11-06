@@ -60,14 +60,14 @@ class col {
 class param {
   String name;
   String type;
-  String? svalue;
+  dynamic svalue;
   List<String>? listOption;
 
   param(
       {required this.name,
       required this.type,
       List<String>? listOption,
-      String? svalue})
+      dynamic svalue})
       : svalue = svalue ?? '',
         listOption = listOption ?? <String>[];
 

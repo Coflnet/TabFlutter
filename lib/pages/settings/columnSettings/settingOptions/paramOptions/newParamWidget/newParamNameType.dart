@@ -26,14 +26,16 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
     translate("optionString"),
     translate("optionList"),
     translate("option0/10"),
-    translate("date")
+    translate("date"),
+    translate("weather")
   ];
   bool dateT = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.selectedValue == translate("date")) {
+    if (widget.selectedValue == translate("date") ||
+        widget.selectedValue == translate("weather")) {
       dateT = false;
     }
   }
@@ -45,9 +47,9 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
       children: <Widget>[
         Visibility(
             visible: dateT, child: NewParamNameOption(index: widget.index)),
-        NewParamDateType(dateT: dateT),
+        NewParamDateType(dateT: dateT, selectedType: widget.selectedValue),
         Expanded(
-          flex: 2,
+          flex: 3,
           child: Column(
             children: <Widget>[
               Text(
@@ -96,8 +98,8 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
                         ? translate("optionString")
                         : widget.selectedValue,
                     onChanged: (value) => {
-                      checkType(value ?? ""),
-                      widget.updateType(value ?? widget.selectedValue)
+                      widget.updateType(value ?? widget.selectedValue),
+                      checkType(value ?? "")
                     },
                   )))
             ],
@@ -109,7 +111,11 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
 
   void checkType(String newType) {
     setState(() {
-      dateT = newType != translate("date");
+      print(translate("weather"));
+      print(newType);
+      if (newType == translate("date") || newType == translate("weather")) {
+        dateT = false;
+      }
     });
   }
 }

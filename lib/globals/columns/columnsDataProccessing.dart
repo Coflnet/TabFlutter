@@ -31,6 +31,8 @@ class ColumnsDataProccessing {
         namedCollumns.add(i);
       }
     }
+    print("named collumns");
+    print(namedCollumns);
     return namedCollumns;
   }
 

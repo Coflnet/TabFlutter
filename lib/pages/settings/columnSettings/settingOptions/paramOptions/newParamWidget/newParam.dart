@@ -105,8 +105,10 @@ class _NewParamState extends State<NewParam>
   void changeType(String newType) {
     EditingColumns().updateParam(widget.index, "type", newType);
     if (newType == translate("Date")) {
-      print("date");
       EditingColumns().updateParam(widget.index, "name", "Date");
+    }
+    if (newType == translate("weather")) {
+      EditingColumns().updateParam(widget.index, "name", "Weather");
     }
     if (newType == translate("optionList")) {
       setState(() {

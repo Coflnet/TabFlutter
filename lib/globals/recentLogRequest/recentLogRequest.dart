@@ -2,16 +2,16 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
+import 'package:table_entry/globals/weatherService.dart';
+
+List weatherCache = [];
 
 class RecentLogRequest {
   Future<List<col>> request(String inputText, col collumn) async {
     Map<String, PropertyInfo> inputData = {};
 
     for (var i in collumn.params) {
-      if (i.type == translate("date")) {
-        i.svalue = DateTime.now().toIso8601String();
-        continue;
-      }
+      if (checkType(i)) continue;
       inputData[i.name] =
           PropertyInfo(type: matchType(i.type), enumValues: i.listOption);
     }
@@ -47,6 +47,32 @@ class RecentLogRequest {
 
     return newCollumns;
   }
+}
+
+bool checkType(param i) {
+  if (i.type == translate("date")) {
+    i.svalue = DateTime.now().toIso8601String();
+    return true;
+  }
+  if (i.type == translate("weather")) {
+    if (weatherCache.isEmpty) {
+      getWeatherData(i);
+      return true;
+    }
+    i.svalue = weatherCache;
+    return true;
+  }
+  return false;
+}
+
+void getWeatherData(param i) async {
+  final List<dynamic> weatherResult = await WeatherService().getCityName();
+  if (weatherResult.isEmpty) {
+    i.svalue = ["ERROR", "PERMS DENIED", "CONTACT SUPPORT!"];
+    return;
+  }
+  i.svalue = weatherResult;
+  weatherCache = weatherResult;
 }
 
 FunctionObjectTypes matchType(String type) {

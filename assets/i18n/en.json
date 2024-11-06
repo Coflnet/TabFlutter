@@ -29,5 +29,7 @@
     "options": "Options",
     "exTable": "Table",
     "exAfter": "After Date",
-    "date": "Date"
+    "date": "Date",
+    "weather": "Weather",
+    "temperature": "Temperature"
 }

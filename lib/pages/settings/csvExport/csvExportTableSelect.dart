@@ -37,9 +37,11 @@ class _CsvExportTableSelectState extends State<CsvExportTableSelect> {
       setState(() {
         selectedValue =
             SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
-        print(selectedValue);
       });
     }
+    ColumnsDataProccessing().setSelectedColumn =
+        SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
+    print(ColumnsDataProccessing().getFileName);
   }
 
   @override
