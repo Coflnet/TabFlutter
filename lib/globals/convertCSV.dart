@@ -24,6 +24,8 @@ class ConvertCsv {
               .addAll(["${p.svalue[0]}", "${p.svalue[1]}", "${p.svalue[2]}"]);
           continue;
         }
+        print("svalue");
+        print(p.svalue);
         row.add(p.svalue ?? '');
       }
       if (addLast.isNotEmpty) {

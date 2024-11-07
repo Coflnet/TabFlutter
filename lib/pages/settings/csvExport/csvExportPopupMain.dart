@@ -69,7 +69,7 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
     final result = await Share.shareXFiles([
       XFile.fromData(utf8.encode(csv), mimeType: "csv", name: "TabData")
     ], fileNameOverrides: [
-      ColumnsDataProccessing().getFileName.replaceAll(RegExp(r"\s+"), "")
+      "${ColumnsDataProccessing().getFileName.replaceAll(RegExp(r"\s+"), "")}.csv"
     ], text: ColumnsDataProccessing().getFileName);
     if (result.status == ShareResultStatus.success) {
       widget.closePopup();
