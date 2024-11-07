@@ -31,5 +31,6 @@
     "exAfter": "After Date",
     "date": "Date",
     "weather": "Weather",
-    "temperature": "Temperature"
+    "temperature": "Temperature",
+    "noEntries": "You don't have any entries for that tables!"
 }

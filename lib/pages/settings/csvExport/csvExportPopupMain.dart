@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -60,6 +62,17 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
 
   void exportAndClose() async {
     final columnData = ColumnsDataProccessing().getColumnData();
+    if (columnData.isEmpty) {
+      Flushbar(
+        margin: const EdgeInsets.all(12),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: HexColor("1D1E2B"),
+        duration: const Duration(seconds: 3),
+        message: translate("noEntries"),
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(context);
+      return;
+    }
     String csv = ConvertCsv().convertCsv(columnData);
     Directory appDir = await getApplicationDocumentsDirectory();
     String filePath = "${appDir.path}/exportCSVTEMP.json";
