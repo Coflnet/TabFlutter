@@ -65,7 +65,11 @@ class _RecentLogItemState extends State<RecentLogItem> {
               ],
             ),
           ),
-          Visibility(visible: widget.settings, child: const RecentLogMoreInfo())
+          Visibility(
+              visible: widget.settings,
+              child: RecentLogMoreInfo(
+                id: widget.index,
+              ))
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
@@ -21,6 +22,7 @@ class SaveColumn {
     File file = File(filePath);
     if (!file.existsSync()) {
       await createFile(file);
+      loadColumns();
     }
 
     var fileDataJson = file.readAsStringSync();
@@ -37,7 +39,13 @@ class SaveColumn {
   Future<void> createFile(file) async {
     file.createSync();
     var fileData = {
-      "columns": [],
+      "columns": [
+        col(
+            id: 1,
+            name: "Example",
+            emoji: "⚙️",
+            params: [param(name: "Text", type: translate("String"))]).toJson()
+      ],
       "usedBefore": false,
       "language": "en",
       "selectedColumn": 0
@@ -47,7 +55,6 @@ class SaveColumn {
   }
 
   void saveColumn(int id, col col) {
-    print("saved");
     for (var i in collumns) {
       if (i.id == id) {
         collumns.remove(i);
@@ -58,6 +65,16 @@ class SaveColumn {
     }
     collumns.insert(0, col);
     saveFile();
+  }
+
+  void deleteColumn(int id) {
+    for (var i in collumns) {
+      if (i.id == id) {
+        collumns.remove(i);
+        saveFile();
+        return;
+      }
+    }
   }
 
   void saveFile() async {

@@ -72,7 +72,6 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   void loadData() async {
     SaveColumn().loadColumns();
     RecentLogHandler().loadRecentLog();
-    WeatherService().getCityName();
   }
 
   @override
