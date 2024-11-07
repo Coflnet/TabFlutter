@@ -1,4 +1,4 @@
-package com.example.table_entry
+package com.coflnet.spables
 
 import io.flutter.embedding.android.FlutterActivity
 
