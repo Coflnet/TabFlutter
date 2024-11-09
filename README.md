@@ -1,6 +1,6 @@
-# table_entry
+# Spables
 
-A new Flutter project.
+Speech to text app built with Flutter.
 
 ## Getting Started
 
