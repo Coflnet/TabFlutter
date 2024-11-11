@@ -22,7 +22,7 @@ class SaveColumn {
     File file = File(filePath);
     if (!file.existsSync()) {
       await createFile(file);
-      loadColumns();
+      return;
     }
 
     var fileDataJson = file.readAsStringSync();
@@ -39,17 +39,19 @@ class SaveColumn {
   Future<void> createFile(file) async {
     file.createSync();
     var fileData = {
-      "columns": [
-        col(
-            id: 1,
-            name: "Example",
-            emoji: "⚙️",
-            params: [param(name: "Text", type: translate("String"))]).toJson()
-      ],
+      "columns": [],
       "usedBefore": false,
       "language": "en",
       "selectedColumn": 0
     };
+    print("creating file \n \n \n \n \n \n");
+    saveColumn(
+        0,
+        col(
+            id: 1,
+            name: "Example",
+            emoji: "⚙️",
+            params: [param(name: "Text", type: translate("optionString"))]));
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }
