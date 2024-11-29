@@ -4,7 +4,7 @@ description: "Spables - speech to tables."
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.0.2+2
 
 environment:
   sdk: '>=3.4.4 <4.0.0'
