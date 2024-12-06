@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 
 bool _hasSpeech = false;
 bool _logEvents = false;
@@ -11,7 +10,6 @@ String lastWords = '';
 String lastError = '';
 String lastStatus = '';
 String _currentLocaleId = '';
-List<LocaleName> _localeNames = [];
 
 class SpeachSettings {}
 
@@ -25,7 +23,6 @@ class SpeachSettingsRetrevial {
   get getLastError => lastError;
   get getLastStatus => lastStatus;
   get getCurrentLocaleId => _currentLocaleId;
-  get getLocaleNames => _localeNames;
 
   set setHasSpeech(value) => {_hasSpeech = value};
   set setLogEvents(value) => {_logEvents = value};

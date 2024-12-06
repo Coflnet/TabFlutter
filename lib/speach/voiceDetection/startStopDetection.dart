@@ -1,12 +1,9 @@
 import 'dart:math';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
@@ -26,7 +23,6 @@ class StartStopDetection extends StatefulWidget {
 
 class _StartStopDetectionState extends State<StartStopDetection>
     with SingleTickerProviderStateMixin {
-  SpeechToText speech = SpeechToText();
   double level = 0.0;
   late AnimationController controller;
   bool isRunning = false;
@@ -45,9 +41,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
   }
 
   void initSpeach() {
-    setState(() {
-      speech.initialize(onStatus: statusListener);
-    });
+    setState(() {});
   }
 
   @override
@@ -65,7 +59,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
         child: AnimatedBuilder(
           animation: controller,
           builder: (context, child) {
-            double scale = 1 + (level / 50);
             return isRunning
                 ? StartStopDetectionRunning(
                     startStop: startStopListening, run: levelIsZero)
@@ -98,7 +91,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
       setState(() {
         alignment = Alignment.bottomRight;
       });
-      speech.stop();
       List<col> newRecentCol = await RecentLogRequest()
           .request(recordedData, RecentLogHandler().getCurrentSelected);
       if (context.mounted) {
@@ -120,35 +112,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
     setState(() {
       alignment = Alignment.bottomCenter;
     });
-    speech.statusListener = statusListener;
-
-    var options = SpeechListenOptions(
-        onDevice: SpeachSettingsRetrevial().get_onDevice,
-        listenMode: ListenMode.deviceDefault,
-        cancelOnError: true,
-        partialResults: false,
-        autoPunctuation: true,
-        enableHapticFeedback: true);
-    speech.listen(
-      onResult: onResult,
-      listenFor: const Duration(seconds: 3000),
-      pauseFor: const Duration(seconds: 40),
-      localeId: SpeachSettingsRetrevial().getCurrentLocaleId,
-      onSoundLevelChange: soundLevelListener,
-      listenOptions: options,
-    );
-    setState(() {});
-  }
-
-  void onResult(SpeechRecognitionResult result) {
-    if (result.finalResult) {
-      setState(() {
-        recordedData = "$recordedData ${result.recognizedWords}";
-        displayedRecordedData =
-            "$displayedRecordedData\n${result.recognizedWords}.";
-      });
-      widget.changeRecordingData(displayedRecordedData);
-    }
   }
 
   void soundLevelListener(double level) {
@@ -167,14 +130,6 @@ class _StartStopDetectionState extends State<StartStopDetection>
   }
 
   void statusListener(String status) {
-    if (!speech.isListening && status == 'done') {
-      speech.stop();
-      Future.delayed(const Duration(milliseconds: 20), () {
-        if (isRunning) {
-          startListening();
-        }
-      });
-    }
     setState(() {
       lastStatus = status;
     });

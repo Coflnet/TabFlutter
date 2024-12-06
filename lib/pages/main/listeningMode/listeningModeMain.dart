@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/globals/recordingService/recordingServer.dart';
 import 'package:table_entry/pages/main/listeningMode/listeningModeHeader.dart';
 
-class ListeningModeMain extends StatelessWidget {
-  final String recognizedWords;
-  const ListeningModeMain({super.key, required this.recognizedWords});
+class Listeningmodemain extends StatefulWidget {
+  const Listeningmodemain({super.key});
+
+  @override
+  State<Listeningmodemain> createState() => _ListeningmodemainState();
+}
+
+class _ListeningmodemainState extends State<Listeningmodemain> {
+  String recognizedWords = "";
+  final recServer = SaveColumn().getRecordingServerREF;
+
+  @override
+  void initState() {
+    super.initState();
+    recServer.addListener(reactToNotifier);
+  }
+
+  void reactToNotifier() {
+    setState(() {
+      reconizedWords = recServer.getReconizedWords;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

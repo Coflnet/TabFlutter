@@ -6,11 +6,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/recordingService/recordingServer.dart';
 
 List<col> collumns = [];
 bool usedBefore = false;
 String language = "en";
 int selectedColumn = 0;
+late RecordingServer recordingServerREF;
 
 class SaveColumn {
   void loadColumns() async {
@@ -105,4 +107,6 @@ class SaveColumn {
   List<col> get getColumns => collumns;
   int get getSelcColumn => selectedColumn;
   set setSelcColumn(v) => selectedColumn = v;
+  set setRecordingServerREF(v) => recordingServerREF = v;
+  RecordingServer get getRecordingServerREF => recordingServerREF;
 }

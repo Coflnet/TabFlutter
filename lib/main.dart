@@ -6,7 +6,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
-import 'package:table_entry/globals/weatherService.dart';
+import 'package:table_entry/globals/recordingService/recordingServer.dart';
 import 'package:table_entry/launchPage.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
 import 'package:table_entry/pages/main/listeningMode/listeningModeMain.dart';
@@ -67,6 +67,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
         .animate(
             CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic));
     loadData();
+    RecordingServer().startStreaming();
   }
 
   void loadData() async {
@@ -118,8 +119,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                           duration: const Duration(milliseconds: 500),
                           child: SlideTransition(
                               position: animation2,
-                              child: ListeningModeMain(
-                                  recognizedWords: recognizedWords)),
+                              child: const Listeningmodemain()),
                         )),
                       ],
                     ),

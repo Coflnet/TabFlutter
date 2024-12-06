@@ -9,6 +9,7 @@ import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.
 
 class RecentLogPopup extends StatefulWidget {
   final VoidCallback closePopup;
+
   const RecentLogPopup({super.key, required this.closePopup});
 
   @override

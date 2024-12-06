@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
+import 'package:table_entry/globals/recordingService/recordingServer.dart';
 import 'package:table_entry/main.dart';
 
 class LaunchPageLogo extends StatefulWidget {
@@ -23,11 +24,14 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
   void loadApp() async {
     SaveColumn().loadColumns();
     RecentLogHandler().loadRecentLog();
-
-    await Future.delayed(const Duration(milliseconds: 200));
+    final RecordingServer newRec = RecordingServer();
+    newRec.connectSocket();
+    SaveColumn().setRecordingServerREF = newRec;
 
     Locale local = Localizations.localeOf(context);
     changeLocale(context, SaveColumn().getlanguage);
+
+    RecordingServer().startRecorder();
     if (local.languageCode == "de") {
       changeLocale(context, "de");
       SaveColumn().setlanguage = "de";
