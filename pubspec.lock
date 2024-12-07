@@ -137,6 +137,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  ffmpeg_kit_flutter:
+    dependency: "direct main"
+    description:
+      name: ffmpeg_kit_flutter
+      sha256: "843aae41823ca94a0988d975b4b6cdc6948744b9b7e2707d81a3a9cd237b0100"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.3"
+  ffmpeg_kit_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_platform_interface
+      sha256: addf046ae44e190ad0101b2fde2ad909a3cd08a2a109f6106d2f7048b7abedee
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   file:
     dependency: transitive
     description:
@@ -183,26 +199,26 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_sound
-      sha256: "1f40b26b92907a433afe877c927cd48f5a2e4d0f7188e5d39eb5756008aa51ab"
+      sha256: b55c561458f39eb7d54e0f3783f82a12c269669a7a2f907abfd4a805c023a212
       url: "https://pub.dev"
     source: hosted
-    version: "9.6.0"
+    version: "9.17.6"
   flutter_sound_platform_interface:
     dependency: transitive
     description:
       name: flutter_sound_platform_interface
-      sha256: "2e218521d8187b9a4c65063ad9c79bfe88119531ff68047a2eaa6b027cb276bb"
+      sha256: a7116c44fccc234b5d66a6894ff892c08c9e541196bf89cc1cbfd5973eb323ca
       url: "https://pub.dev"
     source: hosted
-    version: "9.6.0"
+    version: "9.17.6"
   flutter_sound_web:
     dependency: transitive
     description:
       name: flutter_sound_web
-      sha256: "5013a15e4e69a4bdc8badd729130eef43c3305e30ba8e6933f863436ce969932"
+      sha256: e31249abaafa4af8a6f06c118a681b41c0e708fc84b63cb3d2466c4aff9a1196
       url: "https://pub.dev"
     source: hosted
-    version: "9.6.0"
+    version: "9.17.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -325,14 +341,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.3.0"
-  inject_js:
-    dependency: transitive
-    description:
-      name: inject_js
-      sha256: "849eacfd4b7e9182a7e743843a820d74bf1abcb692bdbe09e34ef0f753ad7227"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   intl:
     dependency: "direct main"
     description:
@@ -345,10 +353,10 @@ packages:
     dependency: transitive
     description:
       name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.7"
+    version: "0.7.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -453,62 +461,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.2"
-  opus_dart:
-    dependency: "direct main"
-    description:
-      name: opus_dart
-      sha256: e8ab4774409997af33cbfdfe91a186854ed6458b2fec66b0e52f4434b1af2f7c
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
-  opus_flutter:
-    dependency: "direct main"
-    description:
-      name: opus_flutter
-      sha256: "86edfdab1220d64bd7daa3e9bda1785cc0c8c793629e89f34a2a87bdfce57e25"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
-  opus_flutter_android:
-    dependency: transitive
-    description:
-      name: opus_flutter_android
-      sha256: "9e5b71f5d959e1ee3b5faf7e1e893aabe7955d3a234c83f02462d801a5218497"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
-  opus_flutter_ios:
-    dependency: transitive
-    description:
-      name: opus_flutter_ios
-      sha256: c999bbe8b8f1a4073fb62de6cc04ecd3ab3acdefa6b8d78b03c0dac9c81ef0fa
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
-  opus_flutter_platform_interface:
-    dependency: transitive
-    description:
-      name: opus_flutter_platform_interface
-      sha256: "41180b74f1dacc131270d49815fd4eb46bd7cc5ad57aac84eab748d08de59138"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
-  opus_flutter_web:
-    dependency: transitive
-    description:
-      name: opus_flutter_web
-      sha256: "037a4cdb27c3a1c05c85aed3dbe0a4b8c2f49ccce33cef259ef34f1815af6785"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.3"
-  opus_flutter_windows:
-    dependency: transitive
-    description:
-      name: opus_flutter_windows
-      sha256: "6a26862dd331c9c4b5e4c805efe3dd4e4a049e4a18bee230d994c25d72928a3b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   path:
     dependency: transitive
     description:
@@ -962,14 +914,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  web_ffi:
-    dependency: transitive
-    description:
-      name: web_ffi
-      sha256: "48ef8037f7bc051d11b88d0f2903e02bec21092c51833d37c3361c36e3edc4f7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.2"
   web_socket:
     dependency: transitive
     description:

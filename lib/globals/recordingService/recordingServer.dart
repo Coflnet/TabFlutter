@@ -1,24 +1,27 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_streamer/audio_streamer.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:opus_dart/opus_dart.dart';
-import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:socket_io_client/socket_io_client.dart' as soi;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:logger/logger.dart' show Level;
 
 late soi.Socket? ws;
 
 //final AudioRecorder recorder = AudioRecorder();
-final encoder = SimpleOpusEncoder(
-    sampleRate: 48000, channels: 1, application: Application.voip);
-List<double> audioBuffer = [];
+
+Uint8List audioBuffer = Uint8List(0);
 StreamSubscription? audioStream;
-  StreamController<Food> _audioStreamController = StreamController<Food>();
+StreamController<Uint8List> _audioStreamController =
+    StreamController<Uint8List>();
 String reconizedWords = "";
 late WebSocketChannel channel;
 final FlutterSoundRecorder recorder = FlutterSoundRecorder();
@@ -42,7 +45,12 @@ class RecordingServer extends ChangeNotifier {
   }
 
   void sendMessage(data) async {
-    channel.sink.add(data);
+    try {
+      channel.sink.add(data);
+      print("Message sent: ${data.length}");
+    } catch (e) {
+      print("Error sending message: $e");
+    }
     return;
     if (ws?.connected == true) {
       print("hi");
@@ -51,59 +59,67 @@ class RecordingServer extends ChangeNotifier {
   }
 
   Future<void> startRecorder() async {
-    initOpus(await opus_flutter.load());
     await recorder.openRecorder();
 
+    recorder.setLogLevel(Level.error);
 
-  void onAudio(List<double> buffer) {
-    audioBuffer.addAll(buffer);
+    Future<void> stopRecording() async {}
   }
 
-  Future<void> stopRecording() async {}
+  void startStreaming() async {
+    final dir = "audio";
+    recorder.startRecorder(sampleRate: 16000, toFile: dir, codec: Codec.pcm16);
 
-  void startStreaming() {
-      
+    Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
+      print(
+          "\n\n\n\n\n\n\n\n\n ${await recorder.isEncoderSupported(Codec.pcm16)}");
+      final dir = await recorder.stopRecorder();
 
-   recorder.startRecorder(
-      codec: Codec.pcm16, // Use raw PCM for byte stream
-      toStream: _audioStreamController.sink,
-    );
-
-      
-
-    _audioStreamController.stream.listen((data) {
-      // Handle the raw byte data from the microphone
-      print("Audio bytes: ${data.length} bytes");
-    }); 
-
-    Timer.periodic(const Duration(milliseconds: 60), (timer) {
-      if (audioBuffer.isNotEmpty) {
-        final chunk = get300msChunk();
-        if (chunk != null) {
-          sendMessage(convertToOpus(Int16List.fromList(chunk));
-          return;
-        }
+      if (dir == null) {
+        print("null");
       }
+
+      final tempDir = await getTemporaryDirectory();
+      final outFile = "${tempDir.path}/opusAudio.opus";
+
+      final command = [
+        '-y',
+        '-ar', '16000', // Sample rate (adjust based on your PCM data)
+        '-ac', '1', // Number of audio channels (adjust if needed)
+        '-i', dir ?? "", // Input file
+        '-c:a', 'opus', // Codec: Opus
+        '-b:a', '64k', // Bitrate (adjust as needed)
+        '-strict', '-2',
+        outFile, // Output file
+      ];
+
+      final result = await FFmpegKit.executeWithArgumentsAsync(command);
+
+      if (await result.getReturnCode() != ReturnCode(0)) {
+        final fuckingErrors = await result.getLogs();
+
+        for (var fuck in fuckingErrors) {
+          print(fuck.getMessage());
+        }
+
+        print(
+            "something went from encoding to opus with ffmpeg ${fuckingErrors[0].getMessage()}");
+      }
+
+      File file = File(dir ?? "");
+
+      Uint8List audioData = await file.readAsBytes();
+
+      print("audio data output is ${audioData.length}");
+      await recorder.startRecorder(
+          sampleRate: 16000,
+          numChannels: 1,
+          toFile: 'audio',
+          codec: Codec.pcm16);
+      sendMessage(audioData);
+
+      return;
     });
-  }
-
-  Uint8List convertToOpus(Int16List data) {
-    return encoder.encode(input: data);
-  }
-
-  List<double>? get300msChunk() {
-    const int sampleRate = 44100;
-    const int channels = 1;
-    const int bytesPerCan = 2;
-
-    const int bytesNeeded = (sampleRate * channels * bytesPerCan * 60) ~/ 1000;
-
-    List<double> chunk = [];
-    chunk.addAll(audioBuffer);
-
-    audioBuffer = [];
-
-    return chunk;
   }
 
   String get getReconizedWords => reconizedWords;
