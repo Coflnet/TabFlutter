@@ -3,16 +3,15 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audio_streamer/audio_streamer.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 import 'package:socket_io_client/socket_io_client.dart' as soi;
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:logger/logger.dart' show Level;
 
 late soi.Socket? ws;
 
@@ -24,7 +23,7 @@ StreamController<Uint8List> _audioStreamController =
     StreamController<Uint8List>();
 String reconizedWords = "";
 late WebSocketChannel channel;
-final FlutterSoundRecorder recorder = FlutterSoundRecorder();
+final AudioRecorder recorder = AudioRecorder();
 
 class RecordingServer extends ChangeNotifier {
   Future<void> connectSocket() async {
@@ -59,34 +58,54 @@ class RecordingServer extends ChangeNotifier {
   }
 
   Future<void> startRecorder() async {
-    await recorder.openRecorder();
-
-    recorder.setLogLevel(Level.error);
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.defaultToSpeaker,
+      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: const AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
 
     Future<void> stopRecording() async {}
   }
 
   void startStreaming() async {
-    final dir = "audio";
-    recorder.startRecorder(sampleRate: 16000, toFile: dir, codec: Codec.pcm16);
+    final tempDir = await getDownloadsDirectory();
+
+    print(tempDir);
+    final dir = "${tempDir!.path}/audio";
+
+    File(dir).createSync();
+
+    recorder.start(
+        const RecordConfig(
+            encoder: AudioEncoder.pcm16bits,
+            sampleRate: 16000, // Ensure this matches
+            numChannels: 1),
+        path: dir);
 
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
-      print(
-          "\n\n\n\n\n\n\n\n\n ${await recorder.isEncoderSupported(Codec.pcm16)}");
-      final dir = await recorder.stopRecorder();
+      final dire = await recorder.stop();
 
-      if (dir == null) {
-        print("null");
-      }
-
-      final tempDir = await getTemporaryDirectory();
       final outFile = "${tempDir.path}/opusAudio.opus";
 
       final command = [
         '-y',
+        '-f', 's16le',
         '-ar', '16000', // Sample rate (adjust based on your PCM data)
         '-ac', '1', // Number of audio channels (adjust if needed)
-        '-i', dir ?? "", // Input file
+        '-i', dire ?? "", // Input file
         '-c:a', 'opus', // Codec: Opus
         '-b:a', '64k', // Bitrate (adjust as needed)
         '-strict', '-2',
@@ -99,24 +118,27 @@ class RecordingServer extends ChangeNotifier {
         final fuckingErrors = await result.getLogs();
 
         for (var fuck in fuckingErrors) {
-          print(fuck.getMessage());
+          //print(fuck.getMessage());
         }
-
-        print(
-            "something went from encoding to opus with ffmpeg ${fuckingErrors[0].getMessage()}");
       }
 
-      File file = File(dir ?? "");
+      File file = File(outFile ?? "");
 
       Uint8List audioData = await file.readAsBytes();
 
       print("audio data output is ${audioData.length}");
-      await recorder.startRecorder(
-          sampleRate: 16000,
-          numChannels: 1,
-          toFile: 'audio',
-          codec: Codec.pcm16);
+
       sendMessage(audioData);
+
+      File(dir).deleteSync();
+
+      File(dir).createSync();
+      recorder.start(
+          const RecordConfig(
+              encoder: AudioEncoder.pcm16bits,
+              sampleRate: 16000, // Ensure this matches
+              numChannels: 1),
+          path: dir);
 
       return;
     });

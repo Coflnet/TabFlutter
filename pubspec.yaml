@@ -22,8 +22,8 @@ icons_launcher:
       enable: true
 
 dependencies:
-  another_audio_recorder: ^1.2.1
   another_flushbar: ^1.12.30
+  audio_session: ^0.1.21
   csv: ^6.0.0
   custom_pop_up_menu: ^1.2.4
   dropdown_button2: ^2.3.9
@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localization: ^0.2.2
-  flutter_sound: ^9.17.6
   flutter_translate: ^4.1.0
   geolocator: ^13.0.1
   haptic_feedback: ^0.5.1+1
@@ -44,11 +43,11 @@ dependencies:
   noise_meter: ^5.0.2
   path_provider: ^2.1.4
   provider: ^6.1.2
+  record: ^5.2.0
   restart_app: ^1.3.2
   scroll_snap_list: ^0.9.1
   share_plus: ^10.0.2
   socket_io_client: ^3.0.2
-  sound_stream: ^0.4.1
   url_launcher: ^6.3.0
   waveform_flutter: ^1.0.1
   weather: ^3.1.1
