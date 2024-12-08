@@ -4,17 +4,64 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
 
+import 'dart:async';
+import 'dart:io';
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:socket_io_client/socket_io_client.dart' as soi;
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:opus_dart/opus_dart.dart';
+import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
+
+import 'dart:async';
+import 'dart:typed_data';
+
+Stream<List<int>> bufferStream(Stream<Uint8List> inputStream, int chunkSize) {
+  StreamController<List<int>>? controller;
+  List<int> buffer = [];
+
+  controller = StreamController<List<int>>(onListen: () {
+    inputStream.listen((newData) {
+      if (newData.offsetInBytes % Int16List.bytesPerElement == 0) {
+        // Offset is aligned, safe to create Int16List view
+        var int16List = newData.buffer
+            .asInt16List(newData.offsetInBytes, newData.lengthInBytes ~/ 2);
+        buffer.addAll(int16List);
+      } else {
+        // Offset is not aligned, create a new aligned Uint8List
+        Uint8List alignedData = Uint8List.fromList(newData);
+
+        // Create Int16List view from the new aligned data
+        var int16List = alignedData.buffer.asInt16List();
+        buffer.addAll(int16List);
+        print(
+            "Received buffer ${alignedData.length} bytes, ${int16List.length} samples, original offset: ${newData.length} - offset ${newData.offsetInBytes}");
+      }
+
+      while (buffer.length >= chunkSize) {
+        var chunk = buffer.sublist(0, chunkSize);
+        buffer = buffer.sublist(chunkSize);
+        controller!.add(chunk);
+      }
+    }, onDone: () {
+      if (buffer.isNotEmpty) {
+        controller!.add(buffer);
+      }
+      controller!.close();
+    }, onError: (error) {
+      controller!.addError(error);
+    });
+  });
+
+  return controller.stream;
+}
 
 late soi.Socket? ws;
-
 //final AudioRecorder recorder = AudioRecorder();
 
 Uint8List audioBuffer = Uint8List(0);
@@ -22,11 +69,16 @@ StreamSubscription? audioStream;
 StreamController<Uint8List> _audioStreamController =
     StreamController<Uint8List>();
 String reconizedWords = "";
+StreamSubscription? _mRecordingDataSubscription;
 late WebSocketChannel channel;
-final AudioRecorder recorder = AudioRecorder();
+String? _mPath;
+late SimpleOpusEncoder encoder;
+late SimpleOpusDecoder decoder;
+final recorder = FlutterSoundRecorder();
 
 class RecordingServer extends ChangeNotifier {
   Future<void> connectSocket() async {
+    await setupEncoder();
     print("connecting");
 
     channel =
@@ -37,6 +89,14 @@ class RecordingServer extends ChangeNotifier {
     });
     print("connected");
     return;
+  }
+
+  setupEncoder() async {
+    initOpus(await opus_flutter.load());
+    encoder = SimpleOpusEncoder(
+        sampleRate: 16000, channels: 1, application: Application.voip);
+    decoder = SimpleOpusDecoder(sampleRate: 16000, channels: 1);
+    print(getOpusVersion());
   }
 
   void _handleMessage(dynamic message) {
@@ -58,7 +118,12 @@ class RecordingServer extends ChangeNotifier {
   }
 
   Future<void> startRecorder() async {
+    var status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Microphone permission not granted');
+    }
     final session = await AudioSession.instance;
+    print("configuring");
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
       avAudioSessionCategoryOptions:
@@ -76,8 +141,6 @@ class RecordingServer extends ChangeNotifier {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
-
-    Future<void> stopRecording() async {}
   }
 
   void startStreaming() async {
@@ -86,62 +149,53 @@ class RecordingServer extends ChangeNotifier {
     print(tempDir);
     final dir = "${tempDir!.path}/audio";
 
-    File(dir).createSync();
-
-    recorder.start(
-        const RecordConfig(
-            encoder: AudioEncoder.pcm16bits,
-            sampleRate: 16000, // Ensure this matches
-            numChannels: 1),
-        path: dir);
-
-    Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
-      final dire = await recorder.stop();
-
-      final outFile = "${tempDir.path}/opusAudio.opus";
-
-      final command = [
-        '-y',
-        '-f', 's16le',
-        '-ar', '16000', // Sample rate (adjust based on your PCM data)
-        '-ac', '1', // Number of audio channels (adjust if needed)
-        '-i', dire ?? "", // Input file
-        '-c:a', 'opus', // Codec: Opus
-        '-b:a', '64k', // Bitrate (adjust as needed)
-        '-strict', '-2',
-        outFile, // Output file
-      ];
-
-      final result = await FFmpegKit.executeWithArgumentsAsync(command);
-
-      if (await result.getReturnCode() != ReturnCode(0)) {
-        final fuckingErrors = await result.getLogs();
-
-        for (var fuck in fuckingErrors) {
-          //print(fuck.getMessage());
-        }
-      }
-
-      File file = File(outFile ?? "");
-
-      Uint8List audioData = await file.readAsBytes();
-
-      print("audio data output is ${audioData.length}");
-
-      sendMessage(audioData);
-
-      File(dir).deleteSync();
-
-      File(dir).createSync();
-      recorder.start(
-          const RecordConfig(
-              encoder: AudioEncoder.pcm16bits,
-              sampleRate: 16000, // Ensure this matches
-              numChannels: 1),
-          path: dir);
-
-      return;
+    File(dir).createSync(
+      recursive: true,
+    );
+    var sink = await createFile("original.pcm");
+    var reencode = await createFile("reencode.pcm");
+    var control = await createFile("control.pcm");
+    const int chunkSize = 960;
+    List<int> generalBuffer = [];
+    var recordingDataController = StreamController<Uint8List>();
+    _mRecordingDataSubscription =
+        bufferStream(recordingDataController.stream, chunkSize).listen((chunk) {
+      var input = Int16List.fromList(chunk);
+      sink.add(input.buffer.asUint8List());
+      var result = encoder.encode(input: input);
+      var decoded = decoder.decode(input: result);
+      channel.sink.add(result);
+      reencode.add(decoded.buffer.asUint8List());
+      print("recieved data " +
+          decoded.length.toString() +
+          " bytes " +
+          result.length.toString() +
+          " samples");
     });
+
+    await recorder.openRecorder();
+    await recorder.startRecorder(
+      toStream: recordingDataController.sink,
+      codec: Codec.pcm16,
+      numChannels: 1,
+      sampleRate: 16000,
+      bufferSize: 8192,
+    );
+  }
+
+  Future<IOSink> createFile(String name) async {
+    var tempDir = await getDownloadsDirectory();
+    _mPath = '${tempDir!.path}/$name';
+    var outputFile = File(_mPath!);
+    if (outputFile.existsSync()) {
+      await outputFile.delete();
+    }
+    return outputFile.openWrite();
+  }
+
+  Future<void> stopRecording() async {
+    await recorder.stopRecorder();
+    await recorder.closeRecorder();
   }
 
   String get getReconizedWords => reconizedWords;

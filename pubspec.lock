@@ -130,13 +130,13 @@ packages:
     source: hosted
     version: "1.3.1"
   ffi:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
       name: ffi
-      sha256: "16ed7b077ef01ad6170a3d0c57caa4a112a38d7a2ed5602e0aca9ca6f3d98da6"
+      sha256: "13a6ccf6a459a125b3fcdb6ec73bd5ff90822e071207c663bfd1f70062d51d18"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.3"
+    version: "1.2.1"
   ffmpeg_kit_flutter:
     dependency: "direct main"
     description:
@@ -195,6 +195,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_sound:
+    dependency: "direct main"
+    description:
+      name: flutter_sound
+      sha256: "8d003f1aba1a09c970413fee2e742c9fbef434d6f2894e77236ddce4c7c86cd5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.17.8"
+  flutter_sound_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_sound_platform_interface
+      sha256: "17cc7c0095fec0ec08eae0bf6b26c1c4735d8401ce0468710f9ba873fb1f65d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.17.8"
+  flutter_sound_web:
+    dependency: transitive
+    description:
+      name: flutter_sound_web
+      sha256: edd41e486ea8f91851791832b857a2668f9abf9f13e11c947878ccea3d85c257
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.17.8"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -325,6 +349,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -357,6 +389,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: be4b23575aac7ebf01f225a241eb7f6b5641eeaf43c6a8613510fc2f8cf187d1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0"
   logging:
     dependency: transitive
     description:
@@ -421,6 +461,54 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.2"
+  opus_dart:
+    dependency: "direct main"
+    description:
+      name: opus_dart
+      sha256: bf2e1f35b498c60e555fc14b84e54878e12cd66c8390e2b1f2170faacdd86640
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  opus_flutter:
+    dependency: "direct main"
+    description:
+      name: opus_flutter
+      sha256: ee0538954e903452975e64521f5e187f2d5fb79ce2fdae5c8b17270e4fbe9561
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  opus_flutter_android:
+    dependency: transitive
+    description:
+      name: opus_flutter_android
+      sha256: dcb1859eded28b3a01f5ed425697c2c4cc252dda99cf85c0806004d795cadfcb
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  opus_flutter_ios:
+    dependency: transitive
+    description:
+      name: opus_flutter_ios
+      sha256: "5e8eecc7a4dd43f08a9e6d81a142fa2d391419e55002a42bce4f9439ba1a2650"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  opus_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: opus_flutter_platform_interface
+      sha256: a342d2f9e5738e7339d63d21e1550de3683a57f56a2709e0f99d851db4d9436d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  opus_flutter_windows:
+    dependency: transitive
+    description:
+      name: opus_flutter_windows
+      sha256: f3d2668b153b63cc7414a9190a1f4da406ad8fcf05ac9421f14813400409b31a
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   path:
     dependency: transitive
     description:
@@ -557,6 +645,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
+  recase:
+    dependency: transitive
+    description:
+      name: recase
+      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   record:
     dependency: "direct main"
     description:
@@ -770,6 +866,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: "69fe30f3a8b04a0be0c15ae6490fc859a78ef4c43ae2dd5e8a623d45bfcf9225"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0+3"
   term_glyph:
     dependency: transitive
     description:
