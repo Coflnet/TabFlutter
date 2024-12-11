@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
+import 'package:table_entry/globals/recordingService/recordingServer.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetectionRunning.dart';
@@ -91,8 +92,10 @@ class _StartStopDetectionState extends State<StartStopDetection>
       setState(() {
         alignment = Alignment.bottomRight;
       });
-      List<col> newRecentCol = await RecentLogRequest()
-          .request(recordedData, RecentLogHandler().getCurrentSelected);
+      RecordingServer().stopRecorder();
+      List<col> newRecentCol = await RecentLogRequest().request(
+          RecordingServer().getReconizedWords,
+          RecentLogHandler().getCurrentSelected);
       if (context.mounted) {
         Provider.of<UpdateRecentLog>(context, listen: false).recentLogUpdate();
       }
@@ -106,6 +109,8 @@ class _StartStopDetectionState extends State<StartStopDetection>
       widget.changeRecordingData(displayedRecordedData);
     });
     startListening();
+
+    RecordingServer().startStreaming();
   }
 
   void startListening() {

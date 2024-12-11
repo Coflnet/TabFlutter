@@ -67,7 +67,6 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
         .animate(
             CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic));
     loadData();
-    RecordingServer().startStreaming();
   }
 
   void loadData() async {

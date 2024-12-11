@@ -12,18 +12,21 @@ class Listeningmodemain extends StatefulWidget {
 }
 
 class _ListeningmodemainState extends State<Listeningmodemain> {
-  String recognizedWords = "";
-  final recServer = SaveColumn().getRecordingServerREF;
+  String recognizedWords = "Testing";
+  String words = "";
 
   @override
   void initState() {
     super.initState();
-    recServer.addListener(reactToNotifier);
+
+    RecordingServer().addListener(reactToNotifier);
+    words = "for";
+    print(reconizedWords);
   }
 
   void reactToNotifier() {
     setState(() {
-      reconizedWords = recServer.getReconizedWords;
+      words = "${RecordingServer().getReconizedWords}";
     });
   }
 
@@ -44,7 +47,7 @@ class _ListeningmodemainState extends State<Listeningmodemain> {
             ),
             child: SingleChildScrollView(
               child: Text(
-                recognizedWords,
+                words,
                 style: TextStyle(
                     color: Colors.grey.shade300,
                     fontSize: 21,
