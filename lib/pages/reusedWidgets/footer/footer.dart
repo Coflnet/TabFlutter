@@ -37,7 +37,7 @@ class _FooterState extends State<Footer> {
                 wantedPageNum: 0),
             FooterButtons(
                 scene: const AboutMain(),
-                pickedIcon: HugeIcons.strokeRoundedFile01,
+                pickedIcon: HugeIcons.strokeRoundedUser,
                 text: translate("footerAbout"),
                 selectedPageNum: selectedPage,
                 wantedPageNum: 1),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -65,25 +63,22 @@ class _RecentLogState extends State<RecentLog> {
                   fontWeight: FontWeight.w500,
                   fontSize: 23),
             ),
-            TextButton(
-                style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                onPressed: () => {
-                      RecentLogHandler().clear(),
-                      Provider.of<UpdateRecentLog>(context, listen: false)
-                          .recentLogUpdate()
-                    },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: HexColor("1E202E"),
-                    borderRadius: BorderRadius.circular(120),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
+              child: const Row(
+                children: [
+                  Text(
+                    "85/100",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w600),
                   ),
-                  child: Icon(
-                    size: 27,
-                    HugeIcons.strokeRoundedDelete04,
-                    color: Colors.grey.shade200,
-                  ),
-                ))
+                ],
+              ),
+            )
           ],
         ),
         const SizedBox(height: 7),
@@ -94,4 +89,10 @@ class _RecentLogState extends State<RecentLog> {
       ],
     );
   }
+}
+
+Color getTweenColor(double value) {
+  value = value.clamp(0, 100);
+  double normalizedValue = value / 100;
+  return Color.lerp(Colors.red[100], Colors.white, normalizedValue)!;
 }

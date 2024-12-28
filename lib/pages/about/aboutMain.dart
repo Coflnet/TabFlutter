@@ -3,6 +3,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/pages/about/aboutCoflnet.dart';
 import 'package:table_entry/pages/about/aboutHelp.dart';
 import 'package:table_entry/pages/about/aboutLegalButtons.dart';
+import 'package:table_entry/pages/about/account_info.dart';
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 
@@ -33,6 +34,8 @@ class _AboutMainState extends State<AboutMain> {
                     fontWeight: FontWeight.w600,
                     fontSize: 30),
               ),
+              const SizedBox(height: 14),
+              const AccountInfo(),
               const SizedBox(height: 30),
               const SizedBox(height: 45),
               const Expanded(
