@@ -84,9 +84,9 @@ class RecordingServer extends ChangeNotifier {
   Future<void> connectSocket() async {
     await setupEncoder();
     newNum = 1;
-
-    channel =
-        WebSocketChannel.connect(Uri.parse("wss://demo.coflnet.com/api/audio"));
+    String userLocale = Platform.localeName;
+    channel = WebSocketChannel.connect(
+        Uri.parse("wss://demo.coflnet.com/api/audio?language=$userLocale"));
     await channel.ready;
     channel.stream.listen((message) {
       _handleMessage(message);
@@ -116,7 +116,6 @@ class RecordingServer extends ChangeNotifier {
     } catch (e) {
       print("Error sending message: $e");
     }
-    return;
     if (ws?.connected == true) {
       print("hi");
       ws?.emit(data);
@@ -150,6 +149,7 @@ class RecordingServer extends ChangeNotifier {
   }
 
   void startStreaming() async {
+    await connectSocket();
     final tempDir = await getDownloadsDirectory();
 
     final dir = "${tempDir!.path}/audio";
@@ -158,10 +158,7 @@ class RecordingServer extends ChangeNotifier {
       recursive: true,
     );
     var sink = await createFile("original.pcm");
-    var reencode = await createFile("reencode.pcm");
-    var control = await createFile("control.pcm");
     const int chunkSize = 960;
-    List<int> generalBuffer = [];
     var recordingDataController = StreamController<Uint8List>();
 
     List<Uint8List> opusFrameBuffer = [];
@@ -193,11 +190,6 @@ class RecordingServer extends ChangeNotifier {
           opusFrameBuffer,
           isFirst: sequenceNumber == 0,
         );
-
-        if (oggPage.length <= 870) {
-          opusFrameBuffer.clear();
-          return;
-        }
 
         sink.add(oggPage);
         channel.sink.add(oggPage);

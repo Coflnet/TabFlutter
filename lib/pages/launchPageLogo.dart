@@ -25,7 +25,6 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
     SaveColumn().loadColumns();
     RecentLogHandler().loadRecentLog();
     final RecordingServer newRec = RecordingServer();
-    newRec.connectSocket();
     SaveColumn().setRecordingServerREF = newRec;
 
     Locale local = Localizations.localeOf(context);
