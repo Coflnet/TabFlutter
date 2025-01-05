@@ -17,7 +17,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:socket_io_client/socket_io_client.dart' as soi;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:opus_dart/opus_dart.dart';
-import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 
 import 'dart:async';
 import 'dart:typed_data';
@@ -81,6 +80,7 @@ class RecordingServer extends ChangeNotifier {
 
   RecordingServer._internal();
   get getNewNum => newNum;
+
   Future<void> connectSocket() async {
     await setupEncoder();
     newNum = 1;
@@ -95,7 +95,6 @@ class RecordingServer extends ChangeNotifier {
   }
 
   setupEncoder() async {
-    initOpus(await opus_flutter.load());
     encoder = SimpleOpusEncoder(
         sampleRate: 16000, channels: 1, application: Application.voip);
     decoder = SimpleOpusDecoder(sampleRate: 16000, channels: 1);

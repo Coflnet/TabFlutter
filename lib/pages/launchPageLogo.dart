@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:opus_dart/opus_dart.dart';
+import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
@@ -46,6 +48,7 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
         transitionDuration: const Duration(milliseconds: 0),
       ),
     );
+    initOpus(await opus_flutter.load());
   }
 
   @override
