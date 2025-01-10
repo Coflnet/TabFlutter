@@ -11,7 +11,7 @@ import 'dart:io';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_sound/flutter_sound.dart';
+import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:socket_io_client/socket_io_client.dart' as soi;
@@ -68,7 +68,7 @@ late WebSocketChannel channel;
 String? _mPath;
 late SimpleOpusEncoder encoder;
 late SimpleOpusDecoder decoder;
-final recorder = FlutterSoundRecorder();
+final record = AudioRecorder();
 int newNum = 0;
 
 class RecordingServer extends ChangeNotifier {
@@ -121,32 +121,6 @@ class RecordingServer extends ChangeNotifier {
     }
   }
 
-  Future<void> startRecorder() async {
-    var status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      throw RecordingPermissionException('Microphone permission not granted');
-    }
-    final session = await AudioSession.instance;
-    print("configuring");
-    await session.configure(AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.allowBluetooth |
-              AVAudioSessionCategoryOptions.defaultToSpeaker,
-      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: const AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
-  }
-
   void startStreaming() async {
     await connectSocket();
     final tempDir = await getDownloadsDirectory();
@@ -177,8 +151,16 @@ class RecordingServer extends ChangeNotifier {
     sink.add(commentPage);
     channel.sink.add(commentPage);
 
+    if (!await record.hasPermission()) {
+      print("no audo permission");
+      return;
+    }
+
+    final stream = await record.startStream(const RecordConfig(
+        sampleRate: 16000, encoder: AudioEncoder.pcm16bits, numChannels: 1));
+
     _mRecordingDataSubscription =
-        bufferStream(recordingDataController.stream, chunkSize).listen((chunk) {
+        bufferStream(stream, chunkSize).listen((chunk) {
       var input = Int16List.fromList(chunk);
       var opusData = encoder.encode(input: input);
 
@@ -200,19 +182,11 @@ class RecordingServer extends ChangeNotifier {
             (channel.closeCode?.toString() ?? ""));
       }
     });
-
-    await recorder.openRecorder();
-    await recorder.startRecorder(
-      toStream: recordingDataController.sink,
-      codec: Codec.pcm16,
-      numChannels: 1,
-      sampleRate: 16000,
-      bufferSize: 8192,
-    );
   }
 
   void stopRecorder() async {
-    await recorder.stopRecorder();
+    await record.stop();
+    // TODO: dispose
   }
 
   Future<IOSink> createFile(String name) async {
@@ -223,11 +197,6 @@ class RecordingServer extends ChangeNotifier {
       await outputFile.delete();
     }
     return outputFile.openWrite();
-  }
-
-  Future<void> stopRecording() async {
-    await recorder.stopRecorder();
-    await recorder.closeRecorder();
   }
 
   String get getReconizedWords => reconizedWords;

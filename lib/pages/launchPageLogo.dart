@@ -32,7 +32,6 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
     Locale local = Localizations.localeOf(context);
     changeLocale(context, SaveColumn().getlanguage);
 
-    RecordingServer().startRecorder();
     if (local.languageCode == "de") {
       changeLocale(context, "de");
       SaveColumn().setlanguage = "de";
