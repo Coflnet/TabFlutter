@@ -57,6 +57,7 @@ dependencies:
   flutter_background: ^1.3.0+1
   flutter_foreground_task: ^8.17.0
   audioplayers: ^6.1.0
+  onnxruntime: ^1.4.1
 
 dependency_overrides:
   ffi: ^1.1.2 # resolve conflict with opus_dart in favor of opus
@@ -75,6 +76,8 @@ flutter:
   assets:
     - assets/images/
     - assets/i18n/
+    - assets/models/silero_vad_legacy.onnx
+    - assets/models/silero_vad_v5.onnx
 
   fonts: 
     - family: WorkSans

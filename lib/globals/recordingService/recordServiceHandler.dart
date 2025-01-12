@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:opus_dart/opus_dart.dart';
 import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
+import 'package:permission_handler/permission_handler.dart';
+import '../../src/vad/vad_handler.dart';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/intl.dart';
@@ -37,6 +39,7 @@ class RecordServiceHandler extends TaskHandler {
   late SimpleOpusDecoder decoder;
   final record = AudioRecorder();
   int newNum = 0;
+  final _vadHandler = VadHandler.create(isDebug: true);
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
@@ -121,8 +124,49 @@ class RecordServiceHandler extends TaskHandler {
   }
 
   Future<void> _startRecorder() async {
-    // create record directory
-    final Directory supportDir = await getApplicationSupportDirectory();
+    _vadHandler.onSpeechStart.listen((_) {
+      print('Speech detected.');
+      FlutterForegroundTask.updateService(
+        notificationText: 'speaking',
+        notificationButtons: [
+          const NotificationButton(id: _kStopAction, text: 'stop'),
+        ],
+      );
+    });
+
+    _vadHandler.onSpeechEnd.listen((List<double> samples) {
+      FlutterForegroundTask.updateService(
+        notificationText: 'spoke ${samples.length / 16000} seconds',
+        notificationButtons: [
+          const NotificationButton(id: _kStopAction, text: 'stop'),
+        ],
+      );
+      print(
+          'Speech ended, first 10 samples: ${samples.take(10).toList()} length: ${samples.length}');
+    });
+
+    _vadHandler.onVADMisfire.listen((_) {
+      FlutterForegroundTask.updateService(
+        notificationText: 'too short, ignoring',
+        notificationButtons: [
+          const NotificationButton(id: _kStopAction, text: 'stop'),
+        ],
+      );
+      print('VAD misfire detected.');
+    });
+
+    _vadHandler.onError.listen((String message) {
+      print('Error: $message');
+    });
+    FlutterForegroundTask.updateService(
+      notificationText: 'vad start',
+      notificationButtons: [
+        const NotificationButton(id: _kStopAction, text: 'stop'),
+      ],
+    );
+
+    _vadHandler.startListening();
+    return;
 
     FlutterForegroundTask.updateService(
       notificationText: 'setup',
