@@ -196,6 +196,10 @@ class ApiClient {
           return ProblemDetails.fromJson(value);
         case 'PropertyInfo':
           return PropertyInfo.fromJson(value);
+        case 'RecognitionRequest':
+          return RecognitionRequest.fromJson(value);
+        case 'RecognitionResponse':
+          return RecognitionResponse.fromJson(value);
         case 'SurveryResult':
           return SurveryResult.fromJson(value);
         case 'TabRequest':

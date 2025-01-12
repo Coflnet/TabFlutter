@@ -39,6 +39,8 @@ part 'model/mapping_element.dart';
 part 'model/mapping_result2.dart';
 part 'model/problem_details.dart';
 part 'model/property_info.dart';
+part 'model/recognition_request.dart';
+part 'model/recognition_response.dart';
 part 'model/survery_result.dart';
 part 'model/tab_request.dart';
 part 'model/un_mappable.dart';

@@ -20,7 +20,7 @@ class ExcelApi {
   /// Parameters:
   ///
   /// * [String] company:
-  Future<Response> callGetWithHttpInfo({ String? company, }) async {
+  Future<Response> getBrandsWithHttpInfo({ String? company, }) async {
     // ignore: prefer_const_declarations
     final path = r'/api/Excel/brand';
 
@@ -52,15 +52,15 @@ class ExcelApi {
   /// Parameters:
   ///
   /// * [String] company:
-  Future<void> callGet({ String? company, }) async {
-    final response = await callGetWithHttpInfo( company: company, );
+  Future<void> getBrands({ String? company, }) async {
+    final response = await getBrandsWithHttpInfo( company: company, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
   }
 
   /// Performs an HTTP 'GET /api/Excel' operation and returns the [Response].
-  Future<Response> callGet_1WithHttpInfo() async {
+  Future<Response> getMappingWithHttpInfo() async {
     // ignore: prefer_const_declarations
     final path = r'/api/Excel';
 
@@ -85,8 +85,8 @@ class ExcelApi {
     );
   }
 
-  Future<MapingResult?> callGet_1() async {
-    final response = await callGet_1WithHttpInfo();
+  Future<MapingResult?> getMapping() async {
+    final response = await getMappingWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
