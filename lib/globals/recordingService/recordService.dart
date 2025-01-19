@@ -4,7 +4,9 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 
+import '../recentLogRequest/recentLogHandler.dart';
 import 'recordServiceHandler.dart';
 
 typedef RecordStatusChanged = void Function(RecordStatus status);
@@ -131,10 +133,13 @@ class RecordService {
     }
   }
 
-  void _onReceiveTaskData(Object data) {
+  void _onReceiveTaskData(Object data) async {
     if (data == 'stop') {
       stop();
     }
+    print('Received task data: $data');
+    await RecentLogRequest().requestWithAudio(
+        data as String, RecentLogHandler().getCurrentSelected);
   }
 
   void addRecordStatusChangedCallback(RecordStatusChanged callback) {

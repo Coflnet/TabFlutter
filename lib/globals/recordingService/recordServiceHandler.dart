@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:opus_dart/opus_dart.dart';
 import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:table_entry/src/vad/audio_utils.dart';
 import '../../src/vad/vad_handler.dart';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -14,6 +15,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as soi;
 import 'package:record/record.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../recentLogRequest/recentLogHandler.dart';
+import '../recentLogRequest/recentLogRequest.dart';
+import 'recordingServer.dart';
 
 const String _kStopAction = 'action.stop';
 
@@ -141,8 +146,10 @@ class RecordServiceHandler extends TaskHandler {
           const NotificationButton(id: _kStopAction, text: 'stop'),
         ],
       );
+      var url = AudioUtils.createWavUrl(samples);
       print(
           'Speech ended, first 10 samples: ${samples.take(10).toList()} length: ${samples.length}');
+      FlutterForegroundTask.sendDataToMain(url);
     });
 
     _vadHandler.onVADMisfire.listen((_) {

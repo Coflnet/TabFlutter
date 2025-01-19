@@ -93,9 +93,8 @@ class _StartStopDetectionState extends State<StartStopDetection>
         alignment = Alignment.bottomRight;
       });
       RecordingServer().stopRecorder();
-      List<col> newRecentCol = await RecentLogRequest().request(
-          RecordingServer().getReconizedWords,
-          RecentLogHandler().getCurrentSelected);
+      await RecentLogRequest()
+          .requestWithAudio(null, RecentLogHandler().getCurrentSelected);
       if (context.mounted) {
         Provider.of<UpdateRecentLog>(context, listen: false).recentLogUpdate();
       }

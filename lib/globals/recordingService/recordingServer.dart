@@ -58,5 +58,10 @@ class RecordingServer extends ChangeNotifier {
     // TODO: dispose
   }
 
+  void setText(String text) {
+    reconizedWords = text;
+    notifyListeners();
+  }
+
   String get getReconizedWords => reconizedWords;
 }

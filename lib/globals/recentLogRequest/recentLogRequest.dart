@@ -1,20 +1,27 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/weatherService.dart';
 
+import '../recordingService/recordingServer.dart';
+
 List weatherCache = [];
 
 class RecentLogRequest {
-  Future<List<col>> request(String inputText, col collumn) async {
-    Map<String, PropertyInfo> inputData = {};
+  static var sessionUuId = generateUuid();
 
-    for (var i in collumn.params) {
-      if (checkType(i)) continue;
-      inputData[i.name] =
-          PropertyInfo(type: matchType(i.type), enumValues: i.listOption);
-    }
+  static String generateUuid() {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final rand = Random().nextInt(1000000);
+    return '${now}_$rand';
+  }
+
+  Future<List<col>> request(String inputText, col collumn) async {
+    Map<String, PropertyInfo> inputData = convertColumns(collumn);
 
     final client = ApiClient(basePath: "https://demo.coflnet.com");
     final result = await TabApi(client).post(
@@ -26,6 +33,57 @@ class RecentLogRequest {
       throw Exception("result in recent log request is null");
     }
     print("InputData: $inputText \n Request Result: $result");
+    List<col> newCollumns = addNewEntry(result, collumn);
+
+    return newCollumns;
+  }
+
+  Future requestWithAudio(String? audioData, col collumn) async {
+    var currentText = RecordingServer().getReconizedWords;
+    if (!currentText.endsWith("...")) {
+      RecordingServer().setText("$currentText...");
+    }
+    var stackTrace = StackTrace.current;
+    Map<String, PropertyInfo> inputData = convertColumns(collumn);
+    final locale = Platform.localeName;
+    final client = ApiClient(basePath: "https://demo.coflnet.com");
+    RecognitionResponse? result = null;
+    var attempts = 0;
+    while (result == null) {
+      if (attempts++ > 5) {
+        throw Exception("result in recent log request is null");
+      }
+      result = await TabApi(client).recognize(
+          recognitionRequest: RecognitionRequest(
+              base64Opus: audioData,
+              language: locale,
+              sessionId: sessionUuId,
+              columnWithDescription: inputData));
+    }
+    try {
+      print("Request Result: $result");
+    } catch (e) {
+      print("Could not log response, something null");
+    }
+    RecordingServer().setText(result.text ?? "");
+    if (result.columnWithText == null || !(result.isComplete ?? false)) {
+      return;
+    }
+    addNewEntry(result.columnWithText!, collumn);
+  }
+
+  Map<String, PropertyInfo> convertColumns(col collumn) {
+    Map<String, PropertyInfo> inputData = {};
+
+    for (var i in collumn.params) {
+      if (checkType(i)) continue;
+      inputData[i.name] =
+          PropertyInfo(type: matchType(i.type), enumValues: i.listOption);
+    }
+    return inputData;
+  }
+
+  List<col> addNewEntry(List<Map<String, String>> result, col collumn) {
     List<col> newCollumns = [];
     for (var object in result) {
       col newCollumn = collumn.copy();
@@ -44,7 +102,6 @@ class RecentLogRequest {
     }
     print("new collumn values ${newCollumns[0].toString()}");
     RecentLogHandler().addRecentLog(newCollumns);
-
     return newCollumns;
   }
 }

@@ -10,7 +10,6 @@
 
 part of openapi.api;
 
-
 class TabApi {
   TabApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
 
@@ -20,7 +19,9 @@ class TabApi {
   /// Parameters:
   ///
   /// * [TabRequest] tabRequest:
-  Future<Response> postWithHttpInfo({ TabRequest? tabRequest, }) async {
+  Future<Response> postWithHttpInfo({
+    TabRequest? tabRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/api/Tab';
 
@@ -31,8 +32,11 @@ class TabApi {
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>['application/json', 'text/json', 'application/*+json'];
-
+    const contentTypes = <String>[
+      'application/json',
+      'text/json',
+      'application/*+json'
+    ];
 
     return apiClient.invokeAPI(
       path,
@@ -48,20 +52,25 @@ class TabApi {
   /// Parameters:
   ///
   /// * [TabRequest] tabRequest:
-  Future<List<Map<String, String>>?> post({ TabRequest? tabRequest, }) async {
-    final response = await postWithHttpInfo( tabRequest: tabRequest, );
+  Future<List<Map<String, String>>?> post({
+    TabRequest? tabRequest,
+  }) async {
+    final response = await postWithHttpInfo(
+      tabRequest: tabRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
       final responseBody = await _decodeBodyBytes(response);
-      return (await apiClient.deserializeAsync(responseBody, 'List<Map<String, String>>') as List)
-        .cast<Map>()
-        .toList(growable: false);
-
+      return (await apiClient.deserializeAsync(
+              responseBody, 'List<Map<String, String>>') as List)
+          .cast<Map<String, String>>()
+          .toList(growable: false);
     }
     return null;
   }
@@ -70,7 +79,9 @@ class TabApi {
   /// Parameters:
   ///
   /// * [RecognitionRequest] recognitionRequest:
-  Future<Response> recognizeWithHttpInfo({ RecognitionRequest? recognitionRequest, }) async {
+  Future<Response> recognizeWithHttpInfo({
+    RecognitionRequest? recognitionRequest,
+  }) async {
     // ignore: prefer_const_declarations
     final path = r'/api/Tab/recognize';
 
@@ -81,8 +92,11 @@ class TabApi {
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>['application/json', 'text/json', 'application/*+json'];
-
+    const contentTypes = <String>[
+      'application/json',
+      'text/json',
+      'application/*+json'
+    ];
 
     return apiClient.invokeAPI(
       path,
@@ -98,17 +112,24 @@ class TabApi {
   /// Parameters:
   ///
   /// * [RecognitionRequest] recognitionRequest:
-  Future<RecognitionResponse?> recognize({ RecognitionRequest? recognitionRequest, }) async {
-    final response = await recognizeWithHttpInfo( recognitionRequest: recognitionRequest, );
+  Future<RecognitionResponse?> recognize({
+    RecognitionRequest? recognitionRequest,
+  }) async {
+    final response = await recognizeWithHttpInfo(
+      recognitionRequest: recognitionRequest,
+    );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
     // When a remote server returns no body with a status of 204, we shall not decode it.
     // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
     // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'RecognitionResponse',) as RecognitionResponse;
-    
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'RecognitionResponse',
+      ) as RecognitionResponse;
     }
     return null;
   }
