@@ -86,7 +86,7 @@ class RecordServiceHandler extends TaskHandler {
     newNum = 1;
     String userLocale = Platform.localeName;
     channel = WebSocketChannel.connect(
-        Uri.parse("wss://demo.coflnet.com/api/audio?language=$userLocale"));
+        Uri.parse("wss://tab.coflnet.com/api/audio?language=$userLocale"));
     await channel.ready;
     channel.stream.listen((message) {
       _handleMessage(message);

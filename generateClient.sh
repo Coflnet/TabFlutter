@@ -1,5 +1,5 @@
 docker run --rm -v "${PWD}:/local" --network host -u $(id -u ${USER}):$(id -g ${USER})  openapitools/openapi-generator-cli generate \
- -i https://demo.coflnet.com/api/openapi/v1/openapi.json \
+ -i https://tab.coflnet.com/api/openapi/v1/openapi.json \
  -g dart -o /local/lib/gAll 
 
 rm -rf lib/generatedCode

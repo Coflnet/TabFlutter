@@ -49,11 +49,12 @@ class SaveColumn {
     print("creating file \n \n \n \n \n \n");
     saveColumn(
         0,
-        col(
-            id: 1,
-            name: "Example",
-            emoji: "⚙️",
-            params: [param(name: "Text", type: translate("optionString"))]));
+        col(id: 1, name: "Adress", emoji: "⚙️", params: [
+          param(name: "Street", type: translate("optionString")),
+          param(name: "HouseNumber", type: 'translate("optionString")'),
+          param(name: "City", type: 'translate("optionString")'),
+          param(name: "ZipCode", type: 'translate("optionString")')
+        ]));
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }

@@ -23,7 +23,7 @@ class RecentLogRequest {
   Future<List<col>> request(String inputText, col collumn) async {
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
 
-    final client = ApiClient(basePath: "https://demo.coflnet.com");
+    final client = ApiClient(basePath: "https://tab.coflnet.com");
     final result = await TabApi(client).post(
         tabRequest: TabRequest(
             requiredColums: [],
@@ -46,7 +46,7 @@ class RecentLogRequest {
     var stackTrace = StackTrace.current;
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
     final locale = Platform.localeName;
-    final client = ApiClient(basePath: "https://demo.coflnet.com");
+    final client = ApiClient(basePath: "https://tab.coflnet.com");
     RecognitionResponse? result = null;
     var attempts = 0;
     while (result == null) {
