@@ -64,7 +64,7 @@ class _NewParamState extends State<NewParam>
     if (SaveColumn().getlanguage == "en") {
       return;
     }
-    List<String> enList = ["List", "0/10", "String", "Date"];
+    List<String> enList = ["List", "Number", "String", "Date"];
     if (enList.contains(type)) {
       type = translate(enList[enList.indexOf(type)]);
     }

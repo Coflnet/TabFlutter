@@ -138,7 +138,7 @@ FunctionObjectTypes matchType(String type) {
       return FunctionObjectTypes.string;
     case "List":
       return FunctionObjectTypes.string;
-    case "0/10":
+    case "Number":
       return FunctionObjectTypes.integer;
     default:
       print("default");

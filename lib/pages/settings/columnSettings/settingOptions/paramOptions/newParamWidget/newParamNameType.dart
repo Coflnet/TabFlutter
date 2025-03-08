@@ -25,7 +25,7 @@ class _NewParamNameTypeState extends State<NewParamNameType> {
   final List<String> items = [
     translate("optionString"),
     translate("optionList"),
-    translate("option0/10"),
+    translate("optionNumber"),
     translate("date"),
     translate("weather")
   ];

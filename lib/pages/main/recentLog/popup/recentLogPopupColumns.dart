@@ -27,7 +27,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
     if (SaveColumn().getlanguage == "en") {
       return;
     }
-    List enList = ["List", "0/10", "String", "Date"];
+    List enList = ["List", "Number", "String", "Date"];
     for (var element in widget.params) {
       if (enList.contains(element.type)) {
         element.type = enList[enList.indexOf(element.type)];
@@ -93,7 +93,7 @@ class _RecentLogPopupColumnsState extends State<RecentLogPopupColumns> {
     } else {
       return RecentLogPopupEditBox(
           name: widget.params[index].svalue ?? "",
-          isNumber: (widget.params[index].type == "0/10"),
+          isNumber: (widget.params[index].type == "Number"),
           index: index);
     }
   }
