@@ -51,7 +51,7 @@ class SaveColumn {
         0,
         col(id: 1, name: "Adress", emoji: "⚙️", params: [
           param(name: "Street", type: translate("optionString")),
-          param(name: "HouseNumber", type: 'translate("optionString")'),
+          param(name: "Number", type: 'translate("optionString")'),
           param(name: "City", type: 'translate("optionString")'),
           param(name: "ZipCode", type: 'translate("optionString")')
         ]));
