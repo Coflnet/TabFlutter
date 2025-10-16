@@ -1,5 +1,9 @@
 name: table_entry
-description: "Spables - speech to tables."
+description: "Spables - spe  sha  waveform_flutter: ^1.2.0
+  weather: ^3.2.1
+  web_socket_channel: ^3.0.3plus: ^12.0.0
+  socket_io_client: ^3.1.2
+  url_launcher: ^6.3.2 to tables."
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
@@ -7,7 +11,7 @@ publish_to: 'none'
 version: 0.0.2+2
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: '>=3.4.4 <5.0.0'
 
 icons_launcher:
   image_path: "assets/images/Logo.png"
@@ -22,49 +26,48 @@ icons_launcher:
       enable: true
 
 dependencies:
-  another_flushbar: ^1.12.30
-  audio_session: ^0.1.21
+  another_flushbar: ^1.12.32
+  audio_session: ^0.2.2
   csv: ^6.0.0
   custom_pop_up_menu: ^1.2.4
   dropdown_button2: ^2.3.9
   flutter:
     sdk: flutter
-  flutter_localization: ^0.2.2
+  flutter_localization: ^0.3.3
   flutter_translate: ^4.1.0
-  geolocator: ^13.0.1
+  geolocator: ^14.0.2
   haptic_feedback: ^0.5.1+1
   hexcolor: ^3.0.1
-  http: ^1.2.2
-  hugeicons: ^0.0.7
-  icons_launcher: ^3.0.0
-  noise_meter: ^5.0.2
+  http: ^1.5.0
+  hugeicons: ^0.0.11
+  icons_launcher: ^3.0.3
+  noise_meter: ^5.1.0
   path_provider: ^2.1.4
-  provider: ^6.1.2
-  record: ^5.2.0
+  provider: ^6.1.5+1
+  record: ^6.1.2
   restart_app: ^1.3.2
   scroll_snap_list: ^0.9.1
-  share_plus: ^10.0.2
-  socket_io_client: ^3.0.2
-  url_launcher: ^6.3.0
-  waveform_flutter: ^1.0.1
-  weather: ^3.1.1
-  web_socket_channel: ^3.0.1
+  share_plus: ^12.0.0
+  socket_io_client: ^3.1.2
+  url_launcher: ^6.3.2
+  waveform_flutter: ^1.2.0
+  weather: ^3.2.1
+  web_socket_channel: ^3.0.3
   opus_flutter: ^3.0.1
   opus_dart: ^3.0.1
   flutter_background: ^1.3.0+1
-  flutter_foreground_task: ^8.17.0
-  audioplayers: ^6.1.0
+  flutter_foreground_task: ^9.1.0
+  audioplayers: ^6.5.1
   onnxruntime: ^1.4.1
 
 dependency_overrides:
-  ffi: ^1.1.2 # resolve conflict with opus_dart in favor of opus
+  ffi: ^2.1.4 # resolve conflict with opus_dart in favor of opus
   intl: ^0.20.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
