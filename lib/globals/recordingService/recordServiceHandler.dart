@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/widgets.dart';
 import 'package:opus_dart/opus_dart.dart';
 import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:table_entry/src/vad/audio_utils.dart';
 import '../../src/vad/vad_handler.dart';
+import '../../src/vad/vad_handler_base.dart';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/intl.dart';
@@ -24,13 +26,15 @@ const String _kStopAction = 'action.stop';
 
 @pragma('vm:entry-point')
 void startRecordService() {
+  // Ensure Flutter bindings are initialized in the isolate
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(RecordServiceHandler());
 }
 
 late soi.Socket? ws;
 
 class RecordServiceHandler extends TaskHandler {
-  final AudioRecorder _recorder = AudioRecorder();
+  late final AudioRecorder _recorder;
 
   Uint8List audioBuffer = Uint8List(0);
   StreamSubscription? audioStream;
@@ -42,13 +46,18 @@ class RecordServiceHandler extends TaskHandler {
   String? _mPath;
   late SimpleOpusEncoder encoder;
   late SimpleOpusDecoder decoder;
-  final record = AudioRecorder();
+  late final AudioRecorder record;
   int newNum = 0;
-  final _vadHandler = VadHandler.create(isDebug: true);
+  late final VadHandlerBase _vadHandler;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     try {
+      // Initialize AudioRecorder and VadHandler (bindings are already initialized in startRecordService)
+      _recorder = AudioRecorder();
+      record = AudioRecorder();
+      _vadHandler = VadHandler.create(isDebug: true);
+
       initOpus(await opus_flutter
           .load()); // init opus in background task (its separate isolate)
       await _startRecorder();

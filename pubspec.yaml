@@ -8,7 +8,7 @@ description: "Spables - spe  sha  waveform_flutter: ^1.2.0
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 0.0.2+2
+version: 0.0.3+4
 
 environment:
   sdk: '>=3.4.4 <5.0.0'
