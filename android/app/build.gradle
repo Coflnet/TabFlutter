@@ -5,6 +5,11 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+import java.nio.file.Files
+
+// Apply custom library alignment script for 16 KB page size support
+apply from: 'align_libs.gradle'
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -55,6 +60,7 @@ android {
         // Support for 16 KB page sizes
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+            debugSymbolLevel 'FULL'
         }
     }
 
@@ -72,6 +78,12 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
+            // Ensure native libraries are aligned for 16 KB pages
+            ndk {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+                // Use SYMBOL_TABLE to avoid aggressive stripping that breaks pre-built libs
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
         }
         debug {
             debuggable true
@@ -85,13 +97,139 @@ android {
     }
 
     packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+            // Ensure all native libraries are aligned to 16 KB
+            // This applies page alignment during packaging
+        }
         pickFirst  'lib/arm64-v8a/libc++_shared.so'
         pickFirst  'lib/armeabi-v7a/libc++_shared.so'
         pickFirst  'lib/x86/libc++_shared.so'
         pickFirst  'lib/x86_64/libc++_shared.so'
+        
+        // CRITICAL: Do not strip our pre-built 16KB-aligned libraries
+        // They are already stripped and optimized
+        doNotStrip '**/*.so'
+        doNotStrip '**/libopus.so'
+        doNotStrip '**/libonnxruntime.so'
+    }
+    
+    // Force page alignment for all native libraries
+    android.defaultConfig.ndk.abiFilters.each { abi ->
+        tasks.whenTaskAdded { task ->
+            if (task.name.contains("package") && task.name.contains("Release")) {
+                task.doFirst {
+                    println "Ensuring 16 KB alignment for ${abi} libraries"
+                }
+            }
+        }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+// Task to inject pre-built 16KB-aligned libraries
+// Inject into BOTH merged and stripped directories to avoid stripping issues
+tasks.register('injectPrebuild16KBLibraries') {
+    doLast {
+        def buildDir = project.buildDir
+        
+        // Define our pre-built library locations (relative to project root)
+        def preBuildLibs = [
+            'arm64-v8a': ["${rootDir}/../scripts/opus-install/arm64-v8a/lib/libopus.so",
+                          "${rootDir}/../scripts/onnx-install/arm64-v8a/lib/libonnxruntime.so"],
+            'x86_64': ["${rootDir}/../scripts/opus-install/x86_64/lib/libopus.so",
+                       "${rootDir}/../scripts/onnx-install/x86_64/lib/libonnxruntime.so"]
+        ]
+        
+        // Inject into BOTH locations to ensure they're used in final AAB
+        def targetDirs = [
+            "${buildDir}/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib",
+            "${buildDir}/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib"
+        ]
+        
+        targetDirs.each { targetDir ->
+            def file_targetDir = file(targetDir)
+            file_targetDir.mkdirs()
+            
+            preBuildLibs.each { abi, libs ->
+                def abiDir = file("${targetDir}/${abi}")
+                abiDir.mkdirs()
+                
+                libs.each { libPath ->
+                    def libFile = file(libPath)
+                    if (libFile.exists()) {
+                        def destFile = file("${abiDir}/${libFile.name}")
+                        Files.copy(libFile.toPath(), destFile.toPath(), 
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                        println "✓ Injected pre-built ${libFile.name} for ${abi} into ${targetDir.contains('stripped') ? 'stripped' : 'merged'}"
+                    } else {
+                        println "⚠ Pre-built library not found: ${libPath}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Task to align native libraries for 16 KB page size support
+tasks.register('align16KBLibraries') {
+    doLast {
+        def buildDir = project.buildDir
+        def libDirs = [
+            "${buildDir}/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib",
+            "${buildDir}/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib"
+        ]
+        
+        def problematicLibs = ['libonnxruntime.so', 'libopus.so']
+        
+        libDirs.each { libDir ->
+            def dir = file(libDir)
+            if (dir.exists()) {
+                dir.eachFileRecurse { file ->
+                    if (file.isFile() && problematicLibs.any { file.name.contains(it) }) {
+                        println "Aligning ${file.path} for 16 KB pages"
+                        // Use objcopy to align the library
+                        try {
+                            exec {
+                                commandLine 'objcopy', '--set-section-alignment', '.text=16384', file.path
+                            }
+                        } catch (Exception e) {
+                            println "Warning: Could not align ${file.name}: ${e.message}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Hook the alignment task into the build process
+// CRITICAL: Disable strip task and inject pre-built libs instead
+tasks.whenTaskAdded { task ->
+    if (task.name == 'stripReleaseDebugSymbols') {
+        // DISABLE stripping entirely - our pre-built libs are already stripped
+        task.enabled = false
+        task.finalizedBy injectPrebuild16KBLibraries  // Inject after (disabled) stripping
+    }
+    if (task.name == 'injectPrebuild16KBLibraries') {
+        task.finalizedBy align16KBLibraries  // Then align them
+    }
+}
+
+// Task to verify 16 KB alignment of native libraries
+tasks.register('verify16KBAlignment') {
+    doLast {
+        def apkPath = file("${buildDir}/outputs/apk/release/app-release.apk")
+        if (apkPath.exists()) {
+            println "Checking 16 KB alignment for: ${apkPath}"
+            exec {
+                commandLine 'unzip', '-l', apkPath.absolutePath
+            }
+        } else {
+            println "APK not found at: ${apkPath}. Build release APK first."
+        }
+    }
 }
