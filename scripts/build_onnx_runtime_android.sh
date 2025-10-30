@@ -20,17 +20,27 @@ INSTALL_DIR_BASE="$SCRIPT_DIR/onnx-install"
 NDK=""
 AAB=""
 OUT_AAB=""
+CLEAN_BUILD=0
 ABIS=("arm64-v8a" "armeabi-v7a" "x86_64")
 JOBS="$(nproc || echo 4)"
-ONNXR_TAG="v1.15.1" # fallback tag; you can change this if needed
+ONNXR_TAG="v1.23.2" # Latest stable release as of Oct 2025
 
 usage() {
   cat <<-USAGE
-Usage: $0 [--ndk /path/to/ndk] [--aab path/to/app.aab --out path/to/out.aab] [--abis abi1,abi2] [--tag <onnxruntime-tag>] [--jobs N]
+Usage: $0 [--ndk /path/to/ndk] [--aab path/to/app.aab --out path/to/out.aab] [--abis abi1,abi2] [--tag <onnxruntime-tag>] [--jobs N] [--clean]
 
 This will clone ONNX Runtime (if needed), build libonnxruntime.so for each ABI,
 install them under scripts/onnx-install/<abi>/lib/libonnxruntime.so and optionally
 replace the libs inside an AAB using scripts/replace_libs_in_aab.py.
+
+Options:
+  --ndk PATH          Path to Android NDK
+  --aab PATH          Input AAB file to patch
+  --out PATH          Output AAB file
+  --abis ABI1,ABI2    Comma-separated list of ABIs (default: arm64-v8a,armeabi-v7a,x86_64)
+  --tag VERSION       ONNX Runtime git tag (default: v1.23.2)
+  --jobs N            Parallel jobs for build (default: CPU count)
+  --clean             Clean build directories before building
 USAGE
   exit 1
 }
@@ -43,6 +53,7 @@ while [[ $# -gt 0 ]]; do
     --abis) IFS=',' read -r -a ABIS <<< "$2"; shift 2;;
     --tag) ONNXR_TAG="$2"; shift 2;;
     --jobs) JOBS="$2"; shift 2;;
+    --clean) CLEAN_BUILD=1; shift;;
     -h|--help) usage;;
     *) echo "Unknown arg: $1"; usage;;
   esac
@@ -78,6 +89,13 @@ fi
 
 echo "Using NDK: $NDK"
 echo "ABIs: ${ABIS[*]}"
+echo "ONNX Runtime tag: $ONNXR_TAG"
+
+# Clean build directories if requested
+if [[ $CLEAN_BUILD -eq 1 ]]; then
+  echo "Cleaning build directories..."
+  rm -rf "$REPOS_DIR" "$BUILD_DIR_BASE" "$INSTALL_DIR_BASE"
+fi
 
 mkdir -p "$REPOS_DIR" "$BUILD_DIR_BASE" "$INSTALL_DIR_BASE"
 

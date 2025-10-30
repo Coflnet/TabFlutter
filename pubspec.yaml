@@ -11,7 +11,7 @@ description: "Spables  hexcolor: ^3.0.1
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
 
-version: 0.0.4+6
+version: 0.0.4+7
 
 environment:
   sdk: '>=3.4.4 <5.0.0'

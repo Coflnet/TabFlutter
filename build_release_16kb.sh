@@ -26,10 +26,32 @@ need() { command -v "$1" >/dev/null 2>&1 || { echo "Error: '$1' required" >&2; e
 
 msg "Checking prerequisites"
 for tool in flutter unzip zip python3 readelf; do need "$tool"; done
+
+# Build/download prebuilt libraries if missing
+msg "Ensuring prebuilt libraries are available..."
+if [ ! -d "$PREBUILT_ROOT/opus-install/arm64-v8a" ] || [ ! -f "$PREBUILT_ROOT/opus-install/arm64-v8a/lib/libopus.so" ]; then
+    msg "Building Opus libraries..."
+    bash "$PREBUILT_ROOT/scripts/build_opus_android.sh" --abis arm64-v8a,x86_64 --jobs 8
+fi
+
+if [ ! -d "$PREBUILT_ROOT/onnx-install/arm64-v8a" ] || [ ! -f "$PREBUILT_ROOT/onnx-install/arm64-v8a/libonnxruntime.so" ]; then
+    msg "Downloading and patching ONNX Runtime libraries..."
+    bash "$PREBUILT_ROOT/scripts/download_onnx_runtime_android.sh" --clean
+    msg "Patching ONNX libraries to 16KB alignment..."
+    for lib in "$PREBUILT_ROOT/onnx-install/arm64-v8a/"*.so "$PREBUILT_ROOT/onnx-install/x86_64/"*.so; do
+        python3 "$PREBUILT_ROOT/scripts/align_elf_16kb.py" "$lib"
+    done
+fi
+
+# Verify prebuilt libraries exist
 for abi in "${KEEP_ABIS[@]}"; do
     for lib in "${TARGET_LIBS[@]}"; do
         dir="${LIB_DIRS[$lib]}"
-        path="$PREBUILT_ROOT/$dir/$abi/lib/$lib"
+        if [ "$lib" = "libopus.so" ]; then
+            path="$PREBUILT_ROOT/$dir/$abi/lib/$lib"
+        else
+            path="$PREBUILT_ROOT/$dir/$abi/$lib"
+        fi
         [ -f "$path" ] || { echo "Missing prebuilt $lib for $abi at $path" >&2; exit 1; }
     done
 done
@@ -102,7 +124,7 @@ libs = {
         abi: prebuilt_root / f"opus-install/{abi}/lib/libopus.so" for abi in keep_abis
     },
     "libonnxruntime.so": {
-        abi: prebuilt_root / f"onnx-install/{abi}/lib/libonnxruntime.so" for abi in keep_abis
+        abi: prebuilt_root / f"onnx-install/{abi}/libonnxruntime.so" for abi in keep_abis
     },
 }
 

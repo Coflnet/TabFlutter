@@ -7,8 +7,8 @@ plugins {
 
 import java.nio.file.Files
 
-// Apply custom library alignment script for 16 KB page size support
-apply from: 'align_libs.gradle'
+// Note: 16KB alignment is now handled in post-build AAB patching
+// apply from: 'align_libs.gradle'
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
@@ -139,9 +139,9 @@ tasks.register('injectPrebuild16KBLibraries') {
         // Define our pre-built library locations (relative to project root)
         def preBuildLibs = [
             'arm64-v8a': ["${rootDir}/../scripts/opus-install/arm64-v8a/lib/libopus.so",
-                          "${rootDir}/../scripts/onnx-install/arm64-v8a/lib/libonnxruntime.so"],
+                          "${rootDir}/../scripts/onnx-install/arm64-v8a/libonnxruntime.so"],
             'x86_64': ["${rootDir}/../scripts/opus-install/x86_64/lib/libopus.so",
-                       "${rootDir}/../scripts/onnx-install/x86_64/lib/libonnxruntime.so"]
+                       "${rootDir}/../scripts/onnx-install/x86_64/libonnxruntime.so"]
         ]
         
         // Inject into BOTH locations to ensure they're used in final AAB

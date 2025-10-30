@@ -50,6 +50,8 @@ scripts/opus-build/
 scripts/opus-install/
 scripts/onnx-src/
 scripts/onnx-build/
+scripts/onnx-extract/
+scripts/onnx-download
 scripts/onnx-install/
 
 # Build logs and temporary files
