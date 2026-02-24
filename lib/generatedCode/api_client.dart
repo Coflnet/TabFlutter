@@ -182,30 +182,44 @@ class ApiClient {
           return valueString == 'true' || valueString == '1';
         case 'DateTime':
           return value is DateTime ? value : DateTime.tryParse(value);
+        case 'ApprovedSampleDto':
+          return ApprovedSampleDto.fromJson(value);
+        case 'CacheClearResponse':
+          return CacheClearResponse.fromJson(value);
+        case 'ComplicatedCaseMetadataDto':
+          return ComplicatedCaseMetadataDto.fromJson(value);
+        case 'ErrorReportRequest':
+          return ErrorReportRequest.fromJson(value);
         case 'FunctionObjectTypes':
           return FunctionObjectTypesTypeTransformer().decode(value);
-        case 'MapElement':
-          return MapElement.fromJson(value);
-        case 'MapingResult':
-          return MapingResult.fromJson(value);
-        case 'MappingElement':
-          return MappingElement.fromJson(value);
-        case 'MappingResult2':
-          return MappingResult2.fromJson(value);
+        case 'GetPrompts400Response':
+          return GetPrompts400Response.fromJson(value);
+        case 'GetPrompts500Response':
+          return GetPrompts500Response.fromJson(value);
         case 'ProblemDetails':
           return ProblemDetails.fromJson(value);
+        case 'ProgressDto':
+          return ProgressDto.fromJson(value);
         case 'PropertyInfo':
           return PropertyInfo.fromJson(value);
         case 'RecognitionRequest':
           return RecognitionRequest.fromJson(value);
         case 'RecognitionResponse':
           return RecognitionResponse.fromJson(value);
-        case 'SurveryResult':
-          return SurveryResult.fromJson(value);
-        case 'TabRequest':
-          return TabRequest.fromJson(value);
-        case 'UnMappable':
-          return UnMappable.fromJson(value);
+        case 'ReportComplicatedCaseRequest':
+          return ReportComplicatedCaseRequest.fromJson(value);
+        case 'TokenContainer':
+          return TokenContainer.fromJson(value);
+        case 'UpdateComplicatedCaseRequest':
+          return UpdateComplicatedCaseRequest.fromJson(value);
+        case 'UploadRequest':
+          return UploadRequest.fromJson(value);
+        case 'UserInfoRequest':
+          return UserInfoRequest.fromJson(value);
+        case 'ValidateRequest':
+          return ValidateRequest.fromJson(value);
+        case 'WikipediaSentenceResponse':
+          return WikipediaSentenceResponse.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

@@ -28,22 +28,30 @@ part 'auth/oauth.dart';
 part 'auth/http_basic_auth.dart';
 part 'auth/http_bearer_auth.dart';
 
-part 'api/excel_api.dart';
-part 'api/import_api.dart';
+part 'api/api_api.dart';
+part 'api/auth_api.dart';
+part 'api/dialect_api.dart';
 part 'api/tab_api.dart';
 
+part 'model/approved_sample_dto.dart';
+part 'model/cache_clear_response.dart';
+part 'model/complicated_case_metadata_dto.dart';
+part 'model/error_report_request.dart';
 part 'model/function_object_types.dart';
-part 'model/map_element.dart';
-part 'model/maping_result.dart';
-part 'model/mapping_element.dart';
-part 'model/mapping_result2.dart';
+part 'model/get_prompts400_response.dart';
+part 'model/get_prompts500_response.dart';
 part 'model/problem_details.dart';
+part 'model/progress_dto.dart';
 part 'model/property_info.dart';
 part 'model/recognition_request.dart';
 part 'model/recognition_response.dart';
-part 'model/survery_result.dart';
-part 'model/tab_request.dart';
-part 'model/un_mappable.dart';
+part 'model/report_complicated_case_request.dart';
+part 'model/token_container.dart';
+part 'model/update_complicated_case_request.dart';
+part 'model/upload_request.dart';
+part 'model/user_info_request.dart';
+part 'model/validate_request.dart';
+part 'model/wikipedia_sentence_response.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from
