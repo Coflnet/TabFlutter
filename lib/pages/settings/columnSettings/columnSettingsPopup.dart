@@ -8,6 +8,7 @@ import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/columnNameOption.dart';
 import 'package:table_entry/pages/settings/columnSettings/settingOptions/paramOptions/paramOptionsMaim.dart';
+import 'package:table_entry/pages/settings/table_settings_page.dart';
 
 class ColumnSettingsPopup extends StatefulWidget {
   final bool isShowing;
@@ -58,6 +59,42 @@ class _ColumnSettingsPopupState extends State<ColumnSettingsPopup> {
                 ),
               ),
             ),
+            TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TableSettingsPage(
+                          table: EditingColumns().getEditingCol),
+                    ),
+                  );
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 30,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2))),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.settings, color: Colors.white70, size: 16),
+                      SizedBox(width: 6),
+                      Text(
+                        "Table Settings",
+                        style: TextStyle(
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15),
+                      ),
+                    ],
+                  ),
+                )),
+            const SizedBox(height: 8),
             TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero),
                 onPressed: () {

@@ -1,11 +1,14 @@
-import 'dart:io';
+import 'dart:ui' as ui;
 import 'dart:math';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/weatherService.dart';
+import 'package:table_entry/globals/integration_service.dart';
 
 import '../recordingService/recordingServer.dart';
 
@@ -20,6 +23,7 @@ class RecentLogRequest {
     return '${now}_$rand';
   }
 
+  /*
   Future<List<col>> request(String inputText, col collumn) async {
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
 
@@ -37,6 +41,7 @@ class RecentLogRequest {
 
     return newCollumns;
   }
+  */
 
   Future requestWithAudio(String? audioData, col collumn) async {
     var currentText = RecordingServer().getReconizedWords;
@@ -45,7 +50,9 @@ class RecentLogRequest {
     }
     var stackTrace = StackTrace.current;
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
-    final locale = Platform.localeName;
+    final locale = kIsWeb
+        ? ui.PlatformDispatcher.instance.locale.toLanguageTag()
+        : ui.PlatformDispatcher.instance.locale.toLanguageTag();
     final client = ApiClient(basePath: "https://tab.coflnet.com");
     RecognitionResponse? result = null;
     var attempts = 0;
@@ -99,10 +106,27 @@ class RecentLogRequest {
       newCollumn.id =
           RecentLogHandler().getRecentLog.length + 1 + newCollumns.length;
       newCollumns.add(newCollumn);
+
+      // Push to integrations (fire-and-forget)
+      _pushToIntegrations(object);
     }
     print("new collumn values ${newCollumns[0].toString()}");
     RecentLogHandler().addRecentLog(newCollumns);
     return newCollumns;
+  }
+
+  /// Push entry data to all configured integrations via TabApi.
+  void _pushToIntegrations(Map<String, String> data) async {
+    try {
+      final service = IntegrationService();
+      await service.load();
+      if (service.pushEnabled && service.integrations.isNotEmpty) {
+        await service.pushEntry(data);
+        print("[Integrations] Entry pushed to integrations");
+      }
+    } catch (e) {
+      print("[Integrations] Push error: $e");
+    }
   }
 }
 

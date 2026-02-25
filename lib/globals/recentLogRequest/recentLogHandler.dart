@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 
@@ -10,7 +11,8 @@ List<col> recentLog = [];
 List<col> displayedLog = [];
 
 class RecentLogHandler {
-  void loadRecentLog() async {
+  Future<void> loadRecentLog() async {
+    if (kIsWeb) return;
     if (recentLog.isNotEmpty) {
       return;
     }
@@ -23,10 +25,12 @@ class RecentLogHandler {
 
     var fileDataJson = file.readAsStringSync();
     var fileData = jsonDecode(fileDataJson);
-    for (var element in fileData["columns"]) {
+    var columnsData = fileData["columns"] ?? fileData["recentLog"] ?? [];
+    for (var element in columnsData) {
       recentLog.add(col.fromJson(element));
     }
-    for (var element in fileData["displayed"]) {
+    var displayedData = fileData["displayed"] ?? [];
+    for (var element in displayedData) {
       displayedLog.add(col.fromJson(element));
     }
   }
@@ -38,6 +42,7 @@ class RecentLogHandler {
   }
 
   void saveFile() async {
+    if (kIsWeb) return;
     List savingColumnsAll = [];
     List savingColumnsDisplayed = [];
     Directory appDir = await getApplicationDocumentsDirectory();
@@ -61,7 +66,7 @@ class RecentLogHandler {
 
   Future<void> createFile(file) async {
     file.createSync();
-    var fileData = {"recentLog": [], "displayed": []};
+    var fileData = {"columns": [], "displayed": []};
     var jsonFileData = jsonEncode(fileData);
     await file.writeAsString(jsonFileData);
   }

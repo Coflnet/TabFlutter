@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   flutter_localization
   geolocator_windows
+  opus_flutter_windows
   permission_handler_windows
   record_windows
   share_plus

@@ -56,12 +56,15 @@ class _RecentLogState extends State<RecentLog> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(
-              translate("recentLog"),
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 23),
+            Expanded(
+              child: Text(
+                translate("recentLog"),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 23),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

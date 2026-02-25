@@ -1,0 +1,30 @@
+# Build outputs
+build/
+.dart_tool/
+.packages
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Platform-specific (not needed for web build)
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Test and verification files
+*.txt
+!BUILD_README.md
+flutter_jank_metrics*.json
+
+# Git
+.git/
+.gitignore

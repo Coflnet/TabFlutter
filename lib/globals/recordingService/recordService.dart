@@ -1,13 +1,17 @@
-import 'dart:io';
+import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
+import 'package:table_entry/src/vad/audio_utils.dart';
+import 'package:table_entry/src/vad/core/vad_handler.dart';
 
 import '../recentLogRequest/recentLogHandler.dart';
-import 'recordServiceHandler.dart';
+import 'recordServiceHandler_stub.dart'
+    if (dart.library.io) 'recordServiceHandler.dart';
 
 typedef RecordStatusChanged = void Function(RecordStatus status);
 
@@ -33,8 +37,13 @@ class RecordService {
   RecordStatus _prevRecordStatus = RecordStatus.stopped;
   RecordStatus _currRecordStatus = RecordStatus.stopped;
 
+  // Web-only VAD handler
+  VadHandler? _webVadHandler;
+  StreamSubscription<List<double>>? _webVadSub;
+
   // ------------- Service API -------------
   Future<void> _requestNotificationPermission() async {
+    if (kIsWeb) return;
     // Android 13+, you need to allow notification permission to display foreground service notification.
     //
     // iOS: If you need notification, ask for permission.
@@ -53,6 +62,7 @@ class RecordService {
   }
 
   void init() {
+    if (kIsWeb) return;
     FlutterForegroundTask.initCommunicationPort();
     FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
     FlutterForegroundTask.init(
@@ -77,6 +87,22 @@ class RecordService {
   }
 
   Future<void> start() async {
+    if (kIsWeb) {
+      // On web, audio is handled via the VAD handler directly (no foreground task needed)
+      _updateRecordStatus(RecordStatus.starting);
+      _webVadHandler = VadHandler.create(isDebug: false);
+      _webVadSub = _webVadHandler!.onSpeechEnd.listen((List<double> samples) {
+        // Convert PCM samples to WAV data URL (same format as native handler)
+        final wavUrl = AudioUtils.createWavUrl(samples);
+        _onReceiveTaskData(wavUrl);
+      });
+      _webVadHandler!.onError.listen((String msg) {
+        print('[WebVAD] Error: $msg');
+      });
+      await _webVadHandler!.startListening();
+      _updateRecordStatus(RecordStatus.started);
+      return;
+    }
     await _requestNotificationPermission();
     await _requestRecordPermission();
 
@@ -98,6 +124,15 @@ class RecordService {
   }
 
   Future<void> stop() async {
+    if (kIsWeb) {
+      _webVadHandler?.stopListening();
+      _webVadSub?.cancel();
+      _webVadHandler?.dispose();
+      _webVadHandler = null;
+      _webVadSub = null;
+      _updateRecordStatus(RecordStatus.stopped);
+      return;
+    }
     _updateRecordStatus(RecordStatus.stopping);
 
     final ServiceRequestResult result =
@@ -110,7 +145,8 @@ class RecordService {
     _updateRecordStatus(RecordStatus.stopped);
   }
 
-  Future<bool> get isRunningService => FlutterForegroundTask.isRunningService;
+  Future<bool> get isRunningService =>
+      kIsWeb ? Future.value(false) : FlutterForegroundTask.isRunningService;
 
   RecordStatus get recordStatus => _currRecordStatus;
 

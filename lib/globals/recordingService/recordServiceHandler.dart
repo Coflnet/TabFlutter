@@ -7,8 +7,7 @@ import 'package:opus_dart/opus_dart.dart';
 import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:table_entry/src/vad/audio_utils.dart';
-import '../../src/vad/vad_handler.dart';
-import '../../src/vad/vad_handler_base.dart';
+import '../../src/vad/core/vad_handler.dart';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/intl.dart';
@@ -48,7 +47,7 @@ class RecordServiceHandler extends TaskHandler {
   late SimpleOpusDecoder decoder;
   late final AudioRecorder record;
   int newNum = 0;
-  late final VadHandlerBase _vadHandler;
+  late final VadHandler _vadHandler;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
@@ -181,7 +180,33 @@ class RecordServiceHandler extends TaskHandler {
       ],
     );
 
-    _vadHandler.startListening();
+    // Permission was already requested on the main isolate before starting
+    // the foreground service. Calling hasPermission() here would fail because
+    // not all plugins are registered in the background isolate.
+    await _vadHandler.startListening(
+      bypassPermissionCheck: true,
+      recordConfig: const RecordConfig(
+        encoder: AudioEncoder.pcm16bits,
+        sampleRate: 16000,
+        bitRate: 16,
+        numChannels: 1,
+        echoCancel: true,
+        autoGain: true,
+        noiseSuppress: true,
+        androidConfig: AndroidRecordConfig(
+          speakerphone: false,
+          audioSource: AndroidAudioSource.mic,
+          audioManagerMode: AudioManagerMode.modeNormal,
+        ),
+        iosConfig: IosRecordConfig(
+          categoryOptions: [
+            IosAudioCategoryOption.allowBluetooth,
+            IosAudioCategoryOption.allowBluetoothA2DP,
+          ],
+          manageAudioSession: true,
+        ),
+      ),
+    );
     return;
 
     FlutterForegroundTask.updateService(

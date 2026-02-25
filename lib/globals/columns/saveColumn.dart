@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -15,7 +16,8 @@ int selectedColumn = 0;
 late RecordingServer recordingServerREF;
 
 class SaveColumn {
-  void loadColumns() async {
+  Future<void> loadColumns() async {
+    if (kIsWeb) return;
     if (collumns.isNotEmpty) {
       return;
     }
@@ -83,6 +85,7 @@ class SaveColumn {
   }
 
   void saveFile() async {
+    if (kIsWeb) return;
     List savingColumns = [];
     Directory appDir = await getApplicationDocumentsDirectory();
     for (var i in collumns) {

@@ -19,22 +19,32 @@ import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-    SystemUiOverlay.top,
-    SystemUiOverlay.bottom,
-  ]);
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarBrightness: Brightness.light,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: HexColor("1D1E2B"),
-  ));
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  var delegate = await LocalizationDelegate.create(
-      fallbackLocale: 'en_US', supportedLocales: ['en_US', 'es', 'de']);
-  runApp(LocalizedApp(delegate, const LaunchPage()));
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      debugPrint('FlutterError: ${details.exception}\n${details.stack}');
+    };
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+      SystemUiOverlay.top,
+      SystemUiOverlay.bottom,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: HexColor("1D1E2B"),
+    ));
+
+    var delegate = await LocalizationDelegate.create(
+        fallbackLocale: 'en', supportedLocales: ['en', 'de']);
+    runApp(LocalizedApp(delegate, const LaunchPage()));
+  }, (error, stack) {
+    debugPrint('Uncaught error: $error\n$stack');
+  });
 }
 
 class Main extends StatefulWidget {
@@ -70,8 +80,8 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   }
 
   void loadData() async {
-    SaveColumn().loadColumns();
-    RecentLogHandler().loadRecentLog();
+    await SaveColumn().loadColumns();
+    await RecentLogHandler().loadRecentLog();
   }
 
   @override

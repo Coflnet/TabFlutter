@@ -35,22 +35,25 @@ class RecognitionResponse {
   List<String>? audioIds;
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is RecognitionResponse &&
-    other.isComplete == isComplete &&
-    other.text == text &&
-    _deepEquality.equals(other.columnWithText, columnWithText) &&
-    _deepEquality.equals(other.audioIds, audioIds);
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RecognitionResponse &&
+          other.isComplete == isComplete &&
+          other.text == text &&
+          _deepEquality.equals(other.columnWithText, columnWithText) &&
+          _deepEquality.equals(other.audioIds, audioIds);
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (isComplete == null ? 0 : isComplete!.hashCode) +
-    (text == null ? 0 : text!.hashCode) +
-    (columnWithText == null ? 0 : columnWithText!.hashCode) +
-    (audioIds == null ? 0 : audioIds!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (isComplete == null ? 0 : isComplete!.hashCode) +
+      (text == null ? 0 : text!.hashCode) +
+      (columnWithText == null ? 0 : columnWithText!.hashCode) +
+      (audioIds == null ? 0 : audioIds!.hashCode);
 
   @override
-  String toString() => 'RecognitionResponse[isComplete=$isComplete, text=$text, columnWithText=$columnWithText, audioIds=$audioIds]';
+  String toString() =>
+      'RecognitionResponse[isComplete=$isComplete, text=$text, columnWithText=$columnWithText, audioIds=$audioIds]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -89,8 +92,10 @@ class RecognitionResponse {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "RecognitionResponse[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "RecognitionResponse[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "RecognitionResponse[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "RecognitionResponse[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -98,16 +103,25 @@ class RecognitionResponse {
       return RecognitionResponse(
         isComplete: mapValueOfType<bool>(json, r'isComplete'),
         text: mapValueOfType<String>(json, r'text'),
-        columnWithText: Map.listFromJson(json[r'columnWithText']),
+        columnWithText: json[r'columnWithText'] is Iterable
+            ? (json[r'columnWithText'] as Iterable)
+                .map((e) => (e as Map).cast<String, String>())
+                .toList()
+            : const [],
         audioIds: json[r'audioIds'] is Iterable
-            ? (json[r'audioIds'] as Iterable).cast<String>().toList(growable: false)
+            ? (json[r'audioIds'] as Iterable)
+                .cast<String>()
+                .toList(growable: false)
             : const [],
       );
     }
     return null;
   }
 
-  static List<RecognitionResponse> listFromJson(dynamic json, {bool growable = false,}) {
+  static List<RecognitionResponse> listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <RecognitionResponse>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -135,20 +149,24 @@ class RecognitionResponse {
   }
 
   // maps a json object with a list of RecognitionResponse-objects as value to a dart map
-  static Map<String, List<RecognitionResponse>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<RecognitionResponse>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<RecognitionResponse>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = RecognitionResponse.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = RecognitionResponse.listFromJson(
+          entry.value,
+          growable: growable,
+        );
       }
     }
     return map;
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-  };
+  static const requiredKeys = <String>{};
 }
-

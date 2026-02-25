@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:opus_dart/opus_dart.dart';
-import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
+import 'package:table_entry/globals/recordingService/opus_init_stub.dart'
+    if (dart.library.io) 'package:table_entry/globals/recordingService/opus_init_native.dart';
 import 'package:table_entry/main.dart';
 
 class LaunchPageLogo extends StatefulWidget {
@@ -24,30 +24,48 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
   }
 
   void loadApp() async {
-    SaveColumn().loadColumns();
-    RecentLogHandler().loadRecentLog();
-    final RecordingServer newRec = RecordingServer();
-    SaveColumn().setRecordingServerREF = newRec;
+    try {
+      await SaveColumn().loadColumns();
+      await RecentLogHandler().loadRecentLog();
+      final RecordingServer newRec = RecordingServer();
+      SaveColumn().setRecordingServerREF = newRec;
 
-    Locale local = Localizations.localeOf(context);
-    changeLocale(context, SaveColumn().getlanguage);
+      Locale local = Localizations.localeOf(context);
+      changeLocale(context, SaveColumn().getlanguage);
 
-    if (local.languageCode == "de") {
-      changeLocale(context, "de");
-      SaveColumn().setlanguage = "de";
-      SaveColumn().saveFile();
+      if (local.languageCode == "de") {
+        changeLocale(context, "de");
+        SaveColumn().setlanguage = "de";
+        SaveColumn().saveFile();
+      }
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const Main(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return child;
+          },
+          transitionDuration: const Duration(milliseconds: 0),
+        ),
+      );
+      await initOpusIfAvailable();
+    } catch (e, stack) {
+      debugPrint('loadApp failed: $e\n$stack');
+      // Navigate to Main anyway so the user doesn't see a black screen
+      if (mounted) {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const Main(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) => child,
+            transitionDuration: const Duration(milliseconds: 0),
+          ),
+        );
+      }
     }
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const Main(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return child;
-        },
-        transitionDuration: const Duration(milliseconds: 0),
-      ),
-    );
-    initOpus(await opus_flutter.load());
   }
 
   @override

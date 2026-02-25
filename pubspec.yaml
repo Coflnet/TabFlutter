@@ -71,6 +71,8 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^6.0.0
 
 flutter:
@@ -79,6 +81,7 @@ flutter:
   generate: true
 
   assets:
+    - AssetManifest.json
     - assets/images/
     - assets/i18n/
     - assets/models/silero_vad_legacy.onnx

@@ -5,6 +5,7 @@ import 'package:table_entry/pages/settings/columnSettings/columnSettingsMain.dar
 import 'package:table_entry/pages/settings/export/settingExportMain.dart';
 import 'package:table_entry/pages/settings/settingsHeader.dart';
 import 'package:table_entry/pages/settings/settingsPopup/settingsPopupMain.dart';
+import 'package:table_entry/pages/settings/integrationSettingsPage.dart';
 
 class SettingsMain extends StatefulWidget {
   const SettingsMain({super.key});
@@ -33,6 +34,40 @@ class _SettingsMainState extends State<SettingsMain> {
                   SettingExportMain(exportPopup: popup),
                   const SizedBox(height: 20),
                   ColumnSettingsMain(popup: popup),
+                  const SizedBox(height: 20),
+                  // Integrations button
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const IntegrationSettingsPage()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2B3D),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.extension, color: Color(0xFF9333EA)),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Integrations (Excel, Google Sheets…)',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                          ),
+                          Icon(Icons.chevron_right, color: Colors.white54),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

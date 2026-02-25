@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/pages/about/account_management_page.dart';
 
 class AccountInfo extends StatefulWidget {
   const AccountInfo({super.key});
@@ -50,22 +51,53 @@ class _AccountInfoState extends State<AccountInfo> {
         ),
         const SizedBox(height: 10),
         const Text(""),
-        TextButton(
-            style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () {},
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                  color: HexColor("#8332AC"),
-                  borderRadius: BorderRadius.circular(16)),
-              child: const Text(
-                "Log out",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
-              ),
-            ))
+        Row(
+          children: [
+            TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () {},
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                      color: HexColor("#8332AC"),
+                      borderRadius: BorderRadius.circular(16)),
+                  child: const Text(
+                    "Log out",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600),
+                  ),
+                )),
+            const SizedBox(width: 12),
+            TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const AccountManagementPage()),
+                  );
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3))),
+                  child: const Text(
+                    "Account & Data",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600),
+                  ),
+                )),
+          ],
+        )
       ],
     );
   }
