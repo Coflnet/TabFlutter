@@ -30,13 +30,18 @@ class _LaunchPageLogoState extends State<LaunchPageLogo> {
       final RecordingServer newRec = RecordingServer();
       SaveColumn().setRecordingServerREF = newRec;
 
-      Locale local = Localizations.localeOf(context);
-      changeLocale(context, SaveColumn().getlanguage);
+      // Use device locale (not app locale) to detect language on first launch
+      final deviceLocale =
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      final savedLang = SaveColumn().getlanguage;
 
-      if (local.languageCode == "de") {
+      if (savedLang == "en" && deviceLocale == "de") {
+        // First launch on a German device — switch to German
         changeLocale(context, "de");
         SaveColumn().setlanguage = "de";
         SaveColumn().saveFile();
+      } else {
+        changeLocale(context, savedLang);
       }
       if (!mounted) return;
       Navigator.push(

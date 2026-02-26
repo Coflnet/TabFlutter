@@ -22,6 +22,7 @@ ios/Flutter/Flutter.podspec
 
 # Test and verification files
 *.txt
+*.sh
 !BUILD_README.md
 flutter_jank_metrics*.json
 

@@ -43,12 +43,16 @@ class RecentLogRequest {
   }
   */
 
+  /// Reset the session UUID so the server starts a fresh recognition session.
+  static void resetSession() {
+    sessionUuId = generateUuid();
+  }
+
   Future requestWithAudio(String? audioData, col collumn) async {
     var currentText = RecordingServer().getReconizedWords;
     if (!currentText.endsWith("...")) {
       RecordingServer().setText("$currentText...");
     }
-    RecordingServer().incrementProcessedSegments();
     var stackTrace = StackTrace.current;
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
     final locale = kIsWeb

@@ -60,5 +60,8 @@
     "onboardingWelcome": "Welcome to Tab!",
     "onboardingDesc": "Your voice-powered data entry assistant. Speak naturally and we'll organize your data into tables.",
     "signInWithGoogle": "Sign in with Google",
-    "loginFailed": "Sign-in failed. Please try again."
+    "loginFailed": "Sign-in failed. Please try again.",
+    "sendForTraining": "Send correction for training",
+    "sentForTraining": "Sent for training",
+    "error": "Error"
 }

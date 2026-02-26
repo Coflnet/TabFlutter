@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:table_entry/generatedCode/api.dart';
+import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
@@ -17,6 +19,15 @@ class _ListeningmodemainState extends State<Listeningmodemain>
   String words = "";
   late AnimationController _pulseController;
 
+  /// Tracks which entries are in edit mode, keyed by index.
+  final Map<int, Map<String, TextEditingController>> _editControllers = {};
+
+  /// Tracks which entries have been corrected and can be sent for training.
+  final Set<int> _correctedEntries = {};
+
+  /// Tracks entries that have already been sent for training.
+  final Set<int> _sentForTraining = {};
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +42,11 @@ class _ListeningmodemainState extends State<Listeningmodemain>
   void dispose() {
     RecordingServer().removeListener(_onUpdate);
     _pulseController.dispose();
+    for (final controllers in _editControllers.values) {
+      for (final c in controllers.values) {
+        c.dispose();
+      }
+    }
     super.dispose();
   }
 
@@ -215,6 +231,9 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                     final ageText = age.inSeconds < 60
                         ? '${age.inSeconds}s ago'
                         : '${age.inMinutes}m ago';
+                    final isEditing = _editControllers.containsKey(index);
+                    final wasCorrected = _correctedEntries.contains(index);
+                    final wasSent = _sentForTraining.contains(index);
 
                     return TweenAnimationBuilder<double>(
                       tween: Tween(begin: 0.0, end: 1.0),
@@ -233,16 +252,25 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                           color: HexColor("23263E"),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                              color: const Color(0xFF22C55E)
-                                  .withValues(alpha: 0.3)),
+                              color: wasCorrected
+                                  ? const Color(0xFFF59E0B)
+                                      .withValues(alpha: 0.4)
+                                  : const Color(0xFF22C55E)
+                                      .withValues(alpha: 0.3)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.check_circle,
-                                    color: Color(0xFF22C55E), size: 18),
+                                Icon(
+                                    wasCorrected
+                                        ? Icons.edit_note
+                                        : Icons.check_circle,
+                                    color: wasCorrected
+                                        ? const Color(0xFFF59E0B)
+                                        : const Color(0xFF22C55E),
+                                    size: 18),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -258,34 +286,92 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                                   style: TextStyle(
                                       color: Colors.grey[500], fontSize: 11),
                                 ),
+                                const SizedBox(width: 8),
+                                // Edit / Save button
+                                GestureDetector(
+                                  onTap: () => isEditing
+                                      ? _saveCorrection(index, e)
+                                      : _startEditing(index, e),
+                                  child: Icon(
+                                    isEditing ? Icons.check : Icons.edit,
+                                    color: isEditing
+                                        ? const Color(0xFF22C55E)
+                                        : Colors.white54,
+                                    size: 18,
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              children: e.params
-                                  .where((p) =>
-                                      p.svalue != null &&
-                                      p.svalue.toString().isNotEmpty)
-                                  .map((p) => Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF9333EA)
-                                              .withValues(alpha: 0.15),
+                            // Show editable fields or read-only chips
+                            if (isEditing)
+                              ..._buildEditableFields(index, e)
+                            else
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: e.params
+                                    .where((p) =>
+                                        p.svalue != null &&
+                                        p.svalue.toString().isNotEmpty)
+                                    .map((p) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF9333EA)
+                                                .withValues(alpha: 0.15),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            '${p.name}: ${p.svalue}',
+                                            style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 12),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                            // "Send for training" button after correction
+                            if (wasCorrected && !wasSent)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton.icon(
+                                    onPressed: () => _sendForTraining(index, e),
+                                    icon: const Icon(Icons.school, size: 16),
+                                    label: Text(translate('sendForTraining')),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: const Color(0xFFF59E0B),
+                                      backgroundColor: const Color(0xFFF59E0B)
+                                          .withValues(alpha: 0.1),
+                                      shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          '${p.name}: ${p.svalue}',
-                                          style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
+                                              BorderRadius.circular(8)),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 6),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (wasSent)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle,
+                                        color: Color(0xFF22C55E), size: 14),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      translate('sentForTraining'),
+                                      style: TextStyle(
+                                          color: Colors.grey[500],
+                                          fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -296,5 +382,99 @@ class _ListeningmodemainState extends State<Listeningmodemain>
         const SizedBox(height: 75),
       ],
     );
+  }
+
+  void _startEditing(int index, col entry) {
+    final controllers = <String, TextEditingController>{};
+    for (final p in entry.params) {
+      controllers[p.name] =
+          TextEditingController(text: p.svalue?.toString() ?? '');
+    }
+    setState(() {
+      _editControllers[index] = controllers;
+    });
+  }
+
+  void _saveCorrection(int index, col entry) {
+    final controllers = _editControllers[index]!;
+    bool changed = false;
+    for (final p in entry.params) {
+      final newVal = controllers[p.name]?.text ?? '';
+      if (newVal != (p.svalue?.toString() ?? '')) {
+        p.svalue = newVal;
+        changed = true;
+      }
+    }
+    setState(() {
+      _editControllers.remove(index);
+      if (changed) {
+        _correctedEntries.add(index);
+      }
+    });
+    // Also update the recent log
+    RecentLogHandler().saveFile();
+  }
+
+  List<Widget> _buildEditableFields(int index, col entry) {
+    final controllers = _editControllers[index]!;
+    return entry.params
+        .where((p) => controllers.containsKey(p.name))
+        .map((p) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: TextField(
+                controller: controllers[p.name],
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+                decoration: InputDecoration(
+                  labelText: p.name,
+                  labelStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  isDense: true,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: BorderSide(
+                        color: const Color(0xFF9333EA).withValues(alpha: 0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Color(0xFF9333EA)),
+                  ),
+                ),
+              ),
+            ))
+        .toList();
+  }
+
+  Future<void> _sendForTraining(int index, col entry) async {
+    try {
+      final client = ApiClient(basePath: "https://tab.coflnet.com");
+      final api = DialectApi(client);
+      final correctedData = entry.params
+          .where((p) => p.svalue != null && p.svalue.toString().isNotEmpty)
+          .map((p) => '${p.name}: ${p.svalue}')
+          .join(', ');
+      await api.reportError(
+        errorReportRequest: ErrorReportRequest(
+          deviceId: 'training-correction',
+          appVersion: '0.0.4+7',
+          state: 'correction',
+          message: 'User corrected entry for training',
+          log: 'Table: ${entry.name} | Corrected fields: $correctedData',
+        ),
+      );
+      setState(() {
+        _sentForTraining.add(index);
+      });
+    } catch (e) {
+      debugPrint('Failed to send training data: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${translate("error")}: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

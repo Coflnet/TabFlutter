@@ -1,8 +1,5 @@
 # Stage 1: Build Flutter web app
-FROM ghcr.io/cirruslabs/flutter:3.38.1 AS build
-
-# Install git-lfs so binary assets (ONNX models) are checked out properly
-RUN apt-get update && apt-get install -y git-lfs && git lfs install && rm -rf /var/lib/apt/lists/*
+FROM ghcr.io/cirruslabs/flutter:3.38.7 AS build
 
 WORKDIR /app
 
@@ -14,9 +11,6 @@ RUN flutter pub get
 
 # Copy the rest of the source code
 COPY . .
-
-# Ensure Git LFS files are pulled (replaces pointer files with real binaries)
-RUN git lfs pull || true
 
 # Build for web
 RUN flutter build web --release

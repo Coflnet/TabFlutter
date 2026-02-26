@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/recordingService/recordService.dart';
 
 String reconizedWords = "";
@@ -33,6 +34,8 @@ class RecordingServer extends ChangeNotifier {
     _processedSegments = 0;
     reconizedWords = "";
     notifyListeners();
+    // Reset the API session so previous recording text doesn't leak
+    RecentLogRequest.resetSession();
     RecordService.instance.init();
     await RecordService.instance.start();
   }

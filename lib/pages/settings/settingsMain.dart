@@ -29,11 +29,10 @@ class _SettingsMainState extends State<SettingsMain> {
           children: <Widget>[
             const SettingsHeader(),
             const SizedBox(height: 35),
+            // Data I/O section: Export + Integrations
             SettingExportMain(exportPopup: popup),
-            const SizedBox(height: 20),
-            ColumnSettingsMain(popup: popup),
-            const SizedBox(height: 20),
-            // Integrations button
+            const SizedBox(height: 12),
+            // Integrations button (next to export — both are data I/O)
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -65,6 +64,8 @@ class _SettingsMainState extends State<SettingsMain> {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
+            ColumnSettingsMain(popup: popup),
             const SizedBox(height: 100), // Space for footer
           ],
         ),

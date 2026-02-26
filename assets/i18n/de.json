@@ -60,5 +60,8 @@
     "onboardingWelcome": "Willkommen bei Tab!",
     "onboardingDesc": "Dein sprachgesteuerter Dateneingabe-Assistent. Sprich natürlich und wir organisieren deine Daten in Tabellen.",
     "signInWithGoogle": "Mit Google anmelden",
-    "loginFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut."
+    "loginFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
+    "sendForTraining": "Korrektur zum Training senden",
+    "sentForTraining": "Zum Training gesendet",
+    "error": "Fehler"
 }
