@@ -111,6 +111,10 @@ class RecentLogRequest {
       // Push to integrations (fire-and-forget)
       _pushToIntegrations(object);
     }
+    if (newCollumns.isEmpty) {
+      print("addNewEntry: no entries to add (result was empty)");
+      return newCollumns;
+    }
     print("new collumn values ${newCollumns[0].toString()}");
     RecentLogHandler().addRecentLog(newCollumns);
     // Notify the recording UI about the new entries

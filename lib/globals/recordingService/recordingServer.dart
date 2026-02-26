@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recordingService/recordService.dart';
-import 'package:record/record.dart';
 
 String reconizedWords = "";
-final record = AudioRecorder();
 
 /// Represents an entry that was created during a recording session.
 class RecordedEntry {
@@ -30,7 +28,7 @@ class RecordingServer extends ChangeNotifier {
   /// Number of audio segments processed in this session.
   int _processedSegments = 0;
 
-  void startStreaming() async {
+  Future<void> startStreaming() async {
     _sessionEntries.clear();
     _processedSegments = 0;
     reconizedWords = "";
@@ -39,9 +37,8 @@ class RecordingServer extends ChangeNotifier {
     await RecordService.instance.start();
   }
 
-  void stopRecorder() async {
+  Future<void> stopRecorder() async {
     await RecordService.instance.stop();
-    await record.stop();
   }
 
   void setText(String text) {

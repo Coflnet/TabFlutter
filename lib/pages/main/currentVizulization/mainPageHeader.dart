@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class MainPageHeader extends StatelessWidget {
   const MainPageHeader({Key? key}) : super(key: key);

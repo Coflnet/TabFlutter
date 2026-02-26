@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
@@ -48,7 +48,6 @@ class _ListeningmodemainState extends State<Listeningmodemain>
     final entries = server.sessionEntries;
     final segments = server.processedSegments;
     final columns = SaveColumn().getColumns;
-    final currentTable = RecentLogHandler().getCurrentSelected;
 
     return Column(
       children: <Widget>[
@@ -66,22 +65,34 @@ class _ListeningmodemainState extends State<Listeningmodemain>
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<int>(
-                value: SaveColumn().getSelcColumn,
+                value: columns.isEmpty
+                    ? null
+                    : (SaveColumn().getSelcColumn < columns.length
+                        ? SaveColumn().getSelcColumn
+                        : 0),
                 isExpanded: true,
                 icon: const Icon(Icons.keyboard_arrow_down,
                     color: Colors.white70),
                 dropdownColor: HexColor("23263E"),
                 style: const TextStyle(color: Colors.white, fontSize: 16),
-                items: List.generate(columns.length, (i) {
-                  final t = columns[i] as col;
-                  return DropdownMenuItem<int>(
-                    value: i,
-                    child: Text('${t.emoji} ${t.name}',
-                        style: const TextStyle(fontSize: 16)),
-                  );
-                }),
+                items: columns.isEmpty
+                    ? [
+                        DropdownMenuItem<int>(
+                          value: null,
+                          child: Text(translate('noTablesAvailable'),
+                              style: const TextStyle(fontSize: 16)),
+                        )
+                      ]
+                    : List.generate(columns.length, (i) {
+                        final t = columns[i];
+                        return DropdownMenuItem<int>(
+                          value: i,
+                          child: Text('${t.emoji} ${t.name}',
+                              style: const TextStyle(fontSize: 16)),
+                        );
+                      }),
                 onChanged: (index) {
-                  if (index == null) return;
+                  if (index == null || columns.isEmpty) return;
                   setState(() {
                     SaveColumn().setSelcColumn = index;
                     SaveColumn().saveFile();
@@ -115,7 +126,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
               ),
               const SizedBox(width: 8),
               Text(
-                'Listening',
+                translate('listening'),
                 style: TextStyle(color: Colors.grey[400], fontSize: 13),
               ),
               const Spacer(),
@@ -123,7 +134,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
               Icon(Icons.mic, color: Colors.grey[500], size: 16),
               const SizedBox(width: 4),
               Text(
-                '$segments processed',
+                '$segments ${translate('processed')}',
                 style: TextStyle(color: Colors.grey[500], fontSize: 12),
               ),
               const SizedBox(width: 12),
@@ -135,7 +146,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                   size: 16),
               const SizedBox(width: 4),
               Text(
-                '${entries.length} entries',
+                '${entries.length} ${translate('entries')}',
                 style: TextStyle(
                   color: entries.isNotEmpty
                       ? const Color(0xFF22C55E)
@@ -180,7 +191,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                       Icon(Icons.hearing, size: 48, color: Colors.grey[700]),
                       const SizedBox(height: 12),
                       Text(
-                        'Waiting for speech…',
+                        translate('waitingForSpeech'),
                         style: TextStyle(
                             color: Colors.grey[500],
                             fontSize: 16,
@@ -188,7 +199,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Speak naturally. Entries are created automatically.',
+                        translate('speakNaturally'),
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                     ],

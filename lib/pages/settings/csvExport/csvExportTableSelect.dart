@@ -38,9 +38,9 @@ class _CsvExportTableSelectState extends State<CsvExportTableSelect> {
         selectedValue =
             SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
       });
+      ColumnsDataProccessing().setSelectedColumn =
+          SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
     }
-    ColumnsDataProccessing().setSelectedColumn =
-        SaveColumn().getColumns[SaveColumn().getSelcColumn].name;
     print(ColumnsDataProccessing().getFileName);
   }
 
@@ -82,13 +82,26 @@ class _CsvExportTableSelectState extends State<CsvExportTableSelect> {
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w600),
-                      items: items,
-                      value: selectedValue,
+                      items: items.isEmpty
+                          ? [
+                              DropdownMenuItem<String>(
+                                value: "",
+                                child: Text(translate("noTables")),
+                              )
+                            ]
+                          : items,
+                      value: selectedValue.isEmpty && items.isEmpty
+                          ? ""
+                          : selectedValue,
                       onChanged: (value) => {
-                            ColumnsDataProccessing().setSelectedColumn = value,
-                            setState(() {
-                              selectedValue = value;
-                            })
+                            if (value != null && value != "")
+                              {
+                                ColumnsDataProccessing().setSelectedColumn =
+                                    value,
+                                setState(() {
+                                  selectedValue = value;
+                                })
+                              }
                           }))),
           const Expanded(child: SizedBox()),
         ],

@@ -41,16 +41,22 @@ class DataExportInfo {
 class TableSettingsInfo {
   final String tableId;
   final bool storeRecordings10Years;
+  final bool isImmutable;
+  final bool zeroRetention;
 
   TableSettingsInfo({
     required this.tableId,
     required this.storeRecordings10Years,
+    this.isImmutable = false,
+    this.zeroRetention = false,
   });
 
   factory TableSettingsInfo.fromJson(Map<String, dynamic> json) {
     return TableSettingsInfo(
       tableId: json['tableId'] ?? '',
       storeRecordings10Years: json['storeRecordings10Years'] ?? false,
+      isImmutable: json['isImmutable'] ?? false,
+      zeroRetention: json['zeroRetention'] ?? false,
     );
   }
 }
@@ -83,8 +89,13 @@ class AccountService {
   }
 
   /// Update settings for a specific table.
-  Future<bool> updateTableSettings(String tableId,
-      {required bool storeRecordings10Years, required String authToken}) async {
+  Future<Map<String, dynamic>> updateTableSettings(
+    String tableId, {
+    required bool storeRecordings10Years,
+    bool isImmutable = false,
+    bool zeroRetention = false,
+    required String authToken,
+  }) async {
     try {
       final resp = await http.put(
         Uri.parse('$_baseUrl/api/Account/table-settings/$tableId'),
@@ -92,13 +103,22 @@ class AccountService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
-        body: jsonEncode({'storeRecordings10Years': storeRecordings10Years}),
+        body: jsonEncode({
+          'storeRecordings10Years': storeRecordings10Years,
+          'isImmutable': isImmutable,
+          'zeroRetention': zeroRetention,
+        }),
       );
-      return resp.statusCode == 200;
+      if (resp.statusCode == 200) {
+        return {'success': true};
+      } else {
+        final body = jsonDecode(resp.body);
+        return {'success': false, 'error': body['error'] ?? 'Unknown error'};
+      }
     } catch (e) {
       print('[AccountService] updateTableSettings error: $e');
+      return {'success': false, 'error': e.toString()};
     }
-    return false;
   }
 
   // ── Data Export ────────────────────────────────────────────────────

@@ -136,11 +136,15 @@ class RecordServiceHandler extends TaskHandler {
     }
   }
 
+  int _segmentCount = 0;
+
   Future<void> _startRecorder() async {
     _vadHandler.onSpeechStart.listen((_) {
       print('Speech detected.');
       FlutterForegroundTask.updateService(
-        notificationText: 'speaking',
+        notificationTitle: 'Spables Recording',
+        notificationText:
+            '🎙️ Listening… (${_segmentCount} segments processed)',
         notificationButtons: [
           const NotificationButton(id: _kStopAction, text: 'stop'),
         ],
@@ -148,8 +152,12 @@ class RecordServiceHandler extends TaskHandler {
     });
 
     _vadHandler.onSpeechEnd.listen((List<double> samples) {
+      _segmentCount++;
+      final duration = (samples.length / 16000).toStringAsFixed(1);
       FlutterForegroundTask.updateService(
-        notificationText: 'spoke ${samples.length / 16000} seconds',
+        notificationTitle: 'Spables Recording',
+        notificationText:
+            '✅ Segment #$_segmentCount (${duration}s) — processing…',
         notificationButtons: [
           const NotificationButton(id: _kStopAction, text: 'stop'),
         ],
@@ -162,7 +170,8 @@ class RecordServiceHandler extends TaskHandler {
 
     _vadHandler.onVADMisfire.listen((_) {
       FlutterForegroundTask.updateService(
-        notificationText: 'too short, ignoring',
+        notificationTitle: 'Spables Recording',
+        notificationText: '⏭️ Too short, ignoring…',
         notificationButtons: [
           const NotificationButton(id: _kStopAction, text: 'stop'),
         ],
@@ -174,7 +183,8 @@ class RecordServiceHandler extends TaskHandler {
       print('Error: $message');
     });
     FlutterForegroundTask.updateService(
-      notificationText: 'vad start',
+      notificationTitle: 'Spables Recording',
+      notificationText: '🎙️ Waiting for speech…',
       notificationButtons: [
         const NotificationButton(id: _kStopAction, text: 'stop'),
       ],

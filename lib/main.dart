@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:table_entry/firebase_options.dart';
+import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
@@ -14,8 +17,10 @@ import 'package:table_entry/pages/main/recentLog/popup/recentLogPopupContainer.d
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/pages/main/recentLogSelectHolder.dart';
 import 'package:table_entry/pages/main/recognizedData.dart';
+import 'package:table_entry/pages/onboarding/onboarding_dialog.dart';
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
+import 'package:table_entry/pages/reusedWidgets/responsive_scaffold.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetection.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
@@ -38,6 +43,16 @@ void main() {
       statusBarIconBrightness: Brightness.light,
       systemNavigationBarColor: HexColor("1D1E2B"),
     ));
+
+    // Initialize Firebase (silently — Firebase config may not be present in dev)
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      await AuthService().init();
+    } catch (e) {
+      debugPrint('Firebase init skipped: $e');
+    }
 
     var delegate = await LocalizationDelegate.create(
         fallbackLocale: 'en', supportedLocales: ['en', 'de']);
@@ -82,6 +97,10 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   void loadData() async {
     await SaveColumn().loadColumns();
     await RecentLogHandler().loadRecentLog();
+    // Show onboarding dialog on first launch
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showOnboardingIfNeeded(context);
+    });
   }
 
   @override
@@ -93,58 +112,79 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
               ChangeNotifierProvider(create: (_) => newVoiceDataNotifer()),
               ChangeNotifierProvider(create: (_) => UpdateRecentLog())
             ],
-            child: Scaffold(
-              body: Stack(
+            child: LayoutBuilder(builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= kDesktopBreakpoint;
+              final content = Column(
                 children: [
-                  const Background(),
-                  Column(
-                    children: [
-                      const MainPageHeader(),
-                      Expanded(
-                        child: AnimatedOpacity(
-                          curve: Curves.easeInOutQuad,
-                          opacity: isRecording ? 0.0 : 1.0,
-                          duration: const Duration(milliseconds: 700),
-                          child: SlideTransition(
-                            position: animation,
-                            child: Column(
-                              children: <Widget>[
-                                RecentLogSelectHolder(closePopup: closePopup),
-                              ],
-                            ),
-                          ),
+                  const MainPageHeader(),
+                  Expanded(
+                    child: AnimatedOpacity(
+                      curve: Curves.easeInOutQuad,
+                      opacity: isRecording ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 700),
+                      child: SlideTransition(
+                        position: animation,
+                        child: Column(
+                          children: <Widget>[
+                            RecentLogSelectHolder(closePopup: closePopup),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  Visibility(
-                    visible: isRecording,
-                    child: Column(
-                      children: [
-                        Expanded(
-                            child: AnimatedOpacity(
-                          curve: Curves.easeInOutQuad,
-                          opacity: isRecording ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 500),
-                          child: SlideTransition(
-                              position: animation2,
-                              child: const Listeningmodemain()),
-                        )),
-                      ],
                     ),
                   ),
-                  SlideTransition(position: animation, child: const Footer()),
-                  StartStopDetection(
-                    startStop: () => handleAnimations(),
-                    changeRecordingData: (String newString) =>
-                        setState(() => recognizedWords = newString),
-                  ),
-                  Visibility(
-                      visible: isVisible,
-                      child: RecentLogPopupContainer(closePopup: closePopup)),
                 ],
-              ),
-            )));
+              );
+              final listeningOverlay = Visibility(
+                visible: isRecording,
+                child: Column(
+                  children: [
+                    Expanded(
+                        child: AnimatedOpacity(
+                      curve: Curves.easeInOutQuad,
+                      opacity: isRecording ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 500),
+                      child: SlideTransition(
+                          position: animation2,
+                          child: const Listeningmodemain()),
+                    )),
+                  ],
+                ),
+              );
+              final micButton = StartStopDetection(
+                startStop: () => handleAnimations(),
+                changeRecordingData: (String newString) =>
+                    setState(() => recognizedWords = newString),
+              );
+              final popup = Visibility(
+                  visible: isVisible,
+                  child: RecentLogPopupContainer(closePopup: closePopup));
+
+              if (isWide) {
+                return ResponsiveScaffold(
+                  selectedIndex: 0,
+                  body: Stack(
+                    children: [
+                      content,
+                      listeningOverlay,
+                    ],
+                  ),
+                  overlays: [micButton, popup],
+                );
+              }
+
+              return Scaffold(
+                body: Stack(
+                  children: [
+                    const Background(),
+                    content,
+                    listeningOverlay,
+                    SlideTransition(position: animation, child: const Footer()),
+                    micButton,
+                    popup,
+                  ],
+                ),
+              );
+            })));
   }
 
   void handleAnimations() async {

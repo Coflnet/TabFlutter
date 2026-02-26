@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
 
@@ -17,31 +18,29 @@ late RecordingServer recordingServerREF;
 
 class SaveColumn {
   Future<void> loadColumns() async {
-    if (kIsWeb) return;
     if (collumns.isNotEmpty) {
       return;
     }
-    Directory appDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDir.path}/savedColumn.json";
-    File file = File(filePath);
-    if (!file.existsSync()) {
-      await createFile(file);
+
+    final prefs = await SharedPreferences.getInstance();
+    final fileDataJson = prefs.getString('savedColumn');
+
+    if (fileDataJson == null) {
+      await createFile();
       return;
     }
 
-    var fileDataJson = file.readAsStringSync();
     var fileData = jsonDecode(fileDataJson);
     for (var element in fileData["columns"]) {
       collumns.add(col.fromJson(element));
     }
 
-    usedBefore = fileData["usedBefore"];
-    language = fileData["language"];
-    selectedColumn = fileData["selectedColumn"];
+    usedBefore = fileData["usedBefore"] ?? false;
+    language = fileData["language"] ?? "en";
+    selectedColumn = fileData["selectedColumn"] ?? 0;
   }
 
-  Future<void> createFile(file) async {
-    file.createSync();
+  Future<void> createFile() async {
     var fileData = {
       "columns": [],
       "usedBefore": false,
@@ -49,16 +48,30 @@ class SaveColumn {
       "selectedColumn": 0
     };
     print("creating file \n \n \n \n \n \n");
-    saveColumn(
-        0,
-        col(id: 1, name: "Adress", emoji: "⚙️", params: [
-          param(name: "Street", type: translate("optionString")),
-          param(name: "Number", type: 'translate("optionString")'),
-          param(name: "City", type: 'translate("optionString")'),
-          param(name: "ZipCode", type: 'translate("optionString")')
-        ]));
-    var jsonFileData = jsonEncode(fileData);
-    await file.writeAsString(jsonFileData);
+
+    // Add default sample tables
+    collumns.add(col(id: 1, name: "Address", emoji: "🏠", params: [
+      param(name: "Street", type: translate("optionString")),
+      param(name: "Number", type: translate("optionString")),
+      param(name: "City", type: translate("optionString")),
+      param(name: "ZipCode", type: translate("optionString"))
+    ]));
+
+    collumns.add(col(id: 2, name: "Fahrtenbuch", emoji: "🚗", params: [
+      param(name: "Date", type: translate("optionString")),
+      param(name: "Start", type: translate("optionString")),
+      param(name: "Destination", type: translate("optionString")),
+      param(name: "Distance", type: translate("optionString")),
+      param(name: "Purpose", type: translate("optionString"))
+    ]));
+
+    collumns.add(col(id: 3, name: "Todo/Reminder", emoji: "✅", params: [
+      param(name: "Task", type: translate("optionString")),
+      param(name: "Due Date", type: translate("optionString")),
+      param(name: "Priority", type: translate("optionString"))
+    ]));
+
+    saveFile();
   }
 
   void saveColumn(int id, col col) {
@@ -85,14 +98,11 @@ class SaveColumn {
   }
 
   void saveFile() async {
-    if (kIsWeb) return;
     List savingColumns = [];
-    Directory appDir = await getApplicationDocumentsDirectory();
     for (var i in collumns) {
       savingColumns.add(i.toJson());
     }
-    String filePath = "${appDir.path}/savedColumn.json";
-    File file = File(filePath);
+
     var fileData = {
       "columns": savingColumns,
       "usedBefore": usedBefore,
@@ -101,7 +111,8 @@ class SaveColumn {
     };
 
     var fileDataJson = jsonEncode(fileData);
-    file.writeAsString(fileDataJson);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('savedColumn', fileDataJson);
   }
 
   bool get getUsedBefore => usedBefore;

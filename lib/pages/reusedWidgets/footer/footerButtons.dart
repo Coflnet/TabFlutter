@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footerGlobal.dart';
 import 'package:table_entry/pages/settings/settingsMain.dart';
 
 class FooterButtons extends StatelessWidget {
-  final IconData pickedIcon;
+  final List<List<dynamic>> pickedIcon;
   final String text;
   final int selectedPageNum;
   final int wantedPageNum;
@@ -27,8 +28,8 @@ class FooterButtons extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: 8),
-          Icon(
-            pickedIcon,
+          HugeIcon(
+            icon: pickedIcon,
             size: 35,
             color: selectedPageNum == wantedPageNum
                 ? HexColor("#8332AC")

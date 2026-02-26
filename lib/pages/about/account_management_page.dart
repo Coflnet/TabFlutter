@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:table_entry/globals/account_service.dart';
+import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/pages/reusedWidgets/background.dart';
 import 'package:table_entry/pages/reusedWidgets/footer/footer.dart';
 
@@ -34,8 +35,7 @@ class _AccountManagementPageState extends State<AccountManagementPage> {
   }
 
   String _getAuthToken() {
-    // TODO: Get actual auth token from auth state
-    return '';
+    return AuthService().jwtToken ?? '';
   }
 
   Future<void> _requestFullExport() async {

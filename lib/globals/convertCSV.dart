@@ -32,6 +32,6 @@ class ConvertCsv {
       csvData.add(row);
     }
 
-    return const ListToCsvConverter().convert(csvData);
+    return CsvEncoder().convert(csvData);
   }
 }

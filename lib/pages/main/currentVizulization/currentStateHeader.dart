@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:table_entry/pages/settings/settingsMain.dart';
 
 class CurrentStateHeader extends StatelessWidget {

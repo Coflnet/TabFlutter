@@ -175,10 +175,12 @@ class RecordService {
       stop();
       return;
     }
-    print('Received task data: ${(data as String).substring(0, 50)}...');
+    final dataStr = data as String;
+    print(
+        'Received task data: ${dataStr.substring(0, dataStr.length.clamp(0, 50))}...');
     RecordingServer().incrementProcessedSegments();
-    await RecentLogRequest().requestWithAudio(
-        data as String, RecentLogHandler().getCurrentSelected);
+    await RecentLogRequest()
+        .requestWithAudio(dataStr, RecentLogHandler().getCurrentSelected);
   }
 
   void addRecordStatusChangedCallback(RecordStatusChanged callback) {

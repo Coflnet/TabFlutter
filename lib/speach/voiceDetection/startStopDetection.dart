@@ -109,7 +109,25 @@ class _StartStopDetectionState extends State<StartStopDetection>
     });
     startListening();
 
-    RecordingServer().startStreaming();
+    try {
+      await RecordingServer().startStreaming();
+    } catch (e) {
+      print('Error starting recording: $e');
+      // Revert UI state on failure
+      if (mounted) {
+        setState(() {
+          isRunning = false;
+          alignment = Alignment.bottomRight;
+        });
+        widget.startStop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to start recording: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void startListening() {

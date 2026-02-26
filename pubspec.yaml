@@ -1,12 +1,5 @@
 name: table_entry
-description: "Spables  hexcolor: ^3.0.1
-  http: ^1.5.0
-  hugeicons: 0.0.7
-  icons_launcher: ^3.0.3pe  sha  waveform_flutter: ^1.2.0
-  weather: ^3.2.1
-  web_socket_channel: ^3.0.3plus: ^12.0.0
-  socket_io_client: ^3.1.2
-  url_launcher: ^6.3.2 to tables."
+description: "Spables app to manage tables."
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
@@ -31,15 +24,18 @@ icons_launcher:
 dependencies:
   another_flushbar: ^1.12.32
   audio_session: ^0.2.2
-  csv: ^6.0.0
+  csv: ^7.1.0
   custom_pop_up_menu: ^1.2.4
   dropdown_button2: ^2.3.9
   flutter:
     sdk: flutter
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4
+  google_sign_in: ^7.2.0
   flutter_localization: ^0.3.3
   flutter_translate: ^4.1.0
   geolocator: ^14.0.2
-  haptic_feedback: ^0.5.1+1
+  haptic_feedback: ^0.6.4+3
   hexcolor: ^3.0.1
   http: ^1.5.0
   hugeicons: ^1.1.1
@@ -62,11 +58,11 @@ dependencies:
   flutter_foreground_task: ^9.1.0
   audioplayers: ^6.5.1
   onnxruntime: ^1.4.1  # May need manual library alignment
+  shared_preferences: ^2.5.4
 
 dependency_overrides:
   ffi: ^2.1.4 # resolve conflict with opus_dart in favor of opus
   intl: ^0.20.0
-  hugeicons: 0.0.7
 
 dev_dependencies:
   flutter_test:

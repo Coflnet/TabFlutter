@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class ColumnSettingsHeader extends StatelessWidget {
   final VoidCallback addNewColl;
@@ -27,8 +26,8 @@ class ColumnSettingsHeader extends StatelessWidget {
                 color: HexColor("1E202E"),
                 borderRadius: BorderRadius.circular(60),
               ),
-              child: HugeIcon(
-                icon: Icons.add,
+              child: Icon(
+                Icons.add,
                 color: Colors.grey.shade200,
                 size: 35,
               ),

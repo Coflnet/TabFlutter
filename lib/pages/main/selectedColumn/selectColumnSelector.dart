@@ -22,9 +22,11 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
     _scrollController = ScrollController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(SaveColumn().getSelcColumn * 100,
-          curve: Curves.easeInOutQuart,
-          duration: const Duration(milliseconds: 420));
+      if (columns.isNotEmpty && _scrollController.hasClients) {
+        _scrollController.animateTo(SaveColumn().getSelcColumn * 100,
+            curve: Curves.easeInOutQuart,
+            duration: const Duration(milliseconds: 420));
+      }
     });
 
     loadColumns();
@@ -34,7 +36,10 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
     setState(() {
       columns = SaveColumn().getColumns;
     });
-    RecentLogHandler().setCurrentSelected = columns[SaveColumn().getSelcColumn];
+    if (columns.isNotEmpty) {
+      RecentLogHandler().setCurrentSelected =
+          columns[SaveColumn().getSelcColumn];
+    }
   }
 
   void _onScroll() {
@@ -50,6 +55,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
   }
 
   void _onSelectedIndexChanged(int index) {
+    if (columns.isEmpty || index >= columns.length) return;
     SaveColumn().setSelcColumn = index;
     SaveColumn().saveFile();
     RecentLogHandler().setCurrentSelected = columns[index];
@@ -75,6 +81,7 @@ class _SelectColumnSelectorState extends State<SelectColumnSelector> {
         itemCount: columns.length + 1,
         itemSize: 90,
         onItemFocus: (int num) {
+          if (columns.isEmpty || num >= columns.length) return;
           SaveColumn().setSelcColumn = num;
           SaveColumn().saveFile();
           RecentLogHandler().setCurrentSelected = columns[num];

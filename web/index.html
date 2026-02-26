@@ -31,8 +31,38 @@
 
   <title>table_entry</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #121212; /* Dark background */
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .splash-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .splash-logo {
+      width: 150px;
+      height: 150px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+  </style>
 </head>
 <body>
+  <div id="splash" class="splash-container">
+    <img src="icons/Icon-192.png" alt="Logo" class="splash-logo">
+  </div>
   <!-- ONNX Runtime Web for Silero VAD model inference -->
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
   <script src="flutter_bootstrap.js" async></script>

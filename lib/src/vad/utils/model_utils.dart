@@ -18,6 +18,18 @@ String getModelUrl(String baseAssetPath, String model) {
   return '$baseAssetPath$modelFileName';
 }
 
+/// CDN fallback URLs for when local assets are unavailable or corrupted (e.g. Git LFS pointers).
+String _getCdnFallbackUrl(String model) {
+  if (model == 'v5') {
+    return 'https://huggingface.co/onnx-community/silero-vad/resolve/main/onnx/model.onnx';
+  }
+  return 'https://cdn.jsdelivr.net/gh/snakers4/silero-vad@v4.0/files/silero_vad.onnx';
+}
+
+/// Minimum expected model size in bytes.  Anything smaller is likely a
+/// Git LFS pointer file (~132 bytes) rather than a real ONNX model.
+const int _minModelSizeBytes = 1000;
+
 Future<String> getModelPath(String assetPath, String model) async {
   final modelFileName =
       model == 'v4' ? 'silero_vad_legacy.onnx' : 'silero_vad_v5.onnx';
@@ -32,7 +44,8 @@ Future<String> getModelPath(String assetPath, String model) async {
     try {
       byteData = await rootBundle.load(path);
       loadedPath = path;
-      print('Successfully loaded model from asset path: $loadedPath');
+      print('Successfully loaded model from asset path: $loadedPath '
+          '(${byteData.lengthInBytes} bytes)');
       break;
     } catch (e) {
       print('Info: Failed to load model from asset path: $path');
@@ -40,6 +53,17 @@ Future<String> getModelPath(String assetPath, String model) async {
   }
 
   if (byteData != null) {
+    // Validate that the loaded data is an actual ONNX model, not a Git LFS
+    // pointer file.  LFS pointers are ~132 bytes; real models are >100 KB.
+    if (byteData.lengthInBytes < _minModelSizeBytes) {
+      print('WARNING: Model asset "$loadedPath" is only '
+          '${byteData.lengthInBytes} bytes – likely a Git LFS pointer. '
+          'Falling back to CDN.');
+      final cdnUrl = _getCdnFallbackUrl(model);
+      print('Using CDN model URL: $cdnUrl');
+      return cdnUrl;
+    }
+
     if (kIsWeb) {
       // For web, return the asset path as a URL that can be fetched
       return 'assets/$loadedPath';
@@ -49,10 +73,11 @@ Future<String> getModelPath(String assetPath, String model) async {
     }
   }
 
-  // Fallback to URL if local asset fails
-  print('Failed to load model from any local asset path. Falling back to URL.');
-  return getModelUrl(
-      'https://cdn.jsdelivr.net/npm/@keyurmaru/vad@0.0.1/', model);
+  // Fallback to CDN URL if local asset fails entirely
+  print('Failed to load model from any local asset path. Falling back to CDN.');
+  final cdnUrl = _getCdnFallbackUrl(model);
+  print('Using CDN model URL: $cdnUrl');
+  return cdnUrl;
 }
 
 Map<String, String> getModelInputNames(String model) {
