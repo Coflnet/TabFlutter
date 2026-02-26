@@ -10,6 +10,7 @@ import 'package:table_entry/src/vad/audio_utils.dart';
 import 'package:table_entry/src/vad/core/vad_handler.dart';
 
 import '../recentLogRequest/recentLogHandler.dart';
+import '../recordingService/recordingServer.dart';
 import 'recordServiceHandler_stub.dart'
     if (dart.library.io) 'recordServiceHandler.dart';
 
@@ -172,8 +173,10 @@ class RecordService {
   void _onReceiveTaskData(Object data) async {
     if (data == 'stop') {
       stop();
+      return;
     }
-    print('Received task data: $data');
+    print('Received task data: ${(data as String).substring(0, 50)}...');
+    RecordingServer().incrementProcessedSegments();
     await RecentLogRequest().requestWithAudio(
         data as String, RecentLogHandler().getCurrentSelected);
   }

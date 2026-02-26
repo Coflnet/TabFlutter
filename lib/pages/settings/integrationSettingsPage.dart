@@ -14,6 +14,10 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
   final _service = IntegrationService();
   bool _loading = true;
 
+  /// The service account email that users must invite into their Google Docs/Sheets.
+  static const String _serviceAccountEmail =
+      'spables@spables-tab.iam.gserviceaccount.com';
+
   @override
   void initState() {
     super.initState();
@@ -58,6 +62,88 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
                     },
                   ),
                   const Divider(color: Colors.white24),
+
+                  // Google Docs setup instructions
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A2B3D),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color:
+                              const Color(0xFF9333EA).withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.info_outline,
+                                color: Color(0xFF9333EA), size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Google Docs / Sheets Setup',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'To use Google Docs or Google Sheets integration:',
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          '1. Open your Google Doc or Sheet\n'
+                          '2. Click "Share" in the top-right corner\n'
+                          '3. Invite the service account email below as an Editor\n'
+                          '4. Add the integration here with the document URL as label',
+                          style: TextStyle(
+                              color: Colors.white60, fontSize: 12, height: 1.5),
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () {
+                            Clipboard.setData(const ClipboardData(
+                                text: _serviceAccountEmail));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Service account email copied to clipboard!')),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              children: [
+                                const Expanded(
+                                  child: Text(
+                                    _serviceAccountEmail,
+                                    style: TextStyle(
+                                      color: Color(0xFF9333EA),
+                                      fontSize: 12,
+                                      fontFamily: 'monospace',
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.copy,
+                                    color: Colors.grey[400], size: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   // Integrations list
                   const Padding(
@@ -148,10 +234,12 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
 
   IconData _iconFor(String type) {
     switch (type) {
-      case 'excel':
-        return Icons.table_chart;
+      case 'google_docs':
+        return Icons.description;
       case 'google_sheets':
         return Icons.grid_on;
+      case 'excel':
+        return Icons.table_chart;
       case 'obsidian':
         return Icons.note;
       case 'nextcloud':
@@ -164,7 +252,7 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
   }
 
   void _showAddDialog() {
-    String selectedType = 'excel';
+    String selectedType = 'google_docs';
     final labelController = TextEditingController();
 
     showDialog(
@@ -182,15 +270,18 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
               style: const TextStyle(color: Colors.white),
               items: const [
                 DropdownMenuItem(
-                    value: 'excel', child: Text('Microsoft Excel')),
+                    value: 'google_docs',
+                    child: Text('Google Docs (recommended)')),
                 DropdownMenuItem(
                     value: 'google_sheets', child: Text('Google Sheets')),
+                DropdownMenuItem(
+                    value: 'excel', child: Text('Microsoft Excel')),
                 DropdownMenuItem(value: 'obsidian', child: Text('Obsidian')),
                 DropdownMenuItem(value: 'nextcloud', child: Text('Nextcloud')),
                 DropdownMenuItem(
                     value: 'proton_docs', child: Text('Proton Docs')),
               ],
-              onChanged: (v) => selectedType = v ?? 'excel',
+              onChanged: (v) => selectedType = v ?? 'google_docs',
             ),
             const SizedBox(height: 12),
             TextField(

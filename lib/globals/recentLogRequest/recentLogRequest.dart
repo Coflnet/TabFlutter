@@ -48,6 +48,7 @@ class RecentLogRequest {
     if (!currentText.endsWith("...")) {
       RecordingServer().setText("$currentText...");
     }
+    RecordingServer().incrementProcessedSegments();
     var stackTrace = StackTrace.current;
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
     final locale = kIsWeb
@@ -112,6 +113,10 @@ class RecentLogRequest {
     }
     print("new collumn values ${newCollumns[0].toString()}");
     RecentLogHandler().addRecentLog(newCollumns);
+    // Notify the recording UI about the new entries
+    for (var entry in newCollumns) {
+      RecordingServer().addSessionEntry(entry);
+    }
     return newCollumns;
   }
 
