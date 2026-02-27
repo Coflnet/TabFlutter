@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editingColumns.dart';
+import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/pages/settings/columnSettings/columnSettingsNotifer.dart';
+import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 
 class RecentLogPopupHeader extends StatefulWidget {
-  const RecentLogPopupHeader({Key? key}) : super(key: key);
+  final VoidCallback closePopup;
+  const RecentLogPopupHeader({Key? key, required this.closePopup})
+      : super(key: key);
 
   @override
   _RecentLogPopupHeaderState createState() => _RecentLogPopupHeaderState();
@@ -34,19 +38,25 @@ class _RecentLogPopupHeaderState extends State<RecentLogPopupHeader> {
               offset: const Offset(9, -7),
               child: IconButton(
                   style: IconButton.styleFrom(padding: EdgeInsets.zero),
-                  onPressed: () {},
+                  onPressed: () {
+                    RecentLogHandler()
+                        .deleteColumn(EditingColumns().getEditingCol);
+                    Provider.of<UpdateRecentLog>(context, listen: false)
+                        .recentLogUpdate();
+                    widget.closePopup();
+                  },
                   icon: Icon(
                     Icons.delete_outline,
                     size: 28,
                     color: Colors.redAccent.shade700,
                   )),
             ),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "Recent log",
-                  style: TextStyle(
+                  translate("recentLog"),
+                  style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 23),

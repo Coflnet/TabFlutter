@@ -1,8 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -514,8 +515,6 @@ class _ListeningmodemainState extends State<Listeningmodemain>
     if (confirmed != true) return;
 
     try {
-      final client = ApiClient(basePath: "https://tab.coflnet.com");
-      final api = DialectApi(client);
       final correctedData = entry.params
           .where((p) => p.svalue != null && p.svalue.toString().isNotEmpty)
           .map((p) => '${p.name}: ${p.svalue}')
@@ -523,19 +522,29 @@ class _ListeningmodemainState extends State<Listeningmodemain>
       final initialColumnsStr = recordedEntry.initialColumns.entries
           .map((e) => '${e.key}: ${e.value}')
           .join(', ');
-      await api.reportError(
-        errorReportRequest: ErrorReportRequest(
-          deviceId: 'training-correction',
-          appVersion: '0.0.4+7',
-          state: 'correction',
-          message: 'User corrected entry for training',
-          log: 'Table: ${entry.name} | Corrected fields: $correctedData',
-          audioIds: recordedEntry.audioIds,
-          initialTranscription: recordedEntry.initialTranscription,
-          initialColumns: 'Table: ${entry.name} | $initialColumnsStr',
-          correctedColumns: 'Table: ${entry.name} | $correctedData',
-        ),
+
+      final response = await http.post(
+        Uri.parse('https://tab.coflnet.com/api/dialect/report-training-data'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'deviceId': 'training-correction',
+          'appVersion': '0.0.4+7',
+          'state': 'correction',
+          'message': 'User corrected entry for training',
+          'log': 'Table: ${entry.name} | Corrected fields: $correctedData',
+          'timestamp': DateTime.now().toUtc().toIso8601String(),
+          'audioIds': recordedEntry.audioIds,
+          'initialTranscription': recordedEntry.initialTranscription,
+          'initialColumns': 'Table: ${entry.name} | $initialColumnsStr',
+          'correctedColumns': 'Table: ${entry.name} | $correctedData',
+        }),
       );
+
+      if (response.statusCode >= 400) {
+        throw Exception(
+            'Failed to send training data: ${response.statusCode} ${response.body}');
+      }
+
       setState(() {
         _sentForTraining.add(recordedEntry);
       });

@@ -15,14 +15,23 @@ class RecentLogPopupContainer extends StatefulWidget {
 class _RecentLogPopupContainerState extends State<RecentLogPopupContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Colors.black38,
-          child: Center(child: RecentLogPopup(closePopup: widget.closePopup)),
+    return GestureDetector(
+      onTap: widget.closePopup,
+      child: Container(
+        color: Colors.transparent,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.black38,
+            child: Center(
+              child: GestureDetector(
+                onTap: () {}, // Prevent taps on the popup from closing it
+                child: RecentLogPopup(closePopup: widget.closePopup),
+              ),
+            ),
+          ),
         ),
       ),
     );

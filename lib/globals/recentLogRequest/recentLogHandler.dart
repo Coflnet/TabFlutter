@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 
 col currentSelected = col(name: "no-tabls", emoji: "", id: 1, params: []);
@@ -12,26 +10,29 @@ List<col> displayedLog = [];
 
 class RecentLogHandler {
   Future<void> loadRecentLog() async {
-    if (kIsWeb) return;
     if (recentLog.isNotEmpty) {
       return;
     }
-    Directory appDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDir.path}/recentLog.json";
-    File file = File(filePath);
-    if (!file.existsSync()) {
-      await createFile(file);
+
+    final prefs = await SharedPreferences.getInstance();
+    final fileDataJson = prefs.getString('recentLogData');
+
+    if (fileDataJson == null) {
+      return;
     }
 
-    var fileDataJson = file.readAsStringSync();
-    var fileData = jsonDecode(fileDataJson);
-    var columnsData = fileData["columns"] ?? fileData["recentLog"] ?? [];
-    for (var element in columnsData) {
-      recentLog.add(col.fromJson(element));
-    }
-    var displayedData = fileData["displayed"] ?? [];
-    for (var element in displayedData) {
-      displayedLog.add(col.fromJson(element));
+    try {
+      var fileData = jsonDecode(fileDataJson);
+      var columnsData = fileData["columns"] ?? fileData["recentLog"] ?? [];
+      for (var element in columnsData) {
+        recentLog.add(col.fromJson(element));
+      }
+      var displayedData = fileData["displayed"] ?? [];
+      for (var element in displayedData) {
+        displayedLog.add(col.fromJson(element));
+      }
+    } catch (e) {
+      print('Error loading recent log: $e');
     }
   }
 
@@ -42,10 +43,9 @@ class RecentLogHandler {
   }
 
   void saveFile() async {
-    if (kIsWeb) return;
     List savingColumnsAll = [];
     List savingColumnsDisplayed = [];
-    Directory appDir = await getApplicationDocumentsDirectory();
+
     for (var i in recentLog) {
       savingColumnsAll.add(i.toJson());
     }
@@ -53,22 +53,14 @@ class RecentLogHandler {
       savingColumnsDisplayed.add(i.toJson());
     }
 
-    String filePath = "${appDir.path}/recentLog.json";
-    File file = File(filePath);
     var fileData = {
       "columns": savingColumnsAll,
       "displayed": savingColumnsDisplayed
     };
 
     var fileDataJson = jsonEncode(fileData);
-    file.writeAsString(fileDataJson);
-  }
-
-  Future<void> createFile(file) async {
-    file.createSync();
-    var fileData = {"columns": [], "displayed": []};
-    var jsonFileData = jsonEncode(fileData);
-    await file.writeAsString(jsonFileData);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('recentLogData', fileDataJson);
   }
 
   void clear() {
@@ -93,6 +85,12 @@ class RecentLogHandler {
         break;
       }
     }
+  }
+
+  void deleteColumn(col deletingColumn) {
+    recentLog.removeWhere((element) => element.id == deletingColumn.id);
+    displayedLog.removeWhere((element) => element.id == deletingColumn.id);
+    saveFile();
   }
 
   col get getCurrentSelected => currentSelected;
