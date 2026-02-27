@@ -19,6 +19,10 @@ class ErrorReportRequest {
     this.log,
     this.message,
     this.timestamp,
+    this.audioIds = const [],
+    this.initialTranscription,
+    this.initialColumns,
+    this.correctedColumns,
   });
 
   String? deviceId;
@@ -39,27 +43,50 @@ class ErrorReportRequest {
   ///
   DateTime? timestamp;
 
+  /// Audio IDs making up the invalid entry
+  List<String>? audioIds;
+
+  /// Initial transcription
+  String? initialTranscription;
+
+  /// Initial columns
+  String? initialColumns;
+
+  /// Corrected column data
+  String? correctedColumns;
+
   @override
-  bool operator ==(Object other) => identical(this, other) || other is ErrorReportRequest &&
-    other.deviceId == deviceId &&
-    other.appVersion == appVersion &&
-    other.state == state &&
-    other.log == log &&
-    other.message == message &&
-    other.timestamp == timestamp;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ErrorReportRequest &&
+          other.deviceId == deviceId &&
+          other.appVersion == appVersion &&
+          other.state == state &&
+          other.log == log &&
+          other.message == message &&
+          other.timestamp == timestamp &&
+          _deepEquality.equals(other.audioIds, audioIds) &&
+          other.initialTranscription == initialTranscription &&
+          other.initialColumns == initialColumns &&
+          other.correctedColumns == correctedColumns;
 
   @override
   int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (deviceId == null ? 0 : deviceId!.hashCode) +
-    (appVersion == null ? 0 : appVersion!.hashCode) +
-    (state == null ? 0 : state!.hashCode) +
-    (log == null ? 0 : log!.hashCode) +
-    (message == null ? 0 : message!.hashCode) +
-    (timestamp == null ? 0 : timestamp!.hashCode);
+      // ignore: unnecessary_parenthesis
+      (deviceId == null ? 0 : deviceId!.hashCode) +
+      (appVersion == null ? 0 : appVersion!.hashCode) +
+      (state == null ? 0 : state!.hashCode) +
+      (log == null ? 0 : log!.hashCode) +
+      (message == null ? 0 : message!.hashCode) +
+      (timestamp == null ? 0 : timestamp!.hashCode) +
+      (audioIds == null ? 0 : audioIds!.hashCode) +
+      (initialTranscription == null ? 0 : initialTranscription!.hashCode) +
+      (initialColumns == null ? 0 : initialColumns!.hashCode) +
+      (correctedColumns == null ? 0 : correctedColumns!.hashCode);
 
   @override
-  String toString() => 'ErrorReportRequest[deviceId=$deviceId, appVersion=$appVersion, state=$state, log=$log, message=$message, timestamp=$timestamp]';
+  String toString() =>
+      'ErrorReportRequest[deviceId=$deviceId, appVersion=$appVersion, state=$state, log=$log, message=$message, timestamp=$timestamp, audioIds=$audioIds, initialTranscription=$initialTranscription, initialColumns=$initialColumns, correctedColumns=$correctedColumns]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -93,6 +120,26 @@ class ErrorReportRequest {
     } else {
       json[r'timestamp'] = null;
     }
+    if (this.audioIds != null) {
+      json[r'audioIds'] = this.audioIds;
+    } else {
+      json[r'audioIds'] = null;
+    }
+    if (this.initialTranscription != null) {
+      json[r'initialTranscription'] = this.initialTranscription;
+    } else {
+      json[r'initialTranscription'] = null;
+    }
+    if (this.initialColumns != null) {
+      json[r'initialColumns'] = this.initialColumns;
+    } else {
+      json[r'initialColumns'] = null;
+    }
+    if (this.correctedColumns != null) {
+      json[r'correctedColumns'] = this.correctedColumns;
+    } else {
+      json[r'correctedColumns'] = null;
+    }
     return json;
   }
 
@@ -108,8 +155,10 @@ class ErrorReportRequest {
       // Note 2: this code is stripped in release mode!
       assert(() {
         requiredKeys.forEach((key) {
-          assert(json.containsKey(key), 'Required key "ErrorReportRequest[$key]" is missing from JSON.');
-          assert(json[key] != null, 'Required key "ErrorReportRequest[$key]" has a null value in JSON.');
+          assert(json.containsKey(key),
+              'Required key "ErrorReportRequest[$key]" is missing from JSON.');
+          assert(json[key] != null,
+              'Required key "ErrorReportRequest[$key]" has a null value in JSON.');
         });
         return true;
       }());
@@ -121,12 +170,24 @@ class ErrorReportRequest {
         log: mapValueOfType<String>(json, r'log'),
         message: mapValueOfType<String>(json, r'message'),
         timestamp: mapDateTime(json, r'timestamp', r''),
+        audioIds: json[r'audioIds'] is Iterable
+            ? (json[r'audioIds'] as Iterable)
+                .cast<String>()
+                .toList(growable: false)
+            : const [],
+        initialTranscription:
+            mapValueOfType<String>(json, r'initialTranscription'),
+        initialColumns: mapValueOfType<String>(json, r'initialColumns'),
+        correctedColumns: mapValueOfType<String>(json, r'correctedColumns'),
       );
     }
     return null;
   }
 
-  static List<ErrorReportRequest> listFromJson(dynamic json, {bool growable = false,}) {
+  static List<ErrorReportRequest> listFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final result = <ErrorReportRequest>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
@@ -154,13 +215,19 @@ class ErrorReportRequest {
   }
 
   // maps a json object with a list of ErrorReportRequest-objects as value to a dart map
-  static Map<String, List<ErrorReportRequest>> mapListFromJson(dynamic json, {bool growable = false,}) {
+  static Map<String, List<ErrorReportRequest>> mapListFromJson(
+    dynamic json, {
+    bool growable = false,
+  }) {
     final map = <String, List<ErrorReportRequest>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = ErrorReportRequest.listFromJson(entry.value, growable: growable,);
+        map[entry.key] = ErrorReportRequest.listFromJson(
+          entry.value,
+          growable: growable,
+        );
       }
     }
     return map;
@@ -171,4 +238,3 @@ class ErrorReportRequest {
     'deviceId',
   };
 }
-

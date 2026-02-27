@@ -19,14 +19,15 @@ class _ListeningmodemainState extends State<Listeningmodemain>
   String words = "";
   late AnimationController _pulseController;
 
-  /// Tracks which entries are in edit mode, keyed by index.
-  final Map<int, Map<String, TextEditingController>> _editControllers = {};
+  /// Tracks which entries are in edit mode, keyed by RecordedEntry identity.
+  final Map<RecordedEntry, Map<String, TextEditingController>>
+      _editControllers = {};
 
   /// Tracks which entries have been corrected and can be sent for training.
-  final Set<int> _correctedEntries = {};
+  final Set<RecordedEntry> _correctedEntries = {};
 
   /// Tracks entries that have already been sent for training.
-  final Set<int> _sentForTraining = {};
+  final Set<RecordedEntry> _sentForTraining = {};
 
   @override
   void initState() {
@@ -225,15 +226,18 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   itemCount: entries.length,
                   itemBuilder: (context, index) {
-                    final entry = entries[index];
-                    final e = entry.entry;
-                    final age = DateTime.now().difference(entry.createdAt);
+                    final recordedEntry = entries[index];
+                    final e = recordedEntry.entry;
+                    final age =
+                        DateTime.now().difference(recordedEntry.createdAt);
                     final ageText = age.inSeconds < 60
                         ? '${age.inSeconds}s ago'
                         : '${age.inMinutes}m ago';
-                    final isEditing = _editControllers.containsKey(index);
-                    final wasCorrected = _correctedEntries.contains(index);
-                    final wasSent = _sentForTraining.contains(index);
+                    final isEditing =
+                        _editControllers.containsKey(recordedEntry);
+                    final wasCorrected =
+                        _correctedEntries.contains(recordedEntry);
+                    final wasSent = _sentForTraining.contains(recordedEntry);
 
                     return TweenAnimationBuilder<double>(
                       tween: Tween(begin: 0.0, end: 1.0),
@@ -290,8 +294,8 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                                 // Edit / Save button
                                 GestureDetector(
                                   onTap: () => isEditing
-                                      ? _saveCorrection(index, e)
-                                      : _startEditing(index, e),
+                                      ? _saveCorrection(recordedEntry, e)
+                                      : _startEditing(recordedEntry, e),
                                   child: Icon(
                                     isEditing ? Icons.check : Icons.edit,
                                     color: isEditing
@@ -305,7 +309,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                             const SizedBox(height: 6),
                             // Show editable fields or read-only chips
                             if (isEditing)
-                              ..._buildEditableFields(index, e)
+                              ..._buildEditableFields(recordedEntry, e)
                             else
                               Wrap(
                                 spacing: 8,
@@ -339,7 +343,8 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                                 child: SizedBox(
                                   width: double.infinity,
                                   child: TextButton.icon(
-                                    onPressed: () => _sendForTraining(index, e),
+                                    onPressed: () =>
+                                        _sendForTraining(recordedEntry, e),
                                     icon: const Icon(Icons.school, size: 16),
                                     label: Text(translate('sendForTraining')),
                                     style: TextButton.styleFrom(
@@ -384,19 +389,19 @@ class _ListeningmodemainState extends State<Listeningmodemain>
     );
   }
 
-  void _startEditing(int index, col entry) {
+  void _startEditing(RecordedEntry recordedEntry, col entry) {
     final controllers = <String, TextEditingController>{};
     for (final p in entry.params) {
       controllers[p.name] =
           TextEditingController(text: p.svalue?.toString() ?? '');
     }
     setState(() {
-      _editControllers[index] = controllers;
+      _editControllers[recordedEntry] = controllers;
     });
   }
 
-  void _saveCorrection(int index, col entry) {
-    final controllers = _editControllers[index]!;
+  void _saveCorrection(RecordedEntry recordedEntry, col entry) {
+    final controllers = _editControllers[recordedEntry]!;
     bool changed = false;
     for (final p in entry.params) {
       final newVal = controllers[p.name]?.text ?? '';
@@ -406,17 +411,17 @@ class _ListeningmodemainState extends State<Listeningmodemain>
       }
     }
     setState(() {
-      _editControllers.remove(index);
+      _editControllers.remove(recordedEntry);
       if (changed) {
-        _correctedEntries.add(index);
+        _correctedEntries.add(recordedEntry);
       }
     });
     // Also update the recent log
     RecentLogHandler().saveFile();
   }
 
-  List<Widget> _buildEditableFields(int index, col entry) {
-    final controllers = _editControllers[index]!;
+  List<Widget> _buildEditableFields(RecordedEntry recordedEntry, col entry) {
+    final controllers = _editControllers[recordedEntry]!;
     return entry.params
         .where((p) => controllers.containsKey(p.name))
         .map((p) => Padding(
@@ -445,13 +450,16 @@ class _ListeningmodemainState extends State<Listeningmodemain>
         .toList();
   }
 
-  Future<void> _sendForTraining(int index, col entry) async {
+  Future<void> _sendForTraining(RecordedEntry recordedEntry, col entry) async {
     try {
       final client = ApiClient(basePath: "https://tab.coflnet.com");
       final api = DialectApi(client);
       final correctedData = entry.params
           .where((p) => p.svalue != null && p.svalue.toString().isNotEmpty)
           .map((p) => '${p.name}: ${p.svalue}')
+          .join(', ');
+      final initialColumnsStr = recordedEntry.initialColumns.entries
+          .map((e) => '${e.key}: ${e.value}')
           .join(', ');
       await api.reportError(
         errorReportRequest: ErrorReportRequest(
@@ -460,10 +468,14 @@ class _ListeningmodemainState extends State<Listeningmodemain>
           state: 'correction',
           message: 'User corrected entry for training',
           log: 'Table: ${entry.name} | Corrected fields: $correctedData',
+          audioIds: recordedEntry.audioIds,
+          initialTranscription: recordedEntry.initialTranscription,
+          initialColumns: 'Table: ${entry.name} | $initialColumnsStr',
+          correctedColumns: 'Table: ${entry.name} | $correctedData',
         ),
       );
       setState(() {
-        _sentForTraining.add(index);
+        _sentForTraining.add(recordedEntry);
       });
     } catch (e) {
       debugPrint('Failed to send training data: $e');

@@ -10,8 +10,23 @@ class RecordedEntry {
   final col entry;
   final DateTime createdAt;
 
-  RecordedEntry({required this.entry, DateTime? createdAt})
-      : createdAt = createdAt ?? DateTime.now();
+  /// Audio IDs that were combined to produce this entry.
+  final List<String> audioIds;
+
+  /// The initial transcription text from the recognition.
+  final String? initialTranscription;
+
+  /// The initial column values before any user edits.
+  final Map<String, String> initialColumns;
+
+  RecordedEntry(
+      {required this.entry,
+      DateTime? createdAt,
+      this.audioIds = const [],
+      this.initialTranscription,
+      Map<String, String>? initialColumns})
+      : createdAt = createdAt ?? DateTime.now(),
+        initialColumns = initialColumns ?? {};
 }
 
 class RecordingServer extends ChangeNotifier {
@@ -50,8 +65,18 @@ class RecordingServer extends ChangeNotifier {
   }
 
   /// Called when a new entry is created from recognized speech.
-  void addSessionEntry(col entry) {
-    _sessionEntries.insert(0, RecordedEntry(entry: entry));
+  void addSessionEntry(col entry,
+      {List<String> audioIds = const [],
+      String? initialTranscription,
+      Map<String, String>? initialColumns}) {
+    _sessionEntries.insert(
+        0,
+        RecordedEntry(
+          entry: entry,
+          audioIds: audioIds,
+          initialTranscription: initialTranscription,
+          initialColumns: initialColumns,
+        ));
     notifyListeners();
   }
 

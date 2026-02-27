@@ -81,7 +81,8 @@ class RecentLogRequest {
     if (result.columnWithText == null || !(result.isComplete ?? false)) {
       return;
     }
-    addNewEntry(result.columnWithText!, collumn);
+    addNewEntry(result.columnWithText!, collumn,
+        audioIds: result.audioIds ?? [], initialTranscription: result.text);
   }
 
   Map<String, PropertyInfo> convertColumns(col collumn) {
@@ -95,7 +96,8 @@ class RecentLogRequest {
     return inputData;
   }
 
-  List<col> addNewEntry(List<Map<String, String>> result, col collumn) {
+  List<col> addNewEntry(List<Map<String, String>> result, col collumn,
+      {List<String> audioIds = const [], String? initialTranscription}) {
     List<col> newCollumns = [];
     for (var object in result) {
       col newCollumn = collumn.copy();
@@ -123,7 +125,19 @@ class RecentLogRequest {
     RecentLogHandler().addRecentLog(newCollumns);
     // Notify the recording UI about the new entries
     for (var entry in newCollumns) {
-      RecordingServer().addSessionEntry(entry);
+      // Capture initial column values before any user edits
+      final initialCols = <String, String>{};
+      for (var p in entry.params) {
+        if (p.svalue != null && p.svalue.toString().isNotEmpty) {
+          initialCols[p.name] = p.svalue.toString();
+        }
+      }
+      RecordingServer().addSessionEntry(
+        entry,
+        audioIds: audioIds,
+        initialTranscription: initialTranscription,
+        initialColumns: initialCols,
+      );
     }
     return newCollumns;
   }
