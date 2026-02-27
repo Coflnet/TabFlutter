@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -70,14 +71,19 @@ class _RecentLogState extends State<RecentLog> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: const Row(
+              child: Row(
                 children: [
                   Text(
-                    "85/100",
-                    style: TextStyle(
+                    '${recentLogItems.length}',
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 23,
                         fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    translate("entries"),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
                   ),
                 ],
               ),
@@ -86,8 +92,46 @@ class _RecentLogState extends State<RecentLog> {
         ),
         const SizedBox(height: 7),
         Expanded(
-            child: RecentLogColumn(
-                recentLog: recentLogItems, changeVis: widget.changeVis)),
+          child: recentLogItems.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: HexColor("#8332AC").withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.mic,
+                          size: 64,
+                          color: HexColor("#8332AC"),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        translate('tapToRecord'),
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        translate('speakNaturally'),
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : RecentLogColumn(
+                  recentLog: recentLogItems, changeVis: widget.changeVis),
+        ),
         const SizedBox(height: 75)
       ],
     );

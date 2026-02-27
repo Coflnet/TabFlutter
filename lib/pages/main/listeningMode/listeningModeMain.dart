@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:table_entry/generatedCode/api.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
@@ -451,6 +452,67 @@ class _ListeningmodemainState extends State<Listeningmodemain>
   }
 
   Future<void> _sendForTraining(RecordedEntry recordedEntry, col entry) async {
+    // Show confirmation dialog with privacy policy link
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: HexColor("1D1E2B"),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          translate('sendForTrainingTitle'),
+          style: const TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              translate('sendForTrainingBody'),
+              style: const TextStyle(
+                  color: Colors.white70, fontSize: 14, height: 1.5),
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                // Open privacy policy in browser
+                // ignore: deprecated_member_use
+                launchUrl(Uri.parse('https://spables.app/privacy'));
+              },
+              child: Text(
+                translate('sendForTrainingPrivacy'),
+                style: const TextStyle(
+                  color: Color(0xFF9333EA),
+                  fontSize: 13,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Color(0xFF9333EA),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(translate('cancel'),
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF59E0B),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(translate('confirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
     try {
       final client = ApiClient(basePath: "https://tab.coflnet.com");
       final api = DialectApi(client);

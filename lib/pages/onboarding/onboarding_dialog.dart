@@ -106,8 +106,8 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
         if (_currentPage > 0)
           TextButton(
             onPressed: () => setState(() => _currentPage--),
-            child: const Text('Back',
-                style: TextStyle(color: Colors.white54, fontSize: 16)),
+            child: Text(translate('back'),
+                style: const TextStyle(color: Colors.white54, fontSize: 16)),
           )
         else
           const SizedBox(width: 80),
@@ -128,7 +128,7 @@ class _OnboardingDialogState extends State<OnboardingDialog> {
             }
           },
           child: Text(
-            isLast ? 'Get Started' : 'Next',
+            isLast ? translate('getStarted') : translate('next'),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
@@ -177,9 +177,9 @@ class _HowItWorksPage extends StatelessWidget {
       children: [
         const Icon(Icons.mic, size: 56, color: Color(0xFF8332AC)),
         const SizedBox(height: 20),
-        const Text(
-          'Voice to Data',
-          style: TextStyle(
+        Text(
+          translate('onboardingHowItWorksTitle'),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -187,10 +187,10 @@ class _HowItWorksPage extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        _step('1', 'Tap the microphone button'),
-        _step('2', 'Speak naturally about your data'),
-        _step('3', 'We detect when you pause and process each entry'),
-        _step('4', 'Tap the stop button when done'),
+        _step('1', translate('onboardingStep1')),
+        _step('2', translate('onboardingStep2')),
+        _step('3', translate('onboardingStep3')),
+        _step('4', translate('onboardingStep4')),
       ],
     );
   }
@@ -234,9 +234,9 @@ class _TablesPage extends StatelessWidget {
         const Icon(Icons.table_chart_outlined,
             size: 56, color: Color(0xFF8332AC)),
         const SizedBox(height: 20),
-        const Text(
-          'Your Tables',
-          style: TextStyle(
+        Text(
+          translate('onboardingTablesTitle'),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -244,9 +244,9 @@ class _TablesPage extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
-        const Text(
-          'We\'ve set up some starter tables for you. You can customize them or create new ones in Settings.',
-          style: TextStyle(
+        Text(
+          translate('onboardingTablesDesc'),
+          style: const TextStyle(
             color: Colors.white70,
             fontSize: 15,
             height: 1.5,
