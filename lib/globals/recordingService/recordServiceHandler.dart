@@ -62,6 +62,7 @@ class RecordServiceHandler extends TaskHandler {
       await _startRecorder();
     } catch (e) {
       print("-------------------------\nError starting recorder: $e");
+      FlutterForegroundTask.sendDataToMain("ERROR: Failed to start VAD: $e");
     }
   }
 

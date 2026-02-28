@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import 'package:record/record.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/src/vad/audio_utils.dart';
@@ -42,6 +40,9 @@ class RecordService {
   VadHandler? _webVadHandler;
   StreamSubscription<List<double>>? _webVadSub;
 
+  // Error callback – fires for both web and native errors
+  void Function(String error)? onError;
+
   // ------------- Service API -------------
   Future<void> _requestNotificationPermission() async {
     if (kIsWeb) return;
@@ -57,8 +58,7 @@ class RecordService {
 
   Future<void> _requestRecordPermission() async {
     if (!await AudioRecorder().hasPermission()) {
-      throw Exception(
-          'To start record service, you must grant microphone permission.');
+      throw 'To start record service, you must grant microphone permission.';
     }
   }
 
@@ -162,20 +162,22 @@ class RecordService {
     }
   }
 
-  void _rollbackRecordStatus() {
-    final RecordStatus prevStatus = _prevRecordStatus;
-    _currRecordStatus = prevStatus;
-    for (final RecordStatusChanged callback in _callbacks.toList()) {
-      callback(prevStatus);
-    }
-  }
-
   void _onReceiveTaskData(Object data) async {
     if (data == 'stop') {
       stop();
       return;
     }
     final dataStr = data as String;
+
+    // Handle error messages from the native background isolate
+    if (dataStr.startsWith('ERROR:')) {
+      final errorMsg = dataStr.substring(6).trim();
+      print('[RecordService] Native error: $errorMsg');
+      onError?.call(errorMsg);
+      stop();
+      return;
+    }
+
     print(
         'Received task data: ${dataStr.substring(0, dataStr.length.clamp(0, 50))}...');
     RecordingServer().incrementProcessedSegments();

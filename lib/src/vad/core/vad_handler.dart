@@ -312,12 +312,14 @@ class VadHandler {
       final errorStr = e.toString();
       if (errorStr.contains('NotFoundError') ||
           errorStr.contains('Requested device not found')) {
-        onErrorController.add(
-            'Could not find or access the microphone. Please check your system settings or provide permissions.');
+        final msg =
+            'Could not find or access the microphone. Please check your system settings or provide permissions.';
+        onErrorController.add(msg);
+        throw msg;
       } else {
         onErrorController.add('Error starting audio stream: $e');
+        throw 'Error starting audio stream: $e';
       }
-      return;
     }
   }
 

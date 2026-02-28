@@ -44,14 +44,25 @@ class RecordingServer extends ChangeNotifier {
   /// Number of audio segments processed in this session.
   int _processedSegments = 0;
 
+  /// Last error message from the recording service (e.g. no microphone found).
+  String? _lastError;
+
   Future<void> startStreaming() async {
     _sessionEntries.clear();
     _processedSegments = 0;
+    _lastError = null;
     reconizedWords = "";
     notifyListeners();
     // Reset the API session so previous recording text doesn't leak
     RecentLogRequest.resetSession();
     RecordService.instance.init();
+
+    // Listen for async errors from the native background isolate
+    RecordService.instance.onError = (String error) {
+      _lastError = error;
+      notifyListeners();
+    };
+
     await RecordService.instance.start();
   }
 
@@ -89,4 +100,13 @@ class RecordingServer extends ChangeNotifier {
   List<RecordedEntry> get sessionEntries => _sessionEntries;
   int get processedSegments => _processedSegments;
   String get getReconizedWords => reconizedWords;
+
+  /// Returns and clears the last error message, if any.
+  String? consumeError() {
+    final err = _lastError;
+    _lastError = null;
+    return err;
+  }
+
+  String? get lastError => _lastError;
 }

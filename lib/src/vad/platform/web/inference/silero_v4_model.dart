@@ -8,6 +8,7 @@ import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 
 import 'package:table_entry/src/vad/platform/web/onnxruntime/onnx_runtime_web.dart';
+import 'package:table_entry/src/vad/utils/model_utils_web.dart';
 import 'package:table_entry/src/vad/utils/model_utils.dart';
 import 'package:table_entry/src/vad/core/vad_event.dart';
 import 'package:table_entry/src/vad/core/vad_model.dart';
