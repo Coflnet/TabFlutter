@@ -99,9 +99,18 @@ class RecordService {
       });
       _webVadHandler!.onError.listen((String msg) {
         print('[WebVAD] Error: $msg');
+        _onReceiveTaskData('ERROR: $msg');
       });
-      await _webVadHandler!.startListening();
-      _updateRecordStatus(RecordStatus.started);
+      try {
+        await _webVadHandler!.startListening();
+        _updateRecordStatus(RecordStatus.started);
+      } catch (e) {
+        print('[WebVAD] Exception on start: $e');
+        _updateRecordStatus(RecordStatus.stopped);
+        _webVadHandler?.dispose();
+        _webVadHandler = null;
+        rethrow;
+      }
       return;
     }
     await _requestNotificationPermission();

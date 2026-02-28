@@ -266,9 +266,9 @@ class VadHandler {
     bool hasPermission =
         bypassPermissionCheck ? true : await _audioRecorder.hasPermission();
     if (!hasPermission) {
-      onErrorController.add('VadHandler: No permission to record audio.');
-      print('VadHandler: No permission to record audio.');
-      return;
+      final errorMsg = 'VadHandler: No permission to record audio.';
+      print(errorMsg);
+      throw Exception(errorMsg);
     }
 
     if (_isDebug) print('VadHandler: Audio permissions granted');

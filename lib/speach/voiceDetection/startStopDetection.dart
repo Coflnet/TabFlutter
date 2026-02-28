@@ -8,6 +8,7 @@ import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
+import 'package:table_entry/globals/recordingService/recordService.dart';
 import 'package:table_entry/globals/speachSettingsGlobal.dart';
 import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetectionRunning.dart';
@@ -39,6 +40,28 @@ class _StartStopDetectionState extends State<StartStopDetection>
       vsync: this,
     );
     initSpeach();
+    RecordService.instance
+        .addRecordStatusChangedCallback(_onRecordStatusChanged);
+  }
+
+  @override
+  void dispose() {
+    RecordService.instance
+        .removeRecordStatusChangedCallback(_onRecordStatusChanged);
+    controller.dispose();
+    super.dispose();
+  }
+
+  void _onRecordStatusChanged(RecordStatus status) {
+    if (status == RecordStatus.stopped && isRunning) {
+      if (mounted) {
+        setState(() {
+          isRunning = false;
+          alignment = Alignment.bottomRight;
+        });
+        widget.startStop();
+      }
+    }
   }
 
   void initSpeach() {
