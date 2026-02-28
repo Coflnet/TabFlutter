@@ -7,6 +7,8 @@ import 'dart:typed_data';
 
 // Flutter imports:
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 // Project imports:
 import 'package:table_entry/src/vad/core/vad_event.dart';
@@ -134,6 +136,19 @@ class SileroV5Model implements VadModel {
 
   static Future<Uint8List> _loadModelBytes(String modelPath) async {
     if (modelPath.startsWith('http://') || modelPath.startsWith('https://')) {
+      final fileName = Uri.parse(modelPath).pathSegments.last;
+      final tempDir = await getApplicationSupportDirectory();
+      final localFile = File(p.join(tempDir.path, fileName));
+
+      if (await localFile.exists()) {
+        try {
+          return await localFile.readAsBytes();
+        } catch (e) {
+          print('Error reading cached model: $e. Re-downloading...');
+        }
+      }
+
+      print('Downloading model from $modelPath ...');
       final client = HttpClient();
       try {
         final request = await client.getUrl(Uri.parse(modelPath));
@@ -143,7 +158,15 @@ class SileroV5Model implements VadModel {
           await for (final chunk in response) {
             completer.add(chunk);
           }
-          return completer.toBytes();
+          final bytes = completer.toBytes();
+
+          try {
+            await localFile.writeAsBytes(bytes);
+          } catch (e) {
+            print('Failed to cache model: $e');
+          }
+
+          return bytes;
         } else {
           throw Exception(
               'HTTP ${response.statusCode}: Failed to download model from $modelPath');

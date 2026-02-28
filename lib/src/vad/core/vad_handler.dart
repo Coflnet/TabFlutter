@@ -309,8 +309,15 @@ class VadHandler {
       if (_isDebug) print('VadHandler: Audio stream started successfully');
     } catch (e) {
       print('VadHandler: Error starting audio stream: $e');
-      onErrorController.add('Error starting audio stream: $e');
-      rethrow;
+      final errorStr = e.toString();
+      if (errorStr.contains('NotFoundError') ||
+          errorStr.contains('Requested device not found')) {
+        onErrorController.add(
+            'Could not find or access the microphone. Please check your system settings or provide permissions.');
+      } else {
+        onErrorController.add('Error starting audio stream: $e');
+      }
+      return;
     }
   }
 

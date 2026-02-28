@@ -34,9 +34,21 @@ class SileroV4Model implements VadModel {
       final normalizedWasmPath =
           wasmPath.endsWith('/') ? wasmPath : '$wasmPath/';
 
-      ort.env.wasm.wasmPaths = normalizedWasmPath;
+      final cachedWasmSimd =
+          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm-simd.wasm');
+      final cachedWasm =
+          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm.wasm');
 
-      final session = await ort.InferenceSession.create(modelUrl.toJS).toDart;
+      final wasmPathsObj = {
+        'ort-wasm-simd.wasm': cachedWasmSimd,
+        'ort-wasm.wasm': cachedWasm,
+      }.jsify()!;
+
+      ort.env.wasm.wasmPaths = wasmPathsObj;
+
+      final cachedModelUrl = await getCachedBlobUrl(modelUrl);
+      final session =
+          await ort.InferenceSession.create(cachedModelUrl.toJS).toDart;
       final inputNames = getModelInputNames('v4');
       final outputNames = getModelOutputNames('v4');
 

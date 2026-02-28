@@ -23,7 +23,7 @@ extension type EnvNamespace._(JSObject _) implements JSObject {
 
 @JS()
 extension type WasmNamespace._(JSObject _) implements JSObject {
-  external set wasmPaths(String paths);
+  external set wasmPaths(JSAny paths);
 }
 
 @JS()

@@ -32,8 +32,22 @@ class SileroV5Model implements VadModel {
           'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/';
       final normalizedWasmPath =
           wasmPath.endsWith('/') ? wasmPath : '$wasmPath/';
-      ort.env.wasm.wasmPaths = normalizedWasmPath;
-      final session = await ort.InferenceSession.create(modelUrl.toJS).toDart;
+
+      final cachedWasmSimd =
+          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm-simd.wasm');
+      final cachedWasm =
+          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm.wasm');
+
+      final wasmPathsObj = {
+        'ort-wasm-simd.wasm': cachedWasmSimd,
+        'ort-wasm.wasm': cachedWasm,
+      }.jsify()!;
+
+      ort.env.wasm.wasmPaths = wasmPathsObj;
+
+      final cachedModelUrl = await getCachedBlobUrl(modelUrl);
+      final session =
+          await ort.InferenceSession.create(cachedModelUrl.toJS).toDart;
       final inputNames = getModelInputNames('v5');
       final outputNames = getModelOutputNames('v5');
 
