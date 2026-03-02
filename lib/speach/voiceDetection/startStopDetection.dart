@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
@@ -142,15 +143,89 @@ class _StartStopDetectionState extends State<StartStopDetection>
           isRunning = false;
           alignment = Alignment.bottomRight;
         });
+        // Call startStop again to revert the parent animation/state
         widget.startStop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to start recording: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showMicrophoneErrorDialog(e.toString());
       }
     }
+  }
+
+  void _showMicrophoneErrorDialog(String error) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: HexColor("#2A2B3D"),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              const Icon(Icons.mic_off, color: Colors.redAccent, size: 28),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  translate('micErrorTitle'),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                translate('micErrorDescription'),
+                style: const TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                translate('micErrorInstructions'),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14),
+              ),
+              const SizedBox(height: 8),
+              _instructionRow(Icons.usb, translate('micErrorStep1')),
+              _instructionRow(Icons.refresh, translate('micErrorStep2')),
+              _instructionRow(Icons.settings, translate('micErrorStep3')),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                translate('confirm'),
+                style: const TextStyle(color: Colors.white70),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _instructionRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.white54, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void startListening() {

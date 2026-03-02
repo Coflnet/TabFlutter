@@ -80,5 +80,11 @@
     "back": "Back",
     "next": "Next",
     "getStarted": "Get Started",
-    "tapToRecord": "Tap to start recording"
+    "tapToRecord": "Tap to start recording",
+    "micErrorTitle": "Microphone not available",
+    "micErrorDescription": "The recording could not be started. Your microphone may not be connected or the permission was denied.",
+    "micErrorInstructions": "Try the following:",
+    "micErrorStep1": "Connect a microphone or headset and try again.",
+    "micErrorStep2": "Restart the app so the microphone can be recognized.",
+    "micErrorStep3": "Check your browser or device settings and grant microphone permission."
 }

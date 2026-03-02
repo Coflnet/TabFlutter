@@ -80,5 +80,11 @@
     "back": "Zurück",
     "next": "Weiter",
     "getStarted": "Los geht's",
-    "tapToRecord": "Tippe zum Aufnehmen"
+    "tapToRecord": "Tippe zum Aufnehmen",
+    "micErrorTitle": "Mikrofon nicht verfügbar",
+    "micErrorDescription": "Die Aufnahme konnte nicht gestartet werden. Dein Mikrofon ist möglicherweise nicht angeschlossen oder die Berechtigung wurde verweigert.",
+    "micErrorInstructions": "Versuche Folgendes:",
+    "micErrorStep1": "Schließe ein Mikrofon oder Headset an und versuche es erneut.",
+    "micErrorStep2": "Starte die App neu, damit das Mikrofon erkannt werden kann.",
+    "micErrorStep3": "Überprüfe deine Browser- oder Geräteeinstellungen und erteile die Mikrofonberechtigung."
 }
