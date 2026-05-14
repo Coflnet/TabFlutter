@@ -59,6 +59,8 @@ dependencies:
   audioplayers: ^6.5.1
   onnxruntime: ^1.4.1  # May need manual library alignment
   shared_preferences: ^2.5.4
+  flutter_secure_storage: ^9.2.2
+  package_info_plus: ^8.0.2
 
 dependency_overrides:
   ffi: ^2.1.4 # resolve conflict with opus_dart in favor of opus

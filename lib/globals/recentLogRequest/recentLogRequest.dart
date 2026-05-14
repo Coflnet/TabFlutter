@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
+import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/weatherService.dart';
@@ -59,18 +60,33 @@ class RecentLogRequest {
         ? ui.PlatformDispatcher.instance.locale.toLanguageTag()
         : ui.PlatformDispatcher.instance.locale.toLanguageTag();
     final client = ApiClient(basePath: "https://tab.coflnet.com");
+    // Attach the bearer so the server can associate uploads with the
+    // authenticated user instead of falling back to the IP-based partition
+    // (which trips the anonymous hCaptcha gate at >2 uploads/30min).
+    final jwt = AuthService().jwtToken;
+    if (jwt != null && jwt.isNotEmpty) {
+      client.addDefaultHeader('Authorization', 'Bearer $jwt');
+    }
     RecognitionResponse? result = null;
     var attempts = 0;
     while (result == null) {
       if (attempts++ > 5) {
         throw Exception("result in recent log request is null");
       }
-      result = await TabApi(client).recognize(
-          recognitionRequest: RecognitionRequest(
-              base64Opus: audioData,
-              language: locale,
-              sessionId: sessionUuId,
-              columnWithDescription: inputData));
+      try {
+        result = await TabApi(client).recognize(
+            recognitionRequest: RecognitionRequest(
+                base64Opus: audioData,
+                language: locale,
+                sessionId: sessionUuId,
+                columnWithDescription: inputData));
+      } catch (e) {
+        // Exponential backoff on transient network/TLS errors instead of
+        // hammering the server back-to-back with a 500KB+ base64 payload.
+        if (attempts > 5) rethrow;
+        final delayMs = 300 * (1 << (attempts - 1));
+        await Future.delayed(Duration(milliseconds: delayMs));
+      }
     }
     try {
       print("Request Result: $result");

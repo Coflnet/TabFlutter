@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -19,6 +20,16 @@ class AuthService extends ChangeNotifier {
   static const _jwtKey = 'auth_jwt_token';
   static const _emailKey = 'auth_user_email';
   static const _uidKey = 'auth_user_uid';
+
+  // The JWT is moved out of SharedPreferences into Keychain (iOS) /
+  // Keystore-backed EncryptedSharedPreferences (Android). On web
+  // flutter_secure_storage falls back to an HSM-backed IDB key when
+  // available, otherwise IndexedDB — still strictly better than
+  // localStorage because it isn't reachable from <script> tags loaded by
+  // a different origin via document.domain shenanigans.
+  static const _secure = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   String? _jwtToken;
   String? _email;
@@ -44,7 +55,15 @@ class AuthService extends ChangeNotifier {
   /// Restores any saved session from SharedPreferences.
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
-    _jwtToken = prefs.getString(_jwtKey);
+    // One-shot migration: older versions stored the JWT in plain
+    // SharedPreferences. Pull it out, move it to secure storage, then wipe
+    // the prefs copy so the value never sits unencrypted on disk again.
+    final legacyJwt = prefs.getString(_jwtKey);
+    if (legacyJwt != null && legacyJwt.isNotEmpty) {
+      await _secure.write(key: _jwtKey, value: legacyJwt);
+      await prefs.remove(_jwtKey);
+    }
+    _jwtToken = await _secure.read(key: _jwtKey);
     _email = prefs.getString(_emailKey);
     _uid = prefs.getString(_uidKey);
 
@@ -155,10 +174,10 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  /// Persist session to SharedPreferences.
+  /// Persist session to SharedPreferences (non-secret bits) + secure storage (JWT).
   Future<void> _saveSession() async {
     final prefs = await SharedPreferences.getInstance();
-    if (_jwtToken != null) await prefs.setString(_jwtKey, _jwtToken!);
+    if (_jwtToken != null) await _secure.write(key: _jwtKey, value: _jwtToken);
     if (_email != null) await prefs.setString(_emailKey, _email!);
     if (_uid != null) await prefs.setString(_uidKey, _uid!);
   }
@@ -169,6 +188,7 @@ class AuthService extends ChangeNotifier {
     _email = null;
     _uid = null;
     final prefs = await SharedPreferences.getInstance();
+    await _secure.delete(key: _jwtKey);
     await prefs.remove(_jwtKey);
     await prefs.remove(_emailKey);
     await prefs.remove(_uidKey);

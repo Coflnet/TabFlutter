@@ -62,12 +62,17 @@ class param {
   String type;
   dynamic svalue;
   List<String>? listOption;
+  // Human-readable description of the column. Used by the phase-2 LLM
+  // transcript-to-CSV extractor to know what the column means. Optional;
+  // legacy data omits it. Keep short — recommend < 200 chars.
+  String description;
 
   param(
       {required this.name,
       required this.type,
       List<String>? listOption,
-      dynamic svalue})
+      dynamic svalue,
+      this.description = ''})
       : svalue = svalue ?? '',
         listOption = listOption ?? <String>[];
 
@@ -81,6 +86,8 @@ class param {
         type = value;
       case "value":
         svalue = value;
+      case "description":
+        description = value?.toString() ?? '';
       default:
         throw ArgumentError("Unknown param $key");
     }
@@ -88,7 +95,7 @@ class param {
 
   @override
   String toString() {
-    return "\n Param name $name type $type svalue $svalue  listOption $listOption";
+    return "\n Param name $name type $type svalue $svalue  listOption $listOption description $description";
   }
 
   Map<String, dynamic> toJson() {
@@ -96,7 +103,8 @@ class param {
       'name': name,
       'type': type,
       'listOption': listOption,
-      'svalue': svalue
+      'svalue': svalue,
+      'description': description,
     };
   }
 
@@ -108,7 +116,8 @@ class param {
                 ?.map((item) => item.toString())
                 .toList() ??
             <String>[],
-        svalue: json["svalue"] ?? "hi");
+        svalue: json["svalue"] ?? "hi",
+        description: json['description']?.toString() ?? '');
   }
 
   param copy() {
@@ -116,6 +125,7 @@ class param {
         name: name,
         type: type,
         listOption: List<String>.from(listOption ?? <String>[]),
-        svalue: svalue);
+        svalue: svalue,
+        description: description);
   }
 }

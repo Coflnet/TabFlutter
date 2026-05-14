@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
@@ -534,12 +536,18 @@ class _ListeningmodemainState extends State<Listeningmodemain>
           .map((e) => '${e.key}: ${e.value}')
           .join(', ');
 
+      final pkg = await PackageInfo.fromPlatform();
+      final headers = <String, String>{'Content-Type': 'application/json'};
+      final jwt = AuthService().jwtToken;
+      if (jwt != null && jwt.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $jwt';
+      }
       final response = await http.post(
         Uri.parse('https://tab.coflnet.com/api/dialect/report-training-data'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: jsonEncode({
           'deviceId': 'training-correction',
-          'appVersion': '0.0.4+7',
+          'appVersion': '${pkg.version}+${pkg.buildNumber}',
           'state': 'correction',
           'message': 'User corrected entry for training',
           'log': 'Table: ${entry.name} | Corrected fields: $correctedData',

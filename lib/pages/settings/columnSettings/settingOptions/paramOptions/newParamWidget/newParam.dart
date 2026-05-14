@@ -98,6 +98,43 @@ class _NewParamState extends State<NewParam>
                       ))
                   : const SizedBox.shrink(),
             ),
+            // Description field — fed into the phase-2 LLM CSV extractor so
+            // it knows what this column actually represents. Optional but
+            // strongly recommended for free-text columns.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TextField(
+                maxLines: 2,
+                minLines: 1,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: HexColor("1A1C30"),
+                  hintText: translate("columnDescriptionHint"),
+                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                controller: TextEditingController(
+                  text: EditingColumns()
+                      .getEditingCol
+                      .params[widget.index]
+                      .description,
+                )..selection = TextSelection.fromPosition(TextPosition(
+                    offset: EditingColumns()
+                        .getEditingCol
+                        .params[widget.index]
+                        .description
+                        .length)),
+                onChanged: (v) {
+                  EditingColumns()
+                      .updateParam(widget.index, "description", v);
+                },
+              ),
+            ),
           ],
         ));
   }
