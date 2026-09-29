@@ -18,6 +18,14 @@ RUN flutter build web --release
 # Generate legacy AssetManifest.json required by flutter_translate 4.x
 RUN python3 scripts/generate_asset_manifest.py
 
+# main.dart.js has no content hash but is served as immutable (nginx, Cloudflare,
+# browsers). Hash its name so every build gets a new URL; flutter_bootstrap.js,
+# which references it, is served uncached.
+RUN cd build/web && hash=$(sha256sum main.dart.js | cut -c1-16) \
+    && mv main.dart.js "main.$hash.dart.js" \
+    && sed -i "s/main\.dart\.js/main.$hash.dart.js/g" flutter_bootstrap.js \
+    && grep -q "main.$hash.dart.js" flutter_bootstrap.js
+
 # Stage 2: Serve with nginx
 FROM nginx:alpine
 
