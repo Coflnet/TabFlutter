@@ -71,6 +71,13 @@ class SaveColumn {
       param(name: "Priority", type: translate("optionString"))
     ]));
 
+    collumns.add(col(id: 4, name: "Bestellung", emoji: "📦", params: [
+      param(name: "Kunde", type: translate("optionString")),
+      param(name: "Artikel", type: translate("optionString")),
+      param(name: "Menge", type: translate("optionString")),
+      param(name: "Liefertermin", type: translate("optionString"))
+    ]));
+
     saveFile();
   }
 
