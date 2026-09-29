@@ -10,13 +10,18 @@ import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/weatherService.dart';
 import 'package:table_entry/globals/integration_service.dart';
+import 'package:table_entry/globals/recentLogRequest/recognize_session.dart';
+import 'package:table_entry/globals/timezone/time_zone.dart';
 
 import '../recordingService/recordingServer.dart';
 
 List weatherCache = [];
 
 class RecentLogRequest {
-  static var sessionUuId = generateUuid();
+  /// Current session: id plus the client-held pending state (contract §1).
+  static RecognizeSession _session = RecognizeSession(generateUuid());
+
+  static String get sessionUuId => _session.id;
 
   static String generateUuid() {
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -44,18 +49,27 @@ class RecentLogRequest {
   }
   */
 
-  /// Reset the session UUID so the server starts a fresh recognition session.
+  /// Starts a fresh recognition session: new id, no pending texts or audio.
+  /// Requests still running for the old session keep their own state.
   static void resetSession() {
-    sessionUuId = generateUuid();
+    _session = RecognizeSession(generateUuid());
   }
 
-  Future requestWithAudio(String? audioData, col collumn) async {
+  /// Sends one audio chunk ([audioData]) or, with null, finishes the
+  /// utterance. Chunks of one session run one after another so each one
+  /// carries the pending state produced by the previous one.
+  Future requestWithAudio(String? audioData, col collumn) {
     var currentText = RecordingServer().getReconizedWords;
     if (!currentText.endsWith("...")) {
       RecordingServer().setText("$currentText...");
     }
     // A restart during retries must not move this audio into the new session.
-    final session = sessionUuId;
+    final session = _session;
+    return session.run(() => _recognize(session, audioData, collumn));
+  }
+
+  Future<void> _recognize(
+      RecognizeSession session, String? audioData, col collumn) async {
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
     final locale = ui.PlatformDispatcher.instance.locale.toLanguageTag();
     final client = ApiClient(basePath: "https://tab.coflnet.com");
@@ -63,27 +77,32 @@ class RecentLogRequest {
     if (jwt != null && jwt.isNotEmpty) {
       client.addDefaultHeader('Authorization', 'Bearer $jwt');
     }
+    // Built once: every retry of this chunk resends the same pending state.
+    final request = RecognitionRequest(
+        base64Opus: audioData,
+        language: locale,
+        sessionId: session.id,
+        columnWithDescription: inputData,
+        pendingTexts: List.of(session.pendingTexts),
+        pendingAudioIds: List.of(session.pendingAudioIds),
+        timeZone: localTimeZoneId());
     RecognitionResponse? result;
     for (var attempt = 1;; attempt++) {
       try {
         result = await TabApi(client)
-            .recognize(
-                recognitionRequest: RecognitionRequest(
-                    base64Opus: audioData,
-                    language: locale,
-                    sessionId: session,
-                    columnWithDescription: inputData))
+            .recognize(recognitionRequest: request)
             .timeout(const Duration(seconds: 45));
         break;
       } catch (e) {
         // Retry only what can succeed on a second try (network, timeout,
-        // server errors); client errors fail the same way every time.
+        // server errors incl. 502 from the transcription provider); client
+        // errors fail the same way every time.
         final transient = e is TimeoutException ||
             (e is ApiException && (e.code >= 500 || e.innerException != null));
         if (!transient || attempt >= 4) {
           print('Recognize failed: $e');
           // Never leave "..." on screen forever.
-          RecordingServer().setText(currentText);
+          _removeEllipsis();
           RecordingServer().reportError(translate('recognitionFailed'));
           return;
         }
@@ -91,10 +110,16 @@ class RecentLogRequest {
             Duration(milliseconds: 300 * (1 << (attempt - 1))));
       }
     }
+    // Entries that failed earlier get another chance now that we are online.
+    unawaited(IntegrationService().flushOutbox());
     if (result == null) {
-      RecordingServer().setText(currentText);
+      _removeEllipsis();
       return;
     }
+    session.apply(
+        isComplete: result.isComplete ?? false,
+        pendingTexts: result.pendingTexts,
+        audioIds: result.audioIds);
     try {
       print("Request Result: $result");
     } catch (e) {
@@ -106,6 +131,13 @@ class RecentLogRequest {
     }
     addNewEntry(result.columnWithText!, collumn,
         audioIds: result.audioIds ?? [], initialTranscription: result.text);
+  }
+
+  void _removeEllipsis() {
+    final text = RecordingServer().getReconizedWords;
+    if (text.endsWith("...")) {
+      RecordingServer().setText(text.substring(0, text.length - 3));
+    }
   }
 
   Map<String, PropertyInfo> convertColumns(col collumn) {
@@ -165,15 +197,11 @@ class RecentLogRequest {
     return newCollumns;
   }
 
-  /// Push entry data to all configured integrations via TabApi.
+  /// Push entry data to all paired integrations (fire-and-forget). Failed
+  /// pushes wait in the integration outbox and are retried later.
   void _pushToIntegrations(Map<String, String> data) async {
     try {
-      final service = IntegrationService();
-      await service.load();
-      if (service.pushEnabled && service.integrations.isNotEmpty) {
-        await service.pushEntry(data);
-        print("[Integrations] Entry pushed to integrations");
-      }
+      await IntegrationService().pushEntry(data);
     } catch (e) {
       print("[Integrations] Push error: $e");
     }

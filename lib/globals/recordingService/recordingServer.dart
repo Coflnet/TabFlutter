@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:table_entry/globals/app_messenger.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
 import 'package:table_entry/globals/recordingService/recordService.dart';
@@ -44,13 +45,9 @@ class RecordingServer extends ChangeNotifier {
   /// Number of audio segments processed in this session.
   int _processedSegments = 0;
 
-  /// Last error message from the recording service (e.g. no microphone found).
-  String? _lastError;
-
   Future<void> startStreaming() async {
     _sessionEntries.clear();
     _processedSegments = 0;
-    _lastError = null;
     reconizedWords = "";
     notifyListeners();
     // Reset the API session so previous recording text doesn't leak
@@ -58,10 +55,7 @@ class RecordingServer extends ChangeNotifier {
     RecordService.instance.init();
 
     // Listen for async errors from the native background isolate
-    RecordService.instance.onError = (String error) {
-      _lastError = error;
-      notifyListeners();
-    };
+    RecordService.instance.onError = reportError;
 
     await RecordService.instance.start();
   }
@@ -101,18 +95,10 @@ class RecordingServer extends ChangeNotifier {
   int get processedSegments => _processedSegments;
   String get getReconizedWords => reconizedWords;
 
-  /// Shows [error] once in the listening view (red snackbar).
+  /// Shows [error] as a red SnackBar on top of whatever page is open, so a
+  /// failure after the listening view closed (e.g. the final recognize after
+  /// stop) is still visible. This is the only place that shows these errors.
   void reportError(String error) {
-    _lastError = error;
-    notifyListeners();
+    showAppSnackBar(error, error: true);
   }
-
-  /// Returns and clears the last error message, if any.
-  String? consumeError() {
-    final err = _lastError;
-    _lastError = null;
-    return err;
-  }
-
-  String? get lastError => _lastError;
 }

@@ -59,17 +59,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
 
   void _onUpdate() {
     if (mounted) {
-      // Show a snackbar if the recording service reported an error
-      final error = RecordingServer().consumeError();
-      if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
+      // Errors are shown app-wide by RecordingServer.reportError.
       setState(() {
         words = RecordingServer().getReconizedWords;
       });

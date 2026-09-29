@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:table_entry/firebase_options.dart';
 import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
+import 'package:table_entry/globals/integration_service.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/globals/recordingService/recordService.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
@@ -50,14 +51,22 @@ void main() {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      await AuthService().init();
     } catch (e) {
       debugPrint('Firebase init skipped: $e');
+    }
+    // Restores the API JWT even when Firebase is not available.
+    try {
+      await AuthService().init();
+    } catch (e) {
+      debugPrint('Auth init failed: $e');
     }
 
     var delegate = await LocalizationDelegate.create(
         fallbackLocale: 'en', supportedLocales: ['en', 'de']);
     runApp(LocalizedApp(delegate, const LaunchPage()));
+    // Sends Excel entries that could not be delivered last time, then keeps
+    // retrying every 60 s.
+    unawaited(IntegrationService().start());
   }, (error, stack) {
     debugPrint('Uncaught error: $error\n$stack');
   });

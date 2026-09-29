@@ -17,6 +17,7 @@ class RecognitionResponse {
     this.text,
     this.columnWithText = const [],
     this.audioIds = const [],
+    this.pendingTexts,
   });
 
   ///
@@ -34,6 +35,10 @@ class RecognitionResponse {
   /// List of audio ids that were combined to get the completed response.
   List<String>? audioIds;
 
+  /// Raw texts to send back on the next chunk; `[]` when [isComplete].
+  /// Null when the server does not support stateless recognition.
+  List<String>? pendingTexts;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -41,7 +46,8 @@ class RecognitionResponse {
           other.isComplete == isComplete &&
           other.text == text &&
           _deepEquality.equals(other.columnWithText, columnWithText) &&
-          _deepEquality.equals(other.audioIds, audioIds);
+          _deepEquality.equals(other.audioIds, audioIds) &&
+          _deepEquality.equals(other.pendingTexts, pendingTexts);
 
   @override
   int get hashCode =>
@@ -49,11 +55,12 @@ class RecognitionResponse {
       (isComplete == null ? 0 : isComplete!.hashCode) +
       (text == null ? 0 : text!.hashCode) +
       (columnWithText == null ? 0 : columnWithText!.hashCode) +
-      (audioIds == null ? 0 : audioIds!.hashCode);
+      (audioIds == null ? 0 : audioIds!.hashCode) +
+      (pendingTexts == null ? 0 : pendingTexts!.hashCode);
 
   @override
   String toString() =>
-      'RecognitionResponse[isComplete=$isComplete, text=$text, columnWithText=$columnWithText, audioIds=$audioIds]';
+      'RecognitionResponse[isComplete=$isComplete, text=$text, columnWithText=$columnWithText, audioIds=$audioIds, pendingTexts=$pendingTexts]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -76,6 +83,11 @@ class RecognitionResponse {
       json[r'audioIds'] = this.audioIds;
     } else {
       json[r'audioIds'] = null;
+    }
+    if (this.pendingTexts != null) {
+      json[r'pendingTexts'] = this.pendingTexts;
+    } else {
+      json[r'pendingTexts'] = null;
     }
     return json;
   }
@@ -113,6 +125,11 @@ class RecognitionResponse {
                 .cast<String>()
                 .toList(growable: false)
             : const [],
+        pendingTexts: json[r'pendingTexts'] is Iterable
+            ? (json[r'pendingTexts'] as Iterable)
+                .cast<String>()
+                .toList(growable: false)
+            : null,
       );
     }
     return null;

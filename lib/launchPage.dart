@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:table_entry/globals/app_messenger.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/main.dart';
@@ -26,6 +27,15 @@ class _LaunchPageState extends State<LaunchPage> {
     var localizationDelegate = LocalizedApp.of(context).delegate;
 
     return MaterialApp(
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
+      // A transparent Scaffold around the navigator gives the root messenger
+      // a place to show SnackBars above every page (pages push their own
+      // MaterialApps, whose messengers only reach their own pages).
+      builder: (context, child) => Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: child,
+      ),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

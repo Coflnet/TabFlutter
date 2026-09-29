@@ -3,6 +3,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
+import 'package:table_entry/globals/copy_entries.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
 import 'package:table_entry/pages/main/recentLog/recentLogColumn.dart';
 
@@ -85,6 +86,13 @@ class _RecentLogState extends State<RecentLog> {
                     translate("entries"),
                     style: TextStyle(color: Colors.grey[400], fontSize: 14),
                   ),
+                  if (recentLogItems.isNotEmpty)
+                    IconButton(
+                      tooltip: translate("copyForExcel"),
+                      icon: Icon(Icons.copy_rounded,
+                          color: Colors.grey[300], size: 22),
+                      onPressed: () => copyEntriesToClipboard(recentLogItems),
+                    ),
                 ],
               ),
             )

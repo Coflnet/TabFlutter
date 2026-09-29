@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/globals/integration_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+/// Settings → Integrations: connect an Excel workbook (Spables add-in) with
+/// the pairing code it shows. Works without an account.
 class IntegrationSettingsPage extends StatefulWidget {
   const IntegrationSettingsPage({super.key});
 
@@ -11,22 +14,104 @@ class IntegrationSettingsPage extends StatefulWidget {
 }
 
 class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
-  final _service = IntegrationService();
-  bool _loading = true;
+  static const String addInUrl = 'https://app.spables.app/excel/';
+  static const Color _accent = Color(0xFF9333EA);
+  static const Color _card = Color(0xFF2A2B3D);
 
-  /// The service account email that users must invite into their Google Docs/Sheets.
-  static const String _serviceAccountEmail =
-      'spables@spables-tab.iam.gserviceaccount.com';
+  final _service = IntegrationService();
+  final _codeController = TextEditingController();
+  bool _loading = true;
+  bool _pairing = false;
+  String? _pairingError;
 
   @override
   void initState() {
     super.initState();
+    _service.addListener(_onChanged);
     _load();
+  }
+
+  @override
+  void dispose() {
+    _service.removeListener(_onChanged);
+    _codeController.dispose();
+    super.dispose();
+  }
+
+  void _onChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _load() async {
     await _service.load();
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
+    // Retry waiting entries while the user looks at them.
+    _service.flushOutbox();
+  }
+
+  Future<void> _pair() async {
+    if (_pairing) return;
+    if (IntegrationService.normalizePairingCode(_codeController.text) == null) {
+      setState(() => _pairingError = translate('pairingInvalidCode'));
+      return;
+    }
+    setState(() {
+      _pairing = true;
+      _pairingError = null;
+    });
+    try {
+      final paired = await _service.pair(_codeController.text);
+      _codeController.clear();
+      if (mounted) {
+        FocusScope.of(context).unfocus();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(translate('pairingSuccess',
+                args: {'label': _labelOf(paired)}))));
+      }
+    } on PairingException catch (e) {
+      _pairingError = translate(switch (e.error) {
+        PairingError.invalidCode => 'pairingInvalidCode',
+        PairingError.notFound => 'pairingNotFound',
+        PairingError.rateLimited => 'pairingRateLimited',
+        PairingError.network => 'pairingNetwork',
+        PairingError.unknown => 'pairingUnknown',
+      });
+    } catch (_) {
+      _pairingError = translate('pairingUnknown');
+    }
+    if (mounted) setState(() => _pairing = false);
+  }
+
+  String _labelOf(PairedIntegration integration) =>
+      integration.label.isNotEmpty ? integration.label : 'Excel';
+
+  Future<void> _confirmRemove(PairedIntegration integration) async {
+    final remove = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _card,
+        content: Text(
+          translate('integrationRemoveConfirm',
+              args: {'label': _labelOf(integration)}),
+          style: const TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(translate('cancel'),
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(translate('integrationRemove')),
+          ),
+        ],
+      ),
+    );
+    if (remove == true) await _service.remove(integration.integrationId);
   }
 
   @override
@@ -34,292 +119,185 @@ class _IntegrationSettingsPageState extends State<IntegrationSettingsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF1D1E2B),
       appBar: AppBar(
-        title: const Text('Integrations'),
-        backgroundColor: const Color(0xFF9333EA),
+        title: Text(translate('integrationsTitle')),
+        backgroundColor: _accent,
+        foregroundColor: Colors.white,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
+          : ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Push toggle
-                  SwitchListTile(
-                    title: const Text(
-                      'Push entries to integrations',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: const Text(
-                      'When enabled, recognized data is pushed to all configured integrations.',
-                      style: TextStyle(color: Colors.white54),
-                    ),
-                    value: _service.pushEnabled,
-                    activeColor: const Color(0xFF9333EA),
-                    onChanged: (val) {
-                      setState(() => _service.pushEnabled = val);
-                      _service.save();
-                    },
-                  ),
-                  const Divider(color: Colors.white24),
-
-                  // Google Docs setup instructions
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A2B3D),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color:
-                              const Color(0xFF9333EA).withValues(alpha: 0.3)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.info_outline,
-                                color: Color(0xFF9333EA), size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Google Docs / Sheets Setup',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'To use Google Docs or Google Sheets integration:',
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
-                        ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          '1. Open your Google Doc or Sheet\n'
-                          '2. Click "Share" in the top-right corner\n'
-                          '3. Invite the service account email below as an Editor\n'
-                          '4. Add the integration here with the document URL as label',
-                          style: TextStyle(
-                              color: Colors.white60, fontSize: 12, height: 1.5),
-                        ),
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () {
-                            Clipboard.setData(const ClipboardData(
-                                text: _serviceAccountEmail));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Service account email copied to clipboard!')),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              children: [
-                                const Expanded(
-                                  child: Text(
-                                    _serviceAccountEmail,
-                                    style: TextStyle(
-                                      color: Color(0xFF9333EA),
-                                      fontSize: 12,
-                                      fontFamily: 'monospace',
-                                    ),
-                                  ),
-                                ),
-                                Icon(Icons.copy,
-                                    color: Colors.grey[400], size: 16),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Integrations list
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+              children: [
+                _buildConnectCard(),
+                const SizedBox(height: 20),
+                Text(
+                  translate('connectedIntegrations'),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                if (_service.integrations.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Text(
-                      'Configured Integrations',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+                      translate('noIntegrations'),
+                      style: const TextStyle(color: Colors.white38),
                     ),
                   ),
-                  Expanded(
-                    child: _service.integrations.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'No integrations configured.\nUse the + button to add one.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white38),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: _service.integrations.length,
-                            itemBuilder: (ctx, i) {
-                              final integration = _service.integrations[i];
-                              return Card(
-                                color: const Color(0xFF2A2B3D),
-                                child: ListTile(
-                                  leading: Icon(
-                                    _iconFor(integration.integrationType),
-                                    color: const Color(0xFF9333EA),
-                                  ),
-                                  title: Text(
-                                    integration.label,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        integration.integrationType,
-                                        style: const TextStyle(
-                                            color: Colors.white54),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Clipboard.setData(ClipboardData(
-                                              text: integration.apiToken));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      'API token copied!')));
-                                        },
-                                        child: Text(
-                                          'Token: ${integration.apiToken.substring(0, 12)}… (tap to copy)',
-                                          style: const TextStyle(
-                                              color: Colors.white38,
-                                              fontSize: 11),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.redAccent),
-                                    onPressed: () async {
-                                      _service.integrations.removeAt(i);
-                                      await _service.save();
-                                      setState(() {});
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
+                for (final integration in _service.integrations)
+                  _buildIntegrationTile(integration),
+              ],
+            ),
+    );
+  }
+
+  Widget _buildConnectCard() {
+    const stepStyle = TextStyle(color: Colors.white70, fontSize: 13);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _card,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _accent.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.table_chart, color: _accent, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                translate('excelConnect'),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text('1. ${translate('excelHowTo1')}', style: stepStyle),
+          InkWell(
+            onTap: () => launchUrl(Uri.parse(addInUrl),
+                mode: LaunchMode.externalApplication),
+            child: const Padding(
+              padding: EdgeInsets.only(left: 14, top: 2, bottom: 4),
+              child: Text(
+                addInUrl,
+                style: TextStyle(
+                    color: _accent,
+                    fontSize: 13,
+                    decoration: TextDecoration.underline,
+                    decorationColor: _accent),
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF9333EA),
-        onPressed: _showAddDialog,
-        child: const Icon(Icons.add),
+          ),
+          Text('2. ${translate('excelHowTo2')}', style: stepStyle),
+          const SizedBox(height: 2),
+          Text('3. ${translate('excelHowTo3')}', style: stepStyle),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _codeController,
+                  enabled: !_pairing,
+                  textCapitalization: TextCapitalization.characters,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  maxLength: 12,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      letterSpacing: 2,
+                      fontFamily: 'monospace'),
+                  decoration: InputDecoration(
+                    hintText: translate('pairingCodeHint'),
+                    hintStyle: const TextStyle(
+                        color: Colors.white38, fontSize: 14, letterSpacing: 0),
+                    counterText: '',
+                    errorText: _pairingError,
+                    errorMaxLines: 3,
+                    enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white38)),
+                    focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: _accent)),
+                  ),
+                  onChanged: (_) {
+                    if (_pairingError != null) {
+                      setState(() => _pairingError = null);
+                    }
+                  },
+                  onSubmitted: (_) => _pair(),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: _accent, foregroundColor: Colors.white),
+                  onPressed: _pairing ? null : _pair,
+                  child: _pairing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : Text(translate('pairingConnect')),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  IconData _iconFor(String type) {
-    switch (type) {
-      case 'google_docs':
-        return Icons.description;
-      case 'google_sheets':
-        return Icons.grid_on;
-      case 'excel':
-        return Icons.table_chart;
-      case 'obsidian':
-        return Icons.note;
-      case 'nextcloud':
-        return Icons.cloud;
-      case 'proton_docs':
-        return Icons.lock;
-      default:
-        return Icons.extension;
-    }
-  }
-
-  void _showAddDialog() {
-    String selectedType = 'google_docs';
-    final labelController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2B3D),
-        title: const Text('Add Integration',
-            style: TextStyle(color: Colors.white)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+  Widget _buildIntegrationTile(PairedIntegration integration) {
+    final pending = _service.pendingFor(integration.integrationId);
+    final status = integration.disconnected
+        ? translate('integrationDisconnected')
+        : translate('integrationConnected');
+    return Card(
+      color: _card,
+      child: ListTile(
+        leading: Icon(
+          integration.disconnected ? Icons.link_off : Icons.table_chart,
+          color: integration.disconnected ? Colors.redAccent : _accent,
+        ),
+        title: Text(
+          _labelOf(integration),
+          style: const TextStyle(color: Colors.white),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DropdownButtonFormField<String>(
-              value: selectedType,
-              dropdownColor: const Color(0xFF2A2B3D),
-              style: const TextStyle(color: Colors.white),
-              items: const [
-                DropdownMenuItem(
-                    value: 'google_docs',
-                    child: Text('Google Docs (recommended)')),
-                DropdownMenuItem(
-                    value: 'google_sheets', child: Text('Google Sheets')),
-                DropdownMenuItem(
-                    value: 'excel', child: Text('Microsoft Excel')),
-                DropdownMenuItem(value: 'obsidian', child: Text('Obsidian')),
-                DropdownMenuItem(value: 'nextcloud', child: Text('Nextcloud')),
-                DropdownMenuItem(
-                    value: 'proton_docs', child: Text('Proton Docs')),
-              ],
-              onChanged: (v) => selectedType = v ?? 'google_docs',
+            Text(
+              status,
+              style: TextStyle(
+                  color: integration.disconnected
+                      ? Colors.redAccent
+                      : Colors.white54,
+                  fontSize: 12),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: labelController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'Label',
-                labelStyle: TextStyle(color: Colors.white54),
+            if (pending > 0)
+              Text(
+                translate('integrationPending', args: {'count': pending}),
+                style:
+                    const TextStyle(color: Colors.orangeAccent, fontSize: 12),
               ),
-            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child:
-                const Text('Cancel', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF9333EA)),
-            onPressed: () async {
-              if (labelController.text.isEmpty) return;
-              // Create locally (in a real flow, we'd call the API with auth)
-              final integration = IntegrationConfig(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                integrationType: selectedType,
-                label: labelController.text,
-                apiToken: 'spbl_placeholder_configure_via_api',
-              );
-              _service.integrations.add(integration);
-              await _service.save();
-              setState(() {});
-              Navigator.pop(ctx);
-            },
-            child: const Text('Add'),
-          ),
-        ],
+        trailing: IconButton(
+          tooltip: translate('integrationRemove'),
+          icon: const Icon(Icons.delete, color: Colors.redAccent),
+          onPressed: () => _confirmRemove(integration),
+        ),
       ),
     );
   }

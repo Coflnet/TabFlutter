@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spables</title>
+  <link rel="icon" href="assets/icon-32.png">
+  <link rel="stylesheet" href="taskpane.css">
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="taskpane.js" defer></script>
+</head>
+<body>
+  <header>
+    <img src="assets/icon-32.png" alt="" width="24" height="24">
+    <h1>Spables</h1>
+  </header>
+
+  <main>
+    <p id="loading" data-i18n="loading"></p>
+
+    <section id="pair" hidden>
+      <h2 id="pairTitle"></h2>
+      <ol>
+        <li data-i18n="step1"></li>
+        <li data-i18n="step2"></li>
+        <li data-i18n="step3"></li>
+      </ol>
+      <div id="code" class="code" aria-live="polite"></div>
+      <p id="codeHint" class="hint"></p>
+      <button id="closePair" class="secondary" data-i18n="close" hidden></button>
+    </section>
+
+    <section id="connected" hidden>
+      <h2 class="ok" data-i18n="connectedTitle"></h2>
+      <p data-i18n="connectedText"></p>
+      <button id="addPhone" data-i18n="addPhone"></button>
+      <button id="disconnect" class="secondary" data-i18n="disconnect"></button>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>

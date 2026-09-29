@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spables für Excel</title>
+  <link rel="icon" href="assets/icon-32.png">
+  <style>
+    :root { --accent: #9333EA; --text: #1f1f1f; --muted: #555; --bg: #fff; --card: #f5f0ff; }
+    @media (prefers-color-scheme: dark) {
+      :root { --text: #eee; --muted: #aaa; --bg: #1D1E2B; --card: #2A2B3D; }
+    }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, "Segoe UI", sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; }
+    h1 img { width: 32px; height: 32px; }
+    h2 { font-size: 1.1rem; margin-top: 28px; }
+    .download { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; }
+    .card { background: var(--card); border-radius: 8px; padding: 12px 16px; }
+    code { word-break: break-all; }
+    p.muted, li.muted { color: var(--muted); font-size: .9rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1><img src="assets/icon-64.png" alt="">Spables für Excel</h1>
+  <p>Diktierte Einträge aus der Spables-App erscheinen als neue Zeilen in einer Excel-Tabelle – in Excel für Windows/Mac, Excel im Web und in Arbeitsmappen auf SharePoint/OneDrive. Kein Konto nötig.</p>
+  <p><a class="download" href="manifest.xml" download="spables-excel-manifest.xml">Add-in herunterladen (manifest.xml)</a></p>
+
+  <h2>1. Add-in in Excel hinzufügen</h2>
+  <ol>
+    <li>Excel öffnen, Arbeitsmappe öffnen.</li>
+    <li><b>Start → Add-Ins → Weitere Add-Ins → Meine Add-Ins → Mein Add-In hochladen</b> und die heruntergeladene Datei wählen.</li>
+    <li>Auf der Registerkarte <b>Start</b> auf <b>Spables</b> klicken. Es erscheint ein Code.</li>
+  </ol>
+  <p class="muted">Für das ganze Unternehmen: Microsoft 365 Admin Center → Einstellungen → Integrierte Apps → Benutzerdefinierte Apps hochladen → Link <code>https://app.spables.app/excel/manifest.xml</code>.</p>
+
+  <h2>2. Handy verbinden</h2>
+  <ol>
+    <li>Spables-App öffnen → <b>Einstellungen → Integrationen (Excel) → Excel verbinden</b>.</li>
+    <li>Den Code aus Excel eingeben. Fertig.</li>
+  </ol>
+  <div class="card">Neue Einträge landen in der Tabelle „Spables“ auf dem Blatt „Spables“, solange die Arbeitsmappe mit dem Spables-Bereich geöffnet ist. Er öffnet sich mit der Arbeitsmappe automatisch. Ist Excel geschlossen, warten Einträge bis zu 30 Tage.</div>
+
+  <h2 lang="en">English</h2>
+  <p class="muted" lang="en">Download the manifest above, then in Excel: Home → Add-ins → More Add-ins → My Add-ins → Upload My Add-in. Click <b>Spables</b> on the Home tab to see a code and enter it in the Spables app under Settings → Integrations (Excel) → Connect Excel. Admins can deploy it company-wide via the Microsoft 365 admin center (Integrated apps) with the manifest URL.</p>
+  <p class="muted"><a href="https://coflnet.com/de/privacy/">Datenschutz</a> · Coflnet GmbH</p>
+</main>
+</body>
+</html>

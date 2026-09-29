@@ -17,6 +17,9 @@ class RecognitionRequest {
     this.language,
     this.sessionId,
     this.columnWithDescription = const {},
+    this.pendingTexts,
+    this.pendingAudioIds,
+    this.timeZone,
   });
 
   String? base64Opus;
@@ -27,12 +30,25 @@ class RecognitionRequest {
 
   Map<String, PropertyInfo>? columnWithDescription;
 
+  /// Raw texts of the current utterance from earlier chunks. Non-null (`[]` on
+  /// the first chunk) opts into stateless mode.
+  List<String>? pendingTexts;
+
+  /// Audio ids from earlier chunks of the current utterance.
+  List<String>? pendingAudioIds;
+
+  /// IANA time zone id, e.g. "Europe/Berlin". Server default: Europe/Berlin.
+  String? timeZone;
+
   @override
   bool operator ==(Object other) => identical(this, other) || other is RecognitionRequest &&
     other.base64Opus == base64Opus &&
     other.language == language &&
     other.sessionId == sessionId &&
-    _deepEquality.equals(other.columnWithDescription, columnWithDescription);
+    _deepEquality.equals(other.columnWithDescription, columnWithDescription) &&
+    _deepEquality.equals(other.pendingTexts, pendingTexts) &&
+    _deepEquality.equals(other.pendingAudioIds, pendingAudioIds) &&
+    other.timeZone == timeZone;
 
   @override
   int get hashCode =>
@@ -40,10 +56,13 @@ class RecognitionRequest {
     (base64Opus == null ? 0 : base64Opus!.hashCode) +
     (language == null ? 0 : language!.hashCode) +
     (sessionId == null ? 0 : sessionId!.hashCode) +
-    (columnWithDescription == null ? 0 : columnWithDescription!.hashCode);
+    (columnWithDescription == null ? 0 : columnWithDescription!.hashCode) +
+    (pendingTexts == null ? 0 : pendingTexts!.hashCode) +
+    (pendingAudioIds == null ? 0 : pendingAudioIds!.hashCode) +
+    (timeZone == null ? 0 : timeZone!.hashCode);
 
   @override
-  String toString() => 'RecognitionRequest[base64Opus=$base64Opus, language=$language, sessionId=$sessionId, columnWithDescription=$columnWithDescription]';
+  String toString() => 'RecognitionRequest[base64Opus=$base64Opus, language=$language, sessionId=$sessionId, columnWithDescription=$columnWithDescription, pendingTexts=$pendingTexts, pendingAudioIds=$pendingAudioIds, timeZone=$timeZone]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -66,6 +85,21 @@ class RecognitionRequest {
       json[r'columnWithDescription'] = this.columnWithDescription;
     } else {
       json[r'columnWithDescription'] = null;
+    }
+    if (this.pendingTexts != null) {
+      json[r'pendingTexts'] = this.pendingTexts;
+    } else {
+      json[r'pendingTexts'] = null;
+    }
+    if (this.pendingAudioIds != null) {
+      json[r'pendingAudioIds'] = this.pendingAudioIds;
+    } else {
+      json[r'pendingAudioIds'] = null;
+    }
+    if (this.timeZone != null) {
+      json[r'timeZone'] = this.timeZone;
+    } else {
+      json[r'timeZone'] = null;
     }
     return json;
   }
@@ -93,6 +127,13 @@ class RecognitionRequest {
         language: mapValueOfType<String>(json, r'language'),
         sessionId: mapValueOfType<String>(json, r'sessionId'),
         columnWithDescription: PropertyInfo.mapFromJson(json[r'columnWithDescription']),
+        pendingTexts: json[r'pendingTexts'] is Iterable
+            ? (json[r'pendingTexts'] as Iterable).cast<String>().toList(growable: false)
+            : null,
+        pendingAudioIds: json[r'pendingAudioIds'] is Iterable
+            ? (json[r'pendingAudioIds'] as Iterable).cast<String>().toList(growable: false)
+            : null,
+        timeZone: mapValueOfType<String>(json, r'timeZone'),
       );
     }
     return null;

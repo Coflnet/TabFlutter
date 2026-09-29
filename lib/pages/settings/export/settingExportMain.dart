@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:table_entry/pages/settings/export/copy_as_tsv.dart';
 import 'package:table_entry/pages/settings/export/exportAsCsv.dart';
 
 class SettingExportMain extends StatefulWidget {
@@ -28,7 +29,14 @@ class _SettingExportMainState extends State<SettingExportMain> {
           ],
         ),
         const SizedBox(height: 6),
-        ExportAsCsv(openPopup: widget.exportPopup)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ExportAsCsv(openPopup: widget.exportPopup),
+            const SizedBox(width: 16),
+            const CopyAsTsv(),
+          ],
+        )
       ],
     );
   }

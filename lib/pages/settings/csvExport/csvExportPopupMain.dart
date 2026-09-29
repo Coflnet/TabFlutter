@@ -71,10 +71,13 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
       ).show(context);
       return;
     }
+    // UTF-8 with BOM and the locale's separator, so a double-click opens it
+    // correctly in Excel.
     String csv = ConvertCsv().convertCsv(columnData);
     print(ColumnsDataProccessing().getFileName);
     final result = await Share.shareXFiles([
-      XFile.fromData(utf8.encode(csv), mimeType: "csv", name: "TabData")
+      XFile.fromData(utf8.encode(csv),
+          mimeType: "text/csv", name: "TabData")
     ], fileNameOverrides: [
       "${ColumnsDataProccessing().getFileName.replaceAll(RegExp(r"\s+"), "")}.csv"
     ], text: ColumnsDataProccessing().getFileName);

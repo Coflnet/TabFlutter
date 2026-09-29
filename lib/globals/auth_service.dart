@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:table_entry/generatedCode/api.dart';
+import 'package:table_entry/globals/jwt_utils.dart';
 
 /// Manages Firebase authentication and API JWT tokens.
 ///
@@ -52,32 +55,56 @@ class AuthService extends ChangeNotifier {
   bool get isLoading => _loading;
 
   /// Initialize the auth service. Call once at app startup.
-  /// Restores any saved session from SharedPreferences.
+  /// Restores any saved session from secure storage.
+  ///
+  /// The API JWT is kept until an explicit sign-out or until its own `exp`
+  /// claim has passed. It is not tied to the Firebase session: on web Firebase
+  /// restores its user asynchronously, so `currentUser` is still null here and
+  /// used to wipe the JWT on every reload.
   Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    // One-shot migration: older versions stored the JWT in plain
-    // SharedPreferences. Pull it out, move it to secure storage, then wipe
-    // the prefs copy so the value never sits unencrypted on disk again.
-    final legacyJwt = prefs.getString(_jwtKey);
-    if (legacyJwt != null && legacyJwt.isNotEmpty) {
-      await _secure.write(key: _jwtKey, value: legacyJwt);
-      await prefs.remove(_jwtKey);
-    }
-    _jwtToken = await _secure.read(key: _jwtKey);
-    _email = prefs.getString(_emailKey);
-    _uid = prefs.getString(_uidKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // One-shot migration: older versions stored the JWT in plain
+      // SharedPreferences. Pull it out, move it to secure storage, then wipe
+      // the prefs copy so the value never sits unencrypted on disk again.
+      final legacyJwt = prefs.getString(_jwtKey);
+      if (legacyJwt != null && legacyJwt.isNotEmpty) {
+        await _secure.write(key: _jwtKey, value: legacyJwt);
+        await prefs.remove(_jwtKey);
+      }
+      _jwtToken = await _secure.read(key: _jwtKey);
+      _email = prefs.getString(_emailKey);
+      _uid = prefs.getString(_uidKey);
 
-    // Check if Firebase user is still valid
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser != null && _jwtToken != null) {
-      _email = firebaseUser.email ?? _email;
-      _uid = firebaseUser.uid;
-    } else if (firebaseUser == null) {
-      // Firebase session expired, clear stored JWT
-      await _clearSession();
+      final jwt = _jwtToken;
+      if (jwt != null && jwt.isNotEmpty && isJwtExpired(jwt)) {
+        await _clearSession();
+      }
+    } catch (e) {
+      debugPrint('Auth restore failed: $e');
     }
-
     notifyListeners();
+
+    // Refresh the displayed account from Firebase in the background; this
+    // must never block or break app start.
+    unawaited(_refreshFirebaseUser());
+  }
+
+  /// Updates email/uid from the restored Firebase user, if any.
+  Future<void> _refreshFirebaseUser() async {
+    try {
+      final user = await FirebaseAuth.instance
+          .authStateChanges()
+          .first
+          .timeout(const Duration(seconds: 5));
+      if (user == null || !isAuthenticated) return;
+      _email = user.email ?? _email;
+      _uid = user.uid;
+      await _saveSession();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Firebase user refresh skipped: $e');
+    }
   }
 
   /// Sign in with Google. Works on web and mobile.

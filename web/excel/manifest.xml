@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Spables Excel add-in. Sideload: Excel > Add-ins > My Add-ins > Upload My Add-in.
+     Admin deployment: Microsoft 365 admin center > Integrated apps > Upload custom apps
+     with the URL https://app.spables.app/excel/manifest.xml -->
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>01e9f431-52f6-43f0-8cfc-ff12804bdd48</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Coflnet GmbH</ProviderName>
+  <DefaultLocale>de-DE</DefaultLocale>
+  <DisplayName DefaultValue="Spables">
+    <Override Locale="en-US" Value="Spables"/>
+  </DisplayName>
+  <Description DefaultValue="Per Sprache in der Spables-App erfasste Einträge landen automatisch als neue Zeilen in einer Excel-Tabelle. Verbindung per Code, ohne Konto.">
+    <Override Locale="en-US" Value="Entries dictated in the Spables app appear automatically as new rows in an Excel table. Connect with a pairing code, no account needed."/>
+  </Description>
+  <IconUrl DefaultValue="https://app.spables.app/excel/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://app.spables.app/excel/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://coflnet.com"/>
+  <AppDomains>
+    <AppDomain>https://app.spables.app</AppDomain>
+    <AppDomain>https://tab.coflnet.com</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Workbook"/>
+  </Hosts>
+  <Requirements>
+    <Sets DefaultMinVersion="1.4">
+      <Set Name="ExcelApi" MinVersion="1.4"/>
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://app.spables.app/excel/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Workbook">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.Description"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="Spables.Group">
+                <Label resid="Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="Spables.TaskpaneButton">
+                  <Label resid="Button.Label"/>
+                  <Supertip>
+                    <Title resid="Button.Label"/>
+                    <Description resid="Button.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <!-- This id lets Office.AutoShowTaskpaneWithDocument reopen the pane with the workbook. -->
+                    <TaskpaneId>Office.AutoShowTaskpaneWithDocument</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://app.spables.app/excel/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://app.spables.app/excel/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://app.spables.app/excel/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://coflnet.com"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://app.spables.app/excel/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://app.spables.app/excel/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Spables ist bereit">
+          <bt:Override Locale="en-US" Value="Spables is ready"/>
+        </bt:String>
+        <bt:String id="Group.Label" DefaultValue="Spables">
+          <bt:Override Locale="en-US" Value="Spables"/>
+        </bt:String>
+        <bt:String id="Button.Label" DefaultValue="Spables">
+          <bt:Override Locale="en-US" Value="Spables"/>
+        </bt:String>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Klicken Sie auf Start &gt; Spables und verbinden Sie Ihr Handy mit dem angezeigten Code.">
+          <bt:Override Locale="en-US" Value="Click Home &gt; Spables and connect your phone with the code shown."/>
+        </bt:String>
+        <bt:String id="Button.Tooltip" DefaultValue="Spables-Bereich öffnen: Handy verbinden und Einträge empfangen.">
+          <bt:Override Locale="en-US" Value="Open the Spables pane: connect a phone and receive entries."/>
+        </bt:String>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
