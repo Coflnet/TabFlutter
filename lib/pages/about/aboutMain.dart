@@ -1,3 +1,4 @@
+import 'package:table_entry/pages/about/training_consent_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/pages/about/aboutCoflnet.dart';
@@ -31,6 +32,7 @@ class _AboutMainState extends State<AboutMain> {
           ),
           const SizedBox(height: 14),
           const AccountInfo(),
+          const TrainingConsentButton(),
           const SizedBox(height: 30),
           const SizedBox(height: 45),
           const Expanded(

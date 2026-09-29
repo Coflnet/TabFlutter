@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -163,6 +164,23 @@ class _WelcomePage extends StatelessWidget {
             height: 1.5,
           ),
           textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        // Art. 13 GDPR: say at collection that recordings leave the device.
+        Text(
+          translate('onboardingPrivacyNote'),
+          style:
+              const TextStyle(color: Colors.white54, fontSize: 13, height: 1.4),
+          textAlign: TextAlign.center,
+        ),
+        TextButton(
+          onPressed: () =>
+              launchUrl(Uri.parse('https://coflnet.com/de/privacy/')),
+          child: Text(translate('privacyPolicyLink'),
+              style: const TextStyle(
+                  color: Color(0xFF9333EA),
+                  decoration: TextDecoration.underline,
+                  decorationColor: Color(0xFF9333EA))),
         ),
       ],
     );

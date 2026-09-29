@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, ValueNotifier;
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:record/record.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogRequest.dart';
@@ -36,9 +36,15 @@ class RecordService {
   RecordStatus _prevRecordStatus = RecordStatus.stopped;
   RecordStatus _currRecordStatus = RecordStatus.stopped;
 
-  // Web-only VAD handler
+  // Web-only VAD handler. Kept for the app's lifetime so the model and ONNX
+  // session are loaded once (see [preload]) instead of on every start.
   VadHandler? _webVadHandler;
-  StreamSubscription<List<double>>? _webVadSub;
+  bool _stopRequested = false;
+
+  /// True from tapping start until the speech model is loaded and audio flows.
+  /// The UI shows "preparing" instead of "listening" meanwhile.
+  final ValueNotifier<bool> preparing = ValueNotifier(false);
+  Timer? _readyTimeout;
 
   // Error callback – fires for both web and native errors
   void Function(String error)? onError;
@@ -57,8 +63,38 @@ class RecordService {
   }
 
   Future<void> _requestRecordPermission() async {
-    if (!await AudioRecorder().hasPermission()) {
-      throw 'To start record service, you must grant microphone permission.';
+    final recorder = AudioRecorder();
+    try {
+      if (!await recorder.hasPermission()) {
+        throw 'To start record service, you must grant microphone permission.';
+      }
+    } finally {
+      await recorder.dispose();
+    }
+  }
+
+  VadHandler _webHandler() =>
+      _webVadHandler ??= VadHandler.create(isDebug: false)
+        ..onSpeechEnd.listen((List<double> samples) {
+          // Convert PCM samples to WAV data URL (same format as native handler)
+          _onReceiveTaskData(AudioUtils.createWavUrl(samples));
+        })
+        ..onError.listen((String msg) {
+          print('[WebVAD] Error: $msg');
+          if (_currRecordStatus != RecordStatus.stopped) {
+            _onReceiveTaskData('ERROR: $msg');
+          }
+        });
+
+  /// Web: loads the VAD model and ONNX runtime in the background after the
+  /// app is shown, so the first tap on the microphone starts immediately.
+  /// Failures are only logged; [start] retries the load.
+  Future<void> preload() async {
+    if (!kIsWeb) return;
+    try {
+      await _webHandler().startListening(startMicrophone: false);
+    } catch (e) {
+      print('[WebVAD] Preload failed, will retry on start: $e');
     }
   }
 
@@ -88,33 +124,42 @@ class RecordService {
   }
 
   Future<void> start() async {
+    preparing.value = true;
+    _stopRequested = false;
     if (kIsWeb) {
       // On web, audio is handled via the VAD handler directly (no foreground task needed)
       _updateRecordStatus(RecordStatus.starting);
-      _webVadHandler = VadHandler.create(isDebug: false);
-      _webVadSub = _webVadHandler!.onSpeechEnd.listen((List<double> samples) {
-        // Convert PCM samples to WAV data URL (same format as native handler)
-        final wavUrl = AudioUtils.createWavUrl(samples);
-        _onReceiveTaskData(wavUrl);
-      });
-      _webVadHandler!.onError.listen((String msg) {
-        print('[WebVAD] Error: $msg');
-        _onReceiveTaskData('ERROR: $msg');
-      });
       try {
-        await _webVadHandler!.startListening();
+        await _webHandler().startListening();
+        if (_stopRequested) {
+          // Stop was tapped while the model was still loading.
+          await _webVadHandler?.stopListening();
+          return;
+        }
+        preparing.value = false;
         _updateRecordStatus(RecordStatus.started);
       } catch (e) {
         print('[WebVAD] Exception on start: $e');
+        preparing.value = false;
         _updateRecordStatus(RecordStatus.stopped);
-        _webVadHandler?.dispose();
-        _webVadHandler = null;
         rethrow;
       }
       return;
     }
-    await _requestNotificationPermission();
-    await _requestRecordPermission();
+    try {
+      await _requestNotificationPermission();
+      await _requestRecordPermission();
+      // A service left over from a crash or swipe-away would make startService
+      // fail with ServiceAlreadyStarted on every tap.
+      if (await FlutterForegroundTask.isRunningService) {
+        await FlutterForegroundTask.stopService();
+      }
+    } catch (_) {
+      preparing.value = false;
+      rethrow;
+    }
+    // Stop tapped while the permission prompts were open.
+    if (_stopRequested) return;
 
     _updateRecordStatus(RecordStatus.starting);
 
@@ -127,32 +172,48 @@ class RecordService {
     );
 
     if (result is ServiceRequestFailure) {
+      preparing.value = false;
+      _updateRecordStatus(RecordStatus.stopped);
       throw result.error;
     }
 
-    _updateRecordStatus(RecordStatus.started);
-  }
-
-  Future<void> stop() async {
-    if (kIsWeb) {
-      _webVadHandler?.stopListening();
-      _webVadSub?.cancel();
-      _webVadHandler?.dispose();
-      _webVadHandler = null;
-      _webVadSub = null;
+    if (_stopRequested) {
+      await FlutterForegroundTask.stopService();
       _updateRecordStatus(RecordStatus.stopped);
       return;
     }
+    _updateRecordStatus(RecordStatus.started);
+    // The service isolate reports READY once the model is loaded; never leave
+    // the user on "preparing" forever.
+    _readyTimeout?.cancel();
+    _readyTimeout = Timer(const Duration(seconds: 30), () {
+      if (preparing.value) {
+        _onReceiveTaskData('ERROR: Speech model could not be loaded in time.');
+      }
+    });
+  }
+
+  Future<void> stop() async {
+    _readyTimeout?.cancel();
+    preparing.value = false;
+    _stopRequested = true;
+    if (kIsWeb) {
+      // Pause instead of dispose: the loaded model is reused by the next start.
+      await _webVadHandler?.stopListening();
+      _updateRecordStatus(RecordStatus.stopped);
+      return;
+    }
+    if (_currRecordStatus == RecordStatus.stopped) return;
     _updateRecordStatus(RecordStatus.stopping);
 
     final ServiceRequestResult result =
         await FlutterForegroundTask.stopService();
 
-    if (result is ServiceRequestFailure) {
-      throw result.error;
-    }
-
+    // Whatever the plugin reports, the UI must not stay in "stopping".
     _updateRecordStatus(RecordStatus.stopped);
+    if (result is ServiceRequestFailure) {
+      print('[RecordService] stopService failed: ${result.error}');
+    }
   }
 
   Future<bool> get isRunningService =>
@@ -177,6 +238,12 @@ class RecordService {
       return;
     }
     final dataStr = data as String;
+
+    if (dataStr == 'READY') {
+      _readyTimeout?.cancel();
+      preparing.value = false;
+      return;
+    }
 
     // Handle error messages from the native background isolate
     if (dataStr.startsWith('ERROR:')) {

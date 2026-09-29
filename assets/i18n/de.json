@@ -66,7 +66,6 @@
     "error": "Fehler",
     "sendForTrainingTitle": "Korrekturdaten senden",
     "sendForTrainingBody": "Deine Korrekturdaten (Tabellenname, Spaltenwerte und zugehörige Audiodaten) werden zur Überprüfung eingereicht, um unsere Spracherkennung zu verbessern. Bitte stelle sicher, dass deine Daten keine persönlichen Informationen enthalten (Namen, Adressen, Telefonnummern usw.).",
-    "sendForTrainingPrivacy": "Mit dem Fortfahren stimmst du unserer Datenschutzerklärung zu.",
     "privacyPolicyLink": "Datenschutzerklärung",
     "cancel": "Abbrechen",
     "confirm": "Bestätigen",
@@ -86,5 +85,13 @@
     "micErrorInstructions": "Versuche Folgendes:",
     "micErrorStep1": "Schließe ein Mikrofon oder Headset an und versuche es erneut.",
     "micErrorStep2": "Starte die App neu, damit das Mikrofon erkannt werden kann.",
-    "micErrorStep3": "Überprüfe deine Browser- oder Geräteeinstellungen und erteile die Mikrofonberechtigung."
+    "micErrorStep3": "Überprüfe deine Browser- oder Geräteeinstellungen und erteile die Mikrofonberechtigung.",
+    "trainingConsentAccept": "Einwilligen und senden",
+    "trainingConsentWithdraw": "Einwilligung zum Training widerrufen",
+    "trainingConsentWithdrawn": "Einwilligung widerrufen. Deine Trainingsdaten werden gelöscht.",
+    "onboardingPrivacyNote": "Deine Aufnahmen werden zur Transkription an unsere Server gesendet und dort höchstens 90 Tage gespeichert. Für Training nutzen wir sie nur, wenn du einer Korrektur ausdrücklich zustimmst.",
+    "trainingConsentShort": "Freiwillig, ohne Konto. Verantwortlich ist die Coflnet GmbH. Du kannst jederzeit unter „Info“ widerrufen; dann löschen wir die Daten.",
+    "trainingConsentDetails": "Details und Bedingungen",
+    "preparingSpeech": "Spracherkennung wird vorbereitet…",
+    "recognitionFailed": "Die Aufnahme konnte nicht ausgewertet werden. Bitte prüfe deine Verbindung und versuche es erneut."
 }

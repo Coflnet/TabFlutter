@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:table_entry/globals/columns/columnsDataProccessing.dart';
 import 'package:table_entry/globals/convertCSV.dart';
@@ -74,10 +72,6 @@ class _CsvExportPopupMainState extends State<CsvExportPopupMain> {
       return;
     }
     String csv = ConvertCsv().convertCsv(columnData);
-    Directory appDir = await getApplicationDocumentsDirectory();
-    String filePath = "${appDir.path}/exportCSVTEMP.json";
-    File file = File(filePath);
-    file.createSync();
     print(ColumnsDataProccessing().getFileName);
     final result = await Share.shareXFiles([
       XFile.fromData(utf8.encode(csv), mimeType: "csv", name: "TabData")

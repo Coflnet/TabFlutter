@@ -101,6 +101,12 @@ class RecordingServer extends ChangeNotifier {
   int get processedSegments => _processedSegments;
   String get getReconizedWords => reconizedWords;
 
+  /// Shows [error] once in the listening view (red snackbar).
+  void reportError(String error) {
+    _lastError = error;
+    notifyListeners();
+  }
+
   /// Returns and clears the last error message, if any.
   String? consumeError() {
     final err = _lastError;

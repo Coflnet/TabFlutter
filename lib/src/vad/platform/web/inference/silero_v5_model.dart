@@ -34,17 +34,9 @@ class SileroV5Model implements VadModel {
       final normalizedWasmPath =
           wasmPath.endsWith('/') ? wasmPath : '$wasmPath/';
 
-      final cachedWasmSimd =
-          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm-simd.wasm');
-      final cachedWasm =
-          await getCachedBlobUrl('${normalizedWasmPath}ort-wasm.wasm');
-
-      final wasmPathsObj = {
-        'ort-wasm-simd.wasm': cachedWasmSimd,
-        'ort-wasm.wasm': cachedWasm,
-      }.jsify()!;
-
-      ort.env.wasm.wasmPaths = wasmPathsObj;
+      // A path prefix lets onnxruntime-web 1.22 pick its own wasm build
+      // (ort-wasm-simd-threaded.jsep.wasm); the old per-file names 404.
+      ort.env.wasm.wasmPaths = normalizedWasmPath.toJS;
 
       final cachedModelUrl = await getCachedBlobUrl(modelUrl);
       final session =

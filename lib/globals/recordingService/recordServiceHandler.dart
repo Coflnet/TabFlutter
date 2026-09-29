@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:opus_dart/opus_dart.dart';
-import 'package:opus_flutter/opus_flutter.dart' as opus_flutter;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:table_entry/src/vad/audio_utils.dart';
 import '../../src/vad/core/vad_handler.dart';
@@ -54,11 +53,7 @@ class RecordServiceHandler extends TaskHandler {
     try {
       // Initialize AudioRecorder and VadHandler (bindings are already initialized in startRecordService)
       _recorder = AudioRecorder();
-      record = AudioRecorder();
       _vadHandler = VadHandler.create(isDebug: true);
-
-      initOpus(await opus_flutter
-          .load()); // init opus in background task (its separate isolate)
       await _startRecorder();
     } catch (e) {
       print("-------------------------\nError starting recorder: $e");
@@ -185,7 +180,7 @@ class RecordServiceHandler extends TaskHandler {
     });
     FlutterForegroundTask.updateService(
       notificationTitle: 'Spables Recording',
-      notificationText: '🎙️ Waiting for speech…',
+      notificationText: '⏳ Loading speech model…',
       notificationButtons: [
         const NotificationButton(id: _kStopAction, text: 'stop'),
       ],
@@ -217,6 +212,15 @@ class RecordServiceHandler extends TaskHandler {
           manageAudioSession: true,
         ),
       ),
+    );
+    // Model loaded and microphone streaming: the app can switch to "listening".
+    FlutterForegroundTask.sendDataToMain('READY');
+    FlutterForegroundTask.updateService(
+      notificationTitle: 'Spables Recording',
+      notificationText: '🎙️ Waiting for speech…',
+      notificationButtons: [
+        const NotificationButton(id: _kStopAction, text: 'stop'),
+      ],
     );
     return;
 
@@ -313,9 +317,15 @@ class RecordServiceHandler extends TaskHandler {
   }
 
   Future<void> _stopRecorder() async {
-    // stop recorder
-    await _recorder.stop();
-    await _recorder.dispose();
+    // Release the microphone held by the VAD stream; onStart may have failed
+    // before the handler existed.
+    try {
+      await _vadHandler.dispose();
+    } catch (_) {}
+    try {
+      await _recorder.stop();
+      await _recorder.dispose();
+    } catch (_) {}
   }
 }
 

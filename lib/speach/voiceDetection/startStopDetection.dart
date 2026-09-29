@@ -15,7 +15,8 @@ import 'package:table_entry/pages/main/recentLog/recentLog.dart';
 import 'package:table_entry/speach/voiceDetection/startStopDetectionRunning.dart';
 
 class StartStopDetection extends StatefulWidget {
-  final VoidCallback startStop;
+  /// Called with the new recording state (explicit, not a toggle).
+  final void Function(bool recording) startStop;
   final Function(String) changeRecordingData;
   const StartStopDetection(
       {super.key, required this.startStop, required this.changeRecordingData});
@@ -60,7 +61,7 @@ class _StartStopDetectionState extends State<StartStopDetection>
           isRunning = false;
           alignment = Alignment.bottomRight;
         });
-        widget.startStop();
+        widget.startStop(false);
       }
     }
   }
@@ -106,20 +107,33 @@ class _StartStopDetectionState extends State<StartStopDetection>
     );
   }
 
+  /// Ignores taps while a stop is still being processed; tapping start again
+  /// during a stop used to leave an orphaned recording service behind. A stop
+  /// during start (e.g. while the model loads) is allowed and cancels it.
+  bool _busy = false;
+
   void startStopListening() async {
+    if (_busy) return;
     setState(() {
       isRunning = !isRunning;
     });
-    widget.startStop();
+    widget.startStop(isRunning);
 
     if (!isRunning) {
       setState(() {
         alignment = Alignment.bottomRight;
       });
-      RecordingServer().stopRecorder();
+      _busy = true;
+      try {
+        await RecordingServer().stopRecorder();
+      } catch (e) {
+        print('Error stopping recording: $e');
+      }
+      _busy = false;
+      // Flush the last unfinished entry; failures are reported by the request.
       await RecentLogRequest()
           .requestWithAudio(null, RecentLogHandler().getCurrentSelected);
-      if (context.mounted) {
+      if (mounted) {
         Provider.of<UpdateRecentLog>(context, listen: false).recentLogUpdate();
       }
 
@@ -137,14 +151,16 @@ class _StartStopDetectionState extends State<StartStopDetection>
       await RecordingServer().startStreaming();
     } catch (e) {
       print('Error starting recording: $e');
-      // Revert UI state on failure
+      // Revert UI state on failure. The stopped-status callback may already
+      // have done so; reverting twice used to leave the UI inverted.
       if (mounted) {
-        setState(() {
-          isRunning = false;
-          alignment = Alignment.bottomRight;
-        });
-        // Call startStop again to revert the parent animation/state
-        widget.startStop();
+        if (isRunning) {
+          setState(() {
+            isRunning = false;
+            alignment = Alignment.bottomRight;
+          });
+          widget.startStop(false);
+        }
         _showMicrophoneErrorDialog(e.toString());
       }
     }

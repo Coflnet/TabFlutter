@@ -30,8 +30,12 @@ COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built web app
 COPY --from=build /app/build/web /usr/share/nginx/html
 
+# Apply Alpine security fixes newer than the nginx base image (Argo's Trivy scan
+# blocks fixable HIGH/CRITICAL findings). Runs after the app COPY, so this layer is
+# rebuilt with every change instead of being served stale from the build cache.
 # Create non-root user for security
-RUN adduser -D -u 1001 appuser && \
+RUN apk upgrade --no-cache && \
+    adduser -D -u 1001 appuser && \
     chown -R appuser:appuser /usr/share/nginx/html && \
     chown -R appuser:appuser /var/cache/nginx && \
     chown -R appuser:appuser /var/log/nginx && \

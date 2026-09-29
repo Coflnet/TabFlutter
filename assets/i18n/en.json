@@ -66,7 +66,6 @@
     "error": "Error",
     "sendForTrainingTitle": "Send Correction Data",
     "sendForTrainingBody": "Your correction data (table name, column values, and associated audio) will be submitted for review to improve our speech recognition. Please ensure your data does not contain personal information (names, addresses, phone numbers, etc.).",
-    "sendForTrainingPrivacy": "By continuing you agree to our Privacy Policy.",
     "privacyPolicyLink": "Privacy Policy",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -86,5 +85,13 @@
     "micErrorInstructions": "Try the following:",
     "micErrorStep1": "Connect a microphone or headset and try again.",
     "micErrorStep2": "Restart the app so the microphone can be recognized.",
-    "micErrorStep3": "Check your browser or device settings and grant microphone permission."
+    "micErrorStep3": "Check your browser or device settings and grant microphone permission.",
+    "trainingConsentAccept": "Consent and send",
+    "trainingConsentWithdraw": "Withdraw training consent",
+    "trainingConsentWithdrawn": "Consent withdrawn. Your training data will be deleted.",
+    "onboardingPrivacyNote": "Your recordings are sent to our servers for transcription and stored there for at most 90 days. We only use them for training if you explicitly consent when sending a correction.",
+    "trainingConsentShort": "Voluntary, no account needed. Coflnet GmbH is responsible. You can withdraw at any time under \"Account\"; we then delete the data.",
+    "trainingConsentDetails": "Details and terms",
+    "preparingSpeech": "Preparing speech recognition…",
+    "recognitionFailed": "The recording could not be processed. Please check your connection and try again."
 }

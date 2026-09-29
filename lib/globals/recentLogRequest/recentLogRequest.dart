@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:math';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_entry/generatedCode/api.dart';
@@ -54,39 +54,46 @@ class RecentLogRequest {
     if (!currentText.endsWith("...")) {
       RecordingServer().setText("$currentText...");
     }
-    var stackTrace = StackTrace.current;
+    // A restart during retries must not move this audio into the new session.
+    final session = sessionUuId;
     Map<String, PropertyInfo> inputData = convertColumns(collumn);
-    final locale = kIsWeb
-        ? ui.PlatformDispatcher.instance.locale.toLanguageTag()
-        : ui.PlatformDispatcher.instance.locale.toLanguageTag();
+    final locale = ui.PlatformDispatcher.instance.locale.toLanguageTag();
     final client = ApiClient(basePath: "https://tab.coflnet.com");
-    // Attach the bearer so the server can associate uploads with the
-    // authenticated user instead of falling back to the IP-based partition
-    // (which trips the anonymous hCaptcha gate at >2 uploads/30min).
     final jwt = AuthService().jwtToken;
     if (jwt != null && jwt.isNotEmpty) {
       client.addDefaultHeader('Authorization', 'Bearer $jwt');
     }
-    RecognitionResponse? result = null;
-    var attempts = 0;
-    while (result == null) {
-      if (attempts++ > 5) {
-        throw Exception("result in recent log request is null");
-      }
+    RecognitionResponse? result;
+    for (var attempt = 1;; attempt++) {
       try {
-        result = await TabApi(client).recognize(
-            recognitionRequest: RecognitionRequest(
-                base64Opus: audioData,
-                language: locale,
-                sessionId: sessionUuId,
-                columnWithDescription: inputData));
+        result = await TabApi(client)
+            .recognize(
+                recognitionRequest: RecognitionRequest(
+                    base64Opus: audioData,
+                    language: locale,
+                    sessionId: session,
+                    columnWithDescription: inputData))
+            .timeout(const Duration(seconds: 45));
+        break;
       } catch (e) {
-        // Exponential backoff on transient network/TLS errors instead of
-        // hammering the server back-to-back with a 500KB+ base64 payload.
-        if (attempts > 5) rethrow;
-        final delayMs = 300 * (1 << (attempts - 1));
-        await Future.delayed(Duration(milliseconds: delayMs));
+        // Retry only what can succeed on a second try (network, timeout,
+        // server errors); client errors fail the same way every time.
+        final transient = e is TimeoutException ||
+            (e is ApiException && (e.code >= 500 || e.innerException != null));
+        if (!transient || attempt >= 4) {
+          print('Recognize failed: $e');
+          // Never leave "..." on screen forever.
+          RecordingServer().setText(currentText);
+          RecordingServer().reportError(translate('recognitionFailed'));
+          return;
+        }
+        await Future.delayed(
+            Duration(milliseconds: 300 * (1 << (attempt - 1))));
       }
+    }
+    if (result == null) {
+      RecordingServer().setText(currentText);
+      return;
     }
     try {
       print("Request Result: $result");

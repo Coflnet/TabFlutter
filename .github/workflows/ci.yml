@@ -1,0 +1,23 @@
+name: CI
+
+# Argo only promotes pushes to refs/heads/main (see fleet argo-workflow/CI.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  container-ci:
+    uses: Coflnet/.github/.github/workflows/container-ci.yml@main
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+    with:
+      k8s_file: tab/chart/charts/frontend/values.yaml
+      repo_url: https://github.com/Coflnet/fleet
+    secrets:
+      ARGO_WEBHOOK_SECRET: ${{ secrets.ARGO_WEBHOOK_SECRET }}

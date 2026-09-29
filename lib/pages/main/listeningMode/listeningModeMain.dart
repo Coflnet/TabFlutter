@@ -1,10 +1,12 @@
+import 'package:table_entry/globals/recordingService/recordService.dart';
+import 'package:table_entry/globals/contribution_consent.dart';
+import 'package:table_entry/pages/main/listeningMode/training_consent_dialog.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/editColumnsClasses.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
@@ -141,25 +143,36 @@ class _ListeningmodemainState extends State<Listeningmodemain>
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             children: [
-              // Listening indicator
-              AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, child) {
-                  return Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.red.withValues(
-                          alpha: 0.5 + 0.5 * _pulseController.value),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(width: 8),
-              Text(
-                translate('listening'),
-                style: TextStyle(color: Colors.grey[400], fontSize: 13),
+              // Listening indicator; a spinner until the speech model is ready
+              ValueListenableBuilder<bool>(
+                valueListenable: RecordService.instance.preparing,
+                builder: (context, preparing, _) => Row(children: [
+                  preparing
+                      ? SizedBox(
+                          width: 10,
+                          height: 10,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 1.5, color: Colors.grey[400]))
+                      : AnimatedBuilder(
+                          animation: _pulseController,
+                          builder: (context, child) {
+                            return Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red.withValues(
+                                    alpha: 0.5 + 0.5 * _pulseController.value),
+                              ),
+                            );
+                          },
+                        ),
+                  const SizedBox(width: 8),
+                  Text(
+                    translate(preparing ? 'preparingSpeech' : 'listening'),
+                    style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                  ),
+                ]),
               ),
               const Spacer(),
               // Segments processed counter
@@ -222,13 +235,17 @@ class _ListeningmodemainState extends State<Listeningmodemain>
                     children: [
                       Icon(Icons.hearing, size: 48, color: Colors.grey[700]),
                       const SizedBox(height: 12),
-                      Text(
-                        translate('waitingForSpeech'),
-                        style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400),
-                      ),
+                      ValueListenableBuilder<bool>(
+                          valueListenable: RecordService.instance.preparing,
+                          builder: (context, preparing, _) => Text(
+                                translate(preparing
+                                    ? 'preparingSpeech'
+                                    : 'waitingForSpeech'),
+                                style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400),
+                              )),
                       const SizedBox(height: 4),
                       Text(
                         translate('speakNaturally'),
@@ -465,67 +482,42 @@ class _ListeningmodemainState extends State<Listeningmodemain>
         .toList();
   }
 
-  Future<void> _sendForTraining(RecordedEntry recordedEntry, col entry) async {
-    // Show confirmation dialog with privacy policy link
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: HexColor("1D1E2B"),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          translate('sendForTrainingTitle'),
-          style: const TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              translate('sendForTrainingBody'),
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 14, height: 1.5),
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                // Open privacy policy in browser
-                // ignore: deprecated_member_use
-                launchUrl(Uri.parse('https://spables.app/privacy'));
-              },
-              child: Text(
-                translate('sendForTrainingPrivacy'),
-                style: const TextStyle(
-                  color: Color(0xFF9333EA),
-                  fontSize: 13,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Color(0xFF9333EA),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(translate('cancel'),
-                style: const TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF59E0B),
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(translate('confirm')),
-          ),
-        ],
-      ),
-    );
+  bool _sendingForTraining = false;
 
-    if (confirmed != true) return;
+  /// Guards against double taps posting the same correction twice.
+  Future<void> _sendForTraining(RecordedEntry recordedEntry, col entry) async {
+    if (_sendingForTraining) return;
+    _sendingForTraining = true;
+    try {
+      await _submitTraining(recordedEntry, entry);
+    } finally {
+      _sendingForTraining = false;
+    }
+  }
+
+  Future<void> _submitTraining(RecordedEntry recordedEntry, col entry) async {
+    // Training use needs an explicit, recorded consent for that purpose.
+    String? receipt;
+    try {
+      receipt = await ContributionConsent.activeReceipt();
+      if (receipt == null) {
+        final notice = await ContributionConsent.notice();
+        if (!mounted) return;
+        final agreed = await showDialog<bool>(
+          context: context,
+          builder: (_) => TrainingConsentDialog(notice: notice),
+        );
+        if (agreed != true) return;
+        receipt = await ContributionConsent.grant(notice['version'] as String);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('${translate("error")}: $e'),
+            backgroundColor: Colors.red));
+      }
+      return;
+    }
 
     try {
       final correctedData = entry.params
@@ -537,7 +529,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
           .join(', ');
 
       final pkg = await PackageInfo.fromPlatform();
-      final headers = <String, String>{'Content-Type': 'application/json'};
+      final headers = await ContributionConsent.headers();
       final jwt = AuthService().jwtToken;
       if (jwt != null && jwt.isNotEmpty) {
         headers['Authorization'] = 'Bearer $jwt';
@@ -547,6 +539,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
         headers: headers,
         body: jsonEncode({
           'deviceId': 'training-correction',
+          'contributionConsentId': receipt,
           'appVersion': '${pkg.version}+${pkg.buildNumber}',
           'state': 'correction',
           'message': 'User corrected entry for training',
@@ -564,6 +557,7 @@ class _ListeningmodemainState extends State<Listeningmodemain>
             'Failed to send training data: ${response.statusCode} ${response.body}');
       }
 
+      if (!mounted) return;
       setState(() {
         _sentForTraining.add(recordedEntry);
       });

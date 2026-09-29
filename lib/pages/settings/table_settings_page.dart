@@ -23,6 +23,11 @@ class _TableSettingsPageState extends State<TableSettingsPage> {
   bool _loading = true;
   bool _saving = false;
 
+  /// The server answers even unconfigured tables with defaults, so a null
+  /// result means the load failed. Saving then would overwrite the real
+  /// settings with the defaults shown.
+  bool _loadFailed = false;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +45,7 @@ class _TableSettingsPageState extends State<TableSettingsPage> {
         widget.table.id.toString(),
         authToken: _getAuthToken(),
       );
+      _loadFailed = settings == null;
       if (settings != null) {
         _storeRecordings10Years = settings.storeRecordings10Years;
         _isImmutable = settings.isImmutable;
@@ -48,8 +54,9 @@ class _TableSettingsPageState extends State<TableSettingsPage> {
       }
     } catch (e) {
       print('[TableSettingsPage] Load error: $e');
+      _loadFailed = true;
     }
-    setState(() => _loading = false);
+    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _saveSettings() async {
@@ -83,7 +90,7 @@ class _TableSettingsPageState extends State<TableSettingsPage> {
         );
       }
     }
-    setState(() => _saving = false);
+    if (mounted) setState(() => _saving = false);
   }
 
   @override
@@ -292,12 +299,20 @@ class _TableSettingsPageState extends State<TableSettingsPage> {
                     text:
                         '10-year storage, zero retention, and immutability require a paid subscription and at least one active integration.',
                   ),
+                  if (_loadFailed) ...[
+                    const SizedBox(height: 12),
+                    _buildInfoBanner(
+                      color: Colors.red,
+                      text:
+                          'Settings could not be loaded, so saving is disabled to avoid overwriting them. Please sign in and reopen this page.',
+                    ),
+                  ],
 
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saving ? null : _saveSettings,
+                      onPressed: _saving || _loadFailed ? null : _saveSettings,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: HexColor("#8332AC"),
                         foregroundColor: Colors.white,

@@ -9,6 +9,7 @@ import 'package:table_entry/firebase_options.dart';
 import 'package:table_entry/globals/auth_service.dart';
 import 'package:table_entry/globals/columns/saveColumn.dart';
 import 'package:table_entry/globals/recentLogRequest/recentLogHandler.dart';
+import 'package:table_entry/globals/recordingService/recordService.dart';
 import 'package:table_entry/globals/recordingService/recordingServer.dart';
 import 'package:table_entry/launchPage.dart';
 import 'package:table_entry/pages/main/currentVizulization/mainPageHeader.dart';
@@ -95,6 +96,10 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
   }
 
   void loadData() async {
+    // Web: load the speech model in the background so the first tap on the
+    // microphone does not have to wait for it.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => RecordService.instance.preload());
     await SaveColumn().loadColumns();
     await RecentLogHandler().loadRecentLog();
     // Show onboarding dialog on first launch
@@ -151,7 +156,7 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
                 ),
               );
               final micButton = StartStopDetection(
-                startStop: () => handleAnimations(),
+                startStop: handleAnimations,
                 changeRecordingData: (String newString) =>
                     setState(() => recognizedWords = newString),
               );
@@ -187,8 +192,13 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
             })));
   }
 
-  void handleAnimations() async {
-    if (!isRecording) {
+  int _animationGeneration = 0;
+
+  /// Sets the recording UI to [recording]. Idempotent: repeated calls with the
+  /// same value are harmless, and a newer call cancels a pending older one.
+  void handleAnimations(bool recording) async {
+    final generation = ++_animationGeneration;
+    if (recording) {
       setState(() {
         isRecording = true;
       });
@@ -199,9 +209,11 @@ class _MainState extends State<Main> with TickerProviderStateMixin {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    setState(() {
-      isRecording = !isRecording;
-    });
+    if (mounted && generation == _animationGeneration) {
+      setState(() {
+        isRecording = false;
+      });
+    }
   }
 
   void playAnimations(bool flip) async {
