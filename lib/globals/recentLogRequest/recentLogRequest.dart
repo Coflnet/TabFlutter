@@ -95,7 +95,7 @@ class RecentLogRequest {
         break;
       } catch (e) {
         // Retry only what can succeed on a second try (network, timeout,
-        // server errors incl. 502 from the transcription provider); client
+        // server errors incl. 503 when transcription failed); client
         // errors fail the same way every time.
         final transient = e is TimeoutException ||
             (e is ApiException && (e.code >= 500 || e.innerException != null));
